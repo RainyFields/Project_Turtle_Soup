@@ -1,0 +1,23 @@
+{
+  "id": "turtle_005",
+  "title": "最后一班地铁",
+  "difficulty": "hard",
+  "category": "horror",
+  "surface": "一个人坐上了最后一班地铁。到终点时，车上只剩他一个人，但他却坚称车厢里一直有人。",
+  "solution": "地铁上确实有“乘客”，但并非活人。他在途中察觉到异样却无法确认；到终点后仍能感到那些存在（或看到痕迹），因此坚持认为车上有人。",
+  "key_clues": [
+    "车上有人但不一定是活人",
+    "他在途中感到异样",
+    "终点只剩他一个可见乘客"
+  ],
+  "oracle_rules": {
+    "answerable_topics": ["地铁", "终点站", "是否有人", "异样来源", "心理/超自然"],
+    "forbidden_reveal": []
+  },
+  "metadata": {
+    "source": "original",
+    "language": "zh",
+    "tags": ["horror"]
+  }
+}
+

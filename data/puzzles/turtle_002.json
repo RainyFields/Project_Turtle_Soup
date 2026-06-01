@@ -1,0 +1,23 @@
+{
+  "id": "turtle_002",
+  "title": "电梯里的矮人",
+  "difficulty": "medium",
+  "category": "logic",
+  "surface": "一个矮个子每天回家坐电梯时，总是在中途楼层就下电梯走楼梯回家；只有下雨天他才会直接坐到顶层。",
+  "solution": "矮个子够不到电梯顶层按钮，只能按到中途楼层按钮后走楼梯；下雨天他带伞，能用伞柄按到顶层按钮，所以可以直达。",
+  "key_clues": [
+    "矮个子够不到高楼层按钮",
+    "平时只能按到中途楼层",
+    "下雨天有工具（伞）能按到顶层"
+  ],
+  "oracle_rules": {
+    "answerable_topics": ["身高", "按钮", "雨天", "伞", "楼梯"],
+    "forbidden_reveal": []
+  },
+  "metadata": {
+    "source": "classic",
+    "language": "zh",
+    "tags": ["logic", "classic"]
+  }
+}
+

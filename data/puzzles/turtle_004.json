@@ -1,0 +1,23 @@
+{
+  "id": "turtle_004",
+  "title": "稻草人",
+  "difficulty": "easy",
+  "category": "logic",
+  "surface": "一个农夫在田里立了稻草人后，当晚有人来偷菜，结果第二天小偷却被警察带走了。",
+  "solution": "稻草人身上挂了报警器/摄像头等装置，夜里记录了小偷的行为并留下证据，警方据此抓到了小偷。",
+  "key_clues": [
+    "稻草人不只是摆设",
+    "稻草人能记录/触发报警",
+    "警方有证据抓人"
+  ],
+  "oracle_rules": {
+    "answerable_topics": ["报警器", "摄像头", "证据", "夜里偷菜", "警方抓捕"],
+    "forbidden_reveal": []
+  },
+  "metadata": {
+    "source": "original",
+    "language": "zh",
+    "tags": ["logic"]
+  }
+}
+

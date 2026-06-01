@@ -1,0 +1,15 @@
+oracle:
+  provider: openai
+  model: gpt-4o
+
+questioner:
+  provider: anthropic
+  model: claude-opus-4-6
+
+game:
+  max_rounds: 30
+  min_rounds_before_answer: 5
+  debug_mode: false
+  save_trajectory: true
+  language: zh
+  token_budget: 50000

@@ -1,0 +1,23 @@
+{
+  "id": "turtle_003",
+  "title": "棺材里的逃犯",
+  "difficulty": "medium",
+  "category": "mystery",
+  "surface": "警方在一口密封的棺材里发现了一名逃犯的尸体。棺材里没有食物和水，也没有挣扎痕迹。",
+  "solution": "逃犯伪装成尸体混入葬礼，想借棺材被运出城市/越狱；但棺材在途中被长时间搁置/误送，最终他在密封环境中窒息而死。",
+  "key_clues": [
+    "逃犯主动进入棺材伪装",
+    "棺材密封导致窒息",
+    "没有挣扎痕迹（可能昏迷/来不及反应）"
+  ],
+  "oracle_rules": {
+    "answerable_topics": ["葬礼", "伪装", "窒息", "运输途中", "警方发现原因"],
+    "forbidden_reveal": []
+  },
+  "metadata": {
+    "source": "original",
+    "language": "zh",
+    "tags": ["mystery"]
+  }
+}
+
