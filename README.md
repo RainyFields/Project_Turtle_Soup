@@ -66,6 +66,8 @@ python scripts/visualize_trajectory.py data/trajectories/game_*.json
 pytest -q
 ```
 
+**原创题库生产（A→E 管线）：** 见 [generator/README.md](generator/README.md) — 参考爬取 → 分析 → LLM 生成 → 过滤 → 人工审核发布。
+
 ---
 
 ## 配置
@@ -96,6 +98,7 @@ turtle-soup-bench/
 ├── agents/                   # Oracle / Questioner + providers
 ├── engine/                   # 游戏循环、轨迹
 ├── evaluation/               # 指标、judge、报告
+├── generator/                # 原创题库生产管线 A→E（见 generator/README.md）
 ├── scripts/                  # CLI
 └── tests/
 ```

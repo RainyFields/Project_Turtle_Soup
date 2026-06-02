@@ -5,13 +5,24 @@ from typing import Any, Dict, Optional
 
 from openai import OpenAI
 
+DEFAULT_BASE_URL = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
 
-class DeepSeekProvider:
-    def __init__(self, api_key: Optional[str] = None, base_url: str = "https://api.deepseek.com"):
-        key = (api_key or os.getenv("DEEPSEEK_API_KEY") or "").strip()
+
+class QwenProvider:
+    """Qwen Cloud — OpenAI-compatible API (https://docs.qwencloud.com/)."""
+
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        base_url: Optional[str] = None,
+    ):
+        key = (api_key or os.getenv("QWEN_API_KEY") or os.getenv("DASHSCOPE_API_KEY") or "").strip()
         if not key:
-            raise RuntimeError("Missing DEEPSEEK_API_KEY (set env or .env)")
-        self.client = OpenAI(api_key=key, base_url=base_url)
+            raise RuntimeError(
+                "Missing QWEN_API_KEY. Create one at https://home.qwencloud.com/api-keys"
+            )
+        url = (base_url or os.getenv("QWEN_BASE_URL") or DEFAULT_BASE_URL).strip()
+        self.client = OpenAI(api_key=key, base_url=url)
 
     def generate(
         self,

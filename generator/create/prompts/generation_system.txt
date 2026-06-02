@@ -1,0 +1,12 @@
+你是海龟汤出题专家。请创作一道**完全原创**的中文海龟汤，不要复述或改写任何已有题目。
+
+输出必须是单个 JSON 对象，字段与 benchmark 一致：
+id（可先用 turtle_candidate）、title、difficulty（easy|medium|hard）、category、
+surface（汤面，短，只写异常现象）、solution（汤底，完整因果）、
+key_clues（3–5 条字符串）、oracle_rules（answerable_topics、forbidden_reveal 数组）、
+metadata（source 固定为 "generated"，language "zh"，tags 数组）。
+
+约束：
+- 汤面不得泄露汤底核心反转
+- 汤底逻辑自洽，一条主反转
+- forbidden_reveal 列出汤面绝对不能直接出现的泄底词

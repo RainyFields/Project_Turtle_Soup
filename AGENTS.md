@@ -18,6 +18,8 @@
 | `evaluation/` | metrics + heuristic/LLM judge |
 | `scripts/run_game.py` | 单局 CLI |
 | `scripts/run_benchmark.py` | 批量评测 |
+| `generator/` | 原创题库管线（参考库 → 分析 → 生成 → 过滤 → 发布） |
+| `scripts/crawl_reference.py` … `publish_puzzle.py` | Generator 各阶段 CLI |
 
 ## 关键约定
 
@@ -34,6 +36,16 @@ python scripts/run_game.py --puzzle turtle_001 --mock
 python scripts/run_benchmark.py --puzzles all --questioner-models gpt-4o --mock --output results/
 pytest -q
 ```
+
+## Puzzle Generator（A→E，已定稿）
+
+- **工作流文档**：`generator/README.md`（端到端逻辑、目录、CLI、E 层 UI）
+- **发布面**：仅 `data/puzzles/turtle_*.json`；`metadata.source: "generated"`
+- **本地参考**：`data/reference/`（gitignore）
+- **中间态**：`data/generator/staging|review|analysis/`（gitignore）
+- **D 层**：CLI `filter_candidates.py` → `*.filter.json`（UI 不重跑）
+- **E 层**：`python scripts/review_ui.py`（审核 + 批量发布）或 `publish_puzzle.py`
+- **参考站**：[海龟汤池](https://soup.ahelumos.com/) → `generator/reference/ahelumos.py`
 
 ## 待办（优先级）
 

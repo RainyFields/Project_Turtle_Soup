@@ -10,5 +10,11 @@ data/trajectories/*.json
 !data/trajectories/.gitkeep
 results/
 
+# puzzle generator — reference & pipeline artifacts (never publish raw crawls)
+data/reference/
+data/generator/
+!data/generator/.gitkeep
+!data/reference/.gitkeep
+
 # pytest
 .pytest_cache/

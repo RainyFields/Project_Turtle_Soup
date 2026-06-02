@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>海龟汤审核 · Step E</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='review.css') }}" />
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Step E — 人工审核与发布</h1>
+      <p class="stats" id="stats">加载中…</p>
+    </div>
+    <div class="toolbar">
+      <label>
+        批次
+        <select id="batchFilter">
+          <option value="">全部</option>
+        </select>
+      </label>
+      <label>
+        审核状态
+        <select id="statusFilter">
+          <option value="">全部</option>
+          <option value="pending">待审</option>
+          <option value="accepted">已通过</option>
+          <option value="needs_edit">需修改</option>
+          <option value="rejected">已拒绝</option>
+        </select>
+      </label>
+      <button type="button" id="refreshBtn">刷新</button>
+      <button type="button" class="primary" id="batchPublishBtn" disabled>批量发布选中 (0)</button>
+      <button type="button" id="batchPublishAcceptedBtn" disabled>发布本批次已通过</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="selectAll" title="全选可见" /></th>
+            <th>批次</th>
+            <th>标题</th>
+            <th>难度</th>
+            <th>分类</th>
+            <th>审核</th>
+            <th>已发布</th>
+            <th>Schema</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="8" class="empty">加载中…</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <aside class="panel detail" id="detailPanel">
+      <div class="empty" id="detailEmpty">点击左侧一行开始审核</div>
+      <div id="detailForm" hidden>
+        <div class="meta" id="detailMeta"></div>
+
+        <div class="field">
+          <label>标题</label>
+          <input type="text" id="fTitle" />
+        </div>
+        <div class="field">
+          <label>难度 (easy / medium / hard)</label>
+          <input type="text" id="fDifficulty" />
+        </div>
+        <div class="field">
+          <label>分类</label>
+          <input type="text" id="fCategory" />
+        </div>
+        <div class="field">
+          <label>汤面</label>
+          <textarea id="fSurface"></textarea>
+        </div>
+        <div class="field">
+          <label>汤底</label>
+          <textarea id="fSolution" style="min-height:160px"></textarea>
+        </div>
+        <div class="field">
+          <label>关键线索 key_clues（每行一条）</label>
+          <textarea id="fKeyClues"></textarea>
+        </div>
+        <div class="field">
+          <label>可问主题 answerable_topics（每行一条）</label>
+          <textarea id="fAnswerable"></textarea>
+        </div>
+        <div class="field">
+          <label>禁止泄底 forbidden_reveal（每行一条）</label>
+          <textarea id="fForbidden"></textarea>
+        </div>
+        <div class="field">
+          <label>审核备注</label>
+          <textarea id="fNotes" style="min-height:60px"></textarea>
+        </div>
+
+        <div class="error-list" id="schemaErrors"></div>
+
+        <div class="actions">
+          <button type="button" class="primary" id="saveBtn">保存修改</button>
+          <button type="button" id="acceptBtn">标记通过</button>
+          <button type="button" id="needsEditBtn">需修改</button>
+          <button type="button" class="danger" id="rejectBtn">拒绝</button>
+          <button type="button" class="primary" id="publishBtn">发布到 data/puzzles/</button>
+        </div>
+        <div class="meta" id="publishInfo"></div>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    let rows = [];
+    let current = null;
+    const selectedKeys = new Set();
+
+    const $ = (id) => document.getElementById(id);
+
+    function rowKey(r) {
+      return `${r.batch}/${r.filename}`;
+    }
+
+    function publishableRow(r) {
+      return !r.published_id && r.schema_ok;
+    }
+
+    function updateBatchButtons() {
+      const n = selectedKeys.size;
+      $("batchPublishBtn").textContent = `批量发布选中 (${n})`;
+      $("batchPublishBtn").disabled = n === 0;
+      const batch = $("batchFilter").value;
+      $("batchPublishAcceptedBtn").disabled = !batch;
+    }
+
+    function statusBadge(s) {
+      const map = {
+        pending: ["待审", "pending"],
+        accepted: ["通过", "accepted"],
+        needs_edit: ["需改", "pending"],
+        rejected: ["拒绝", "rejected"],
+      };
+      const [label, cls] = map[s] || [s, "pending"];
+      return `<span class="badge ${cls}">${label}</span>`;
+    }
+
+    function linesToArray(text) {
+      return text.split("\n").map((s) => s.trim()).filter(Boolean);
+    }
+
+    function arrayToLines(arr) {
+      return (arr || []).join("\n");
+    }
+
+    function puzzleFromForm() {
+      const p = current.puzzle;
+      return {
+        ...p,
+        title: $("fTitle").value.trim(),
+        difficulty: $("fDifficulty").value.trim(),
+        category: $("fCategory").value.trim(),
+        surface: $("fSurface").value.trim(),
+        solution: $("fSolution").value.trim(),
+        key_clues: linesToArray($("fKeyClues").value),
+        oracle_rules: {
+          answerable_topics: linesToArray($("fAnswerable").value),
+          forbidden_reveal: linesToArray($("fForbidden").value),
+        },
+        metadata: p.metadata || { source: "generated", language: "zh" },
+      };
+    }
+
+    function fillForm(data) {
+      const p = data.puzzle;
+      $("fTitle").value = p.title || "";
+      $("fDifficulty").value = p.difficulty || "";
+      $("fCategory").value = p.category || "";
+      $("fSurface").value = p.surface || "";
+      $("fSolution").value = p.solution || "";
+      $("fKeyClues").value = arrayToLines(p.key_clues);
+      $("fAnswerable").value = arrayToLines(p.oracle_rules?.answerable_topics);
+      $("fForbidden").value = arrayToLines(p.oracle_rules?.forbidden_reveal);
+      $("fNotes").value = data.review?.notes || "";
+
+      const errs = [...(data.schema_errors || []), ...(data.publish_errors || [])];
+      $("schemaErrors").textContent = errs.length ? "校验：" + [...new Set(errs)].join("；") : "";
+
+      const pub = data.review?.published_id;
+      $("publishInfo").textContent = pub
+        ? `已发布：${pub} → ${data.review.published_path || ""}`
+        : data.publish_ready ? "可发布（schema 通过）" : "发布前请修正 schema / metadata.source";
+      $("publishBtn").disabled = !!pub;
+    }
+
+    async function loadBatches() {
+      const batches = await fetch("/api/batches").then((r) => r.json());
+      const sel = $("batchFilter");
+      sel.innerHTML = '<option value="">全部</option>';
+      batches.forEach((b) => {
+        const o = document.createElement("option");
+        o.value = b;
+        o.textContent = b;
+        sel.appendChild(o);
+      });
+    }
+
+    async function loadTable() {
+      const batch = $("batchFilter").value;
+      const status = $("statusFilter").value;
+      const qs = new URLSearchParams();
+      if (batch) qs.set("batch", batch);
+      if (status) qs.set("status", status);
+      rows = await fetch("/api/candidates?" + qs.toString()).then((r) => r.json());
+      renderTable();
+      const accepted = rows.filter(r => r.review_status === "accepted" && !r.published_id).length;
+      $("stats").textContent = `共 ${rows.length} 道 · 待审 ${rows.filter(r => r.review_status === "pending").length} · 可批量发布 ${accepted}`;
+      updateBatchButtons();
+    }
+
+    function renderTable() {
+      const tbody = $("tableBody");
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty">无候选</td></tr>';
+        $("selectAll").checked = false;
+        return;
+      }
+      const selectable = rows.filter(publishableRow);
+      $("selectAll").checked = selectable.length > 0 && selectable.every(r => selectedKeys.has(rowKey(r)));
+
+      tbody.innerHTML = rows.map((r, i) => {
+        const key = rowKey(r);
+        const canSelect = publishableRow(r);
+        const checked = selectedKeys.has(key) ? "checked" : "";
+        const disabled = canSelect ? "" : "disabled";
+        const pub = r.published_id
+          ? `<span class="badge published">${r.published_id}</span>`
+          : "—";
+        const schema = r.schema_ok
+          ? '<span class="badge pass">OK</span>'
+          : '<span class="badge fail">!</span>';
+        const selected = current && current.batch === r.batch && current.filename === r.filename ? "selected" : "";
+        return `<tr class="${selected}" data-i="${i}">
+          <td><input type="checkbox" class="row-check" data-key="${escapeHtml(key)}" ${checked} ${disabled} /></td>
+          <td>${r.batch}</td>
+          <td>${escapeHtml(r.title)}<br><small>${escapeHtml(r.filename)}</small></td>
+          <td>${r.difficulty}</td>
+          <td>${escapeHtml(r.category)}</td>
+          <td>${statusBadge(r.review_status)}</td>
+          <td>${pub}</td>
+          <td>${schema}</td>
+        </tr>`;
+      }).join("");
+
+      tbody.querySelectorAll("tr[data-i]").forEach((tr) => {
+        tr.addEventListener("click", (e) => {
+          if (e.target.closest(".row-check")) return;
+          openRow(Number(tr.dataset.i));
+        });
+      });
+      tbody.querySelectorAll(".row-check").forEach((cb) => {
+        cb.addEventListener("change", (e) => {
+          e.stopPropagation();
+          const key = cb.dataset.key;
+          if (cb.checked) selectedKeys.add(key);
+          else selectedKeys.delete(key);
+          updateBatchButtons();
+        });
+      });
+    }
+
+    function escapeHtml(s) {
+      return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    async function openRow(i) {
+      const r = rows[i];
+      const data = await fetch(`/api/candidate/${encodeURIComponent(r.batch)}/${encodeURIComponent(r.filename)}`).then((res) => res.json());
+      current = data;
+      $("detailEmpty").hidden = true;
+      $("detailForm").hidden = false;
+      $("detailMeta").textContent = `${r.batch} / ${r.filename}`;
+      fillForm(data);
+      renderTable();
+    }
+
+    async function savePuzzle() {
+      if (!current) return;
+      const puzzle = puzzleFromForm();
+      const res = await fetch(
+        `/api/candidate/${encodeURIComponent(current.batch)}/${encodeURIComponent(current.filename)}`,
+        { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ puzzle }) }
+      );
+      const data = await res.json();
+      if (!res.ok) { alert(data.error || "保存失败"); return; }
+      current = data;
+      fillForm(data);
+      await loadTable();
+      alert("已保存到 staging");
+    }
+
+    async function setReview(status) {
+      if (!current) return;
+      const notes = $("fNotes").value.trim();
+      await fetch(
+        `/api/review/${encodeURIComponent(current.batch)}/${encodeURIComponent(current.filename)}`,
+        { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status, notes }) }
+      );
+      current.review = { ...current.review, status, notes };
+      await loadTable();
+    }
+
+    async function publish() {
+      if (!current) return;
+      if (!confirm("确认发布到 data/puzzles/ ？将分配 turtle_NNN id。")) return;
+      const res = await fetch(
+        `/api/publish/${encodeURIComponent(current.batch)}/${encodeURIComponent(current.filename)}`,
+        { method: "POST" }
+      );
+      const data = await res.json();
+      if (!res.ok) { alert(data.error || "发布失败"); return; }
+      alert(`已发布：${data.published_id}`);
+      await openRow(rows.findIndex(r => r.batch === current.batch && r.filename === current.filename));
+      await loadTable();
+    }
+
+    function formatBatchResult(data) {
+      const lines = [];
+      if (data.published?.length) {
+        lines.push(`成功 ${data.published.length}：`);
+        data.published.forEach(p => lines.push(`  · ${p.batch}/${p.filename} → ${p.published_id}`));
+      }
+      if (data.skipped?.length) {
+        lines.push(`跳过 ${data.skipped.length}：`);
+        data.skipped.forEach(s => lines.push(`  · ${s.batch}/${s.filename} (${s.reason})`));
+      }
+      if (data.failed?.length) {
+        lines.push(`失败 ${data.failed.length}：`);
+        data.failed.forEach(f => lines.push(`  · ${f.batch}/${f.filename}: ${f.error}`));
+      }
+      return lines.join("\n") || "无操作";
+    }
+
+    async function publishBatch(body) {
+      const res = await fetch("/api/publish-batch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) { alert(data.error || "批量发布失败"); return; }
+      alert(formatBatchResult(data));
+      data.published?.forEach(p => selectedKeys.delete(`${p.batch}/${p.filename}`));
+      await loadTable();
+      if (current) {
+        const idx = rows.findIndex(r => r.batch === current.batch && r.filename === current.filename);
+        if (idx >= 0) await openRow(idx);
+      }
+    }
+
+    async function publishSelected() {
+      if (!selectedKeys.size) return;
+      const items = [...selectedKeys].map(key => {
+        const slash = key.indexOf("/");
+        return { batch: key.slice(0, slash), filename: key.slice(slash + 1) };
+      });
+      if (!confirm(`确认批量发布 ${items.length} 道到 data/puzzles/ ？\n（不要求审核状态为「已通过」）`)) return;
+      await publishBatch({ items, only_accepted: false, skip_published: true });
+    }
+
+    async function publishBatchAccepted() {
+      const batch = $("batchFilter").value;
+      if (!batch) return;
+      if (!confirm(`确认发布批次「${batch}」中所有「已通过」且未发布的题目？`)) return;
+      await publishBatch({ batch, only_accepted: true, skip_published: true });
+    }
+
+    $("selectAll").addEventListener("change", () => {
+      rows.filter(publishableRow).forEach(r => {
+        const key = rowKey(r);
+        if ($("selectAll").checked) selectedKeys.add(key);
+        else selectedKeys.delete(key);
+      });
+      renderTable();
+      updateBatchButtons();
+    });
+
+    $("refreshBtn").addEventListener("click", loadTable);
+    $("batchFilter").addEventListener("change", loadTable);
+    $("statusFilter").addEventListener("change", loadTable);
+    $("batchPublishBtn").addEventListener("click", publishSelected);
+    $("batchPublishAcceptedBtn").addEventListener("click", publishBatchAccepted);
+    $("saveBtn").addEventListener("click", savePuzzle);
+    $("acceptBtn").addEventListener("click", () => setReview("accepted"));
+    $("needsEditBtn").addEventListener("click", () => setReview("needs_edit"));
+    $("rejectBtn").addEventListener("click", () => setReview("rejected"));
+    $("publishBtn").addEventListener("click", publish);
+
+    (async () => {
+      await loadBatches();
+      await loadTable();
+    })();
+  </script>
+</body>
+</html>

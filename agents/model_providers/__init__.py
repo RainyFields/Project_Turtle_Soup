@@ -1,8 +1,4 @@
-from .anthropic_provider import AnthropicProvider
-from .deepseek_provider import DeepSeekProvider
-from .local_provider import OllamaProvider
-from .mock_provider import MockProvider
-from .openai_provider import OpenAIProvider
+"""Model providers — import concrete classes from submodules (lazy via provider_factory)."""
 
 __all__ = [
     "AnthropicProvider",
@@ -11,4 +7,3 @@ __all__ = [
     "OllamaProvider",
     "MockProvider",
 ]
-

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 from typing import Any, Dict, List, Optional
 
@@ -42,7 +43,39 @@ class MockProvider:
         if "你是「海龟汤」游戏的出题者" in system or "（汤主）" in system:
             return self._oracle_answer(user)
 
+        if "海龟汤出题专家" in system or "输出必须是单个 JSON 对象" in system:
+            return self._generate_puzzle_json(user)
+
         return user.strip()[:200]
+
+    def _generate_puzzle_json(self, user: str) -> str:
+        category_m = re.search(r"分类：(\S+)", user)
+        difficulty_m = re.search(r"难度：(\S+)", user)
+        category = category_m.group(1) if category_m else "mystery"
+        difficulty = difficulty_m.group(1) if difficulty_m else "medium"
+        idx = MockProvider._questioner_round
+        MockProvider._questioner_round += 1
+
+        puzzle = {
+            "id": f"turtle_candidate_{idx + 1:03d}",
+            "title": f"Mock原创汤 #{idx + 1}",
+            "difficulty": difficulty,
+            "category": category,
+            "surface": "深夜，独居的我听到衣柜里传来敲击声。我打开柜门，里面空无一物，敲击却停了。",
+            "solution": "敲击来自邻居装修；柜门打开后声波路径改变，所以我以为停了。",
+            "key_clues": [
+                "声音在深夜出现",
+                "打开柜门后声音停止",
+                "柜内没有可见声源",
+                "邻居可能在装修",
+            ],
+            "oracle_rules": {
+                "answerable_topics": ["声音来源", "邻居", "柜门", "时间"],
+                "forbidden_reveal": ["声波", "装修"],
+            },
+            "metadata": {"source": "generated", "language": "zh", "tags": [category]},
+        }
+        return json.dumps(puzzle, ensure_ascii=False)
 
     def _oracle_answer(self, user: str) -> str:
         if user.upper().startswith("FINAL_ANSWER"):
