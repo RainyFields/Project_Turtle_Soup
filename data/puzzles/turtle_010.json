@@ -1,8 +1,8 @@
 {
-  "id": "turtle_009",
-  "title": "Mock原创汤 #1",
-  "difficulty": "hard",
-  "category": "horror",
+  "id": "turtle_010",
+  "title": "Mock原创汤 #3",
+  "difficulty": "medium",
+  "category": "comedy",
   "surface": "深夜，独居的我听到衣柜里传来敲击声。我打开柜门，里面空无一物，敲击却停了。",
   "solution": "敲击来自邻居装修；柜门打开后声波路径改变，所以我以为停了。",
   "key_clues": [
@@ -27,11 +27,10 @@
     "source": "generated",
     "language": "zh",
     "tags": [
-      "horror"
+      "comedy"
     ],
     "source_tags": [
-      "红汤",
-      "黑汤"
+      "搞笑"
     ],
     "generator_batch": "v1"
   }
