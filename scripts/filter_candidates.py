@@ -33,6 +33,8 @@ def main() -> None:
     ref_surfaces = [s.get("surface", "") for s in load_all_samples(parsed_dir) if s.get("surface")]
 
     for path in sorted(staging.glob("turtle_candidate_*.json")):
+        if path.name.endswith(".filter.json"):
+            continue
         puzzle = json.loads(path.read_text(encoding="utf-8"))
         result = run_filters(
             puzzle,
