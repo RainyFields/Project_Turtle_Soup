@@ -153,6 +153,15 @@ class TurtleSoupGame:
             question = self.questioner.next_turn(history)
             self._record_tokens(history, question)
 
+            at_last_round = round_idx == self.game_config.max_rounds
+            if (
+                at_last_round
+                and self.game_config.force_final_answer_on_max_rounds
+                and not is_final_answer_turn(question)
+            ):
+                question = self.questioner.request_final_answer(history)
+                self._record_tokens(question)
+
             if is_final_answer_turn(question):
                 if round_idx < self.game_config.min_rounds_before_answer:
                     if verbose:

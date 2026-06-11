@@ -1,0 +1,17 @@
+# Personal model defaults (copy to config.local.yaml — gitignored).
+# Each collaborator picks their own provider + model; keys still go in .env only.
+#
+#   cp config.local.yaml.example config.local.yaml
+#
+# Supported providers: openai, anthropic, deepseek, qwen, zai, gemini, ollama, mock
+
+oracle:
+  provider: zai
+  model: glm-4.7
+
+questioner:
+  provider: zai
+  model: glm-4.7
+
+# game:
+#   max_rounds: 30

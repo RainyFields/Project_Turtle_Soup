@@ -40,12 +40,21 @@ class QuestionerAgent(BaseAgent):
         self.inputs = inputs
 
     def next_turn(self, qa_history: str) -> str:
+        return self._complete_turn(qa_history, user="请继续。")
+
+    def request_final_answer(self, qa_history: str) -> str:
+        user = (
+            "根据目前的问答记录，请仅用 FINAL_ANSWER: 开头给出你认为最完整的故事还原，"
+            "不要提出新问题。"
+        )
+        return self._complete_turn(qa_history, user=user)
+
+    def _complete_turn(self, qa_history: str, *, user: str) -> str:
         system = QUESTIONER_SYSTEM_TEMPLATE.format(
             surface=self.inputs.surface,
             qa_history=qa_history.strip() or "(无)",
             min_questions=self.inputs.min_questions,
         )
-        out = self.complete(system=system, user="请继续。").strip()
-        # Ensure a single line question/answer marker
+        out = self.complete(system=system, user=user).strip()
         return out.replace("\n", " ").strip()
 

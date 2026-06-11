@@ -9,10 +9,12 @@ alwaysApply: true
 
 海龟汤 **双 Agent** 评测框架：`Oracle`（汤主，三值回答）+ `Questioner`（猜题者，主动提问）。代号 `turtle-soup-bench`，PRD v0.1。
 
-## Status (as of 2026-06-01)
+## Status (as of 2026-06-11)
 
-- ✅ M0–M3：五道题、`agents/`、`engine/`、`evaluation/`、`scripts/`、`tests/`（7 passed）
-- 🔲 M4：benchmark 报告增强、async
+- ✅ M0–M3：框架 + `tests/`（7 passed）
+- ✅ 题库 11 题：`turtle_001`–`005` + `turtle_010`–`015`
+- 🔲 M4a：轮数评测 Exp1/Exp2 — see **`plan.md`**
+- 🔲 M4b：benchmark 报告、async
 - 🔲 M5：多 Questioner（Phase 2）
 
 ## Entry points
@@ -25,7 +27,8 @@ alwaysApply: true
 
 - Game loop: `engine/game.py` → `TurtleSoupGame`
 - Providers: `agents/provider_factory.py` (mock for offline)
-- Puzzles: `data/puzzles/turtle_001.json` … `turtle_005.json`
+- Puzzles: `turtle_001`–`005`, `turtle_010`–`015` (11 total)
+- Evaluation plan: `plan.md`
 - Trajectories: `data/trajectories/*.json` (gitignored)
 
 ## When user says "continue"

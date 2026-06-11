@@ -28,8 +28,16 @@ cd Project_Turtle_Soup
 python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example .env   # 使用真实模型时填写 API Key
+
+# 每位开发者用自己的 API Key（勿提交 .env，勿在聊天里发送 key）
+python scripts/setup_env.py
+python scripts/check_env.py
+
+# 可选：个人默认模型（gitignore）
+cp config.local.yaml.example config.local.yaml
 ```
+
+详见 **[CONTRIBUTING.md](CONTRIBUTING.md)**（协作者必读）。
 
 **离线单局（推荐首次验证）：**
 
@@ -77,7 +85,8 @@ pytest -q
 | Oracle | openai | gpt-4o |
 | Questioner | anthropic | claude-opus-4-6 |
 
-环境变量见 `.env.example`（`OPENAI_API_KEY`、`ANTHROPIC_API_KEY`、`DEEPSEEK_API_KEY`、`OLLAMA_BASE_URL` 等）。
+密钥在 **`.env`**（每人一份）；模型默认可在 **`config.local.yaml`** 覆盖。  
+支持：`openai` · `anthropic` · `deepseek` · `qwen` · **`zai` (GLM)** · `gemini` · `ollama` · `mock`
 
 ---
 

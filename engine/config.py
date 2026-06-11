@@ -18,6 +18,7 @@ class GameConfig:
     language: str = "zh"
     token_budget: int = 50_000
     seed: Optional[int] = None
+    force_final_answer_on_max_rounds: bool = False
 
 
 @dataclass
@@ -37,6 +38,16 @@ def _model_cfg(section: Dict[str, Any]) -> ModelConfig:
     )
 
 
+def _deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
+    out = dict(base)
+    for k, v in override.items():
+        if k in out and isinstance(out[k], dict) and isinstance(v, dict):
+            out[k] = _deep_merge(out[k], v)
+        else:
+            out[k] = v
+    return out
+
+
 def load_app_config(config_path: Optional[Path] = None) -> AppConfig:
     root = Path(__file__).resolve().parents[1]
     path = config_path or (root / "config.yaml")
@@ -44,6 +55,13 @@ def load_app_config(config_path: Optional[Path] = None) -> AppConfig:
     if path.exists():
         with path.open("r", encoding="utf-8") as f:
             raw = yaml.safe_load(f) or {}
+
+    local_path = root / "config.local.yaml"
+    if local_path.exists() and config_path is None:
+        with local_path.open("r", encoding="utf-8") as f:
+            local_raw = yaml.safe_load(f) or {}
+        if isinstance(local_raw, dict):
+            raw = _deep_merge(raw, local_raw)
 
     game_raw = raw.get("game") or {}
     return AppConfig(

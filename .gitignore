@@ -1,4 +1,7 @@
 .env
+.env.local
+.env.*.local
+config.local.yaml
 .venv/
 venv/
 __pycache__/
@@ -9,6 +12,12 @@ __pycache__/
 data/trajectories/*.json
 !data/trajectories/.gitkeep
 results/
+
+# puzzle generator — reference & pipeline artifacts (never publish raw crawls)
+data/reference/
+data/generator/
+!data/generator/.gitkeep
+!data/reference/.gitkeep
 
 # pytest
 .pytest_cache/

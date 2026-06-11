@@ -1,0 +1,39 @@
+# Generator pipeline config (local reference crawl — fill before use)
+
+reference:
+  # https://soup.ahelumos.com/ — 仅本地参考，不进入 data/puzzles/
+  base_url: "https://soup.ahelumos.com/"
+  site: ahelumos
+  rate_limit_seconds: 2.0
+  user_agent: "turtle-soup-bench-research/0.1"
+  # 首页 ?sort=rating_desc | hot_desc | rating_asc 等
+  default_sort: ""
+  max_index_pages: 1
+
+paths:
+  reference_raw: data/reference/raw
+  reference_parsed: data/reference/parsed
+  reference_index: data/reference/index
+  analysis_output: data/generator/analysis
+  staging_dir: data/generator/staging
+  review_dir: data/generator/review
+
+analysis:
+  # 高评分汤（≥此分）用于难度分布校准
+  min_rating_for_calibration: 8.0
+
+generation:
+  provider: qwen
+  model: qwen-plus
+  gemini_delay_seconds: 21
+  request_delay_seconds: 1
+  candidates_per_slot: 3
+  default_language: zh
+
+filter:
+  similarity_threshold: 0.85
+  max_rewrite_attempts: 2
+
+publish:
+  puzzles_dir: data/puzzles
+  id_prefix: turtle_

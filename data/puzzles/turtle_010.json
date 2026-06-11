@@ -1,0 +1,37 @@
+{
+  "id": "turtle_010",
+  "title": "Mock原创汤 #3",
+  "difficulty": "medium",
+  "category": "comedy",
+  "surface": "深夜，独居的我听到衣柜里传来敲击声。我打开柜门，里面空无一物，敲击却停了。",
+  "solution": "敲击来自邻居装修；柜门打开后声波路径改变，所以我以为停了。",
+  "key_clues": [
+    "声音在深夜出现",
+    "打开柜门后声音停止",
+    "柜内没有可见声源",
+    "邻居可能在装修"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "声音来源",
+      "邻居",
+      "柜门",
+      "时间"
+    ],
+    "forbidden_reveal": [
+      "声波",
+      "装修"
+    ]
+  },
+  "metadata": {
+    "source": "generated",
+    "language": "zh",
+    "tags": [
+      "comedy"
+    ],
+    "source_tags": [
+      "搞笑"
+    ],
+    "generator_batch": "v1"
+  }
+}
