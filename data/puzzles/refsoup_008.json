@@ -1,0 +1,42 @@
+{
+  "id": "refsoup_008",
+  "title": "生日",
+  "difficulty": "easy",
+  "category": "classic",
+  "surface": "一个人过生日，邀请他所有的好朋友来参加。吹完蜡烛、，这个人把他所有的好朋友都杀了。",
+  "solution": "男主和朋友曾经一起去探险，一段时间后没有了食物，因为男主本身是一个盲人，所以这帮朋友都骗他说每人砍下一只手来吃，可最后只砍了男主一个人的手。之后有一次男主邀请朋友们来参加自己的生日聚会，吹完蜡烛后所有人都鼓掌了，男主发现只有自己的手被砍下来吃了，男主无法忍受这样的欺骗于是杀了所有的好朋友。",
+  "key_clues": [
+    "砍下来",
+    "无法忍受",
+    "探险",
+    "欺骗",
+    "盲人"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "经典"
+    ],
+    "forbidden_reveal": [
+      "男主和朋友曾经一起去探险，一段时间后没有了食物，",
+      "之后有一次男主邀请朋友们来参加自己的生日聚会，吹"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "classic"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "9",
+    "reference_url": "https://soup.ahelumos.com/soups/9",
+    "rating": 2.0,
+    "rating_count": null,
+    "author": "admin"
+  }
+}

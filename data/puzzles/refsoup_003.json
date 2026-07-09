@@ -1,0 +1,41 @@
+{
+  "id": "refsoup_003",
+  "title": "墙上的洞",
+  "difficulty": "easy",
+  "category": "classic",
+  "surface": "女人在新租的房子里住了一段时间后，问了房东一句话，就疯了。",
+  "solution": "出租屋墙上有个洞，女人看过去洞里是红色的，有一天，她问房东：“我隔壁住着什么人呀”，房东说：“你隔壁是个红眼病患者”。",
+  "key_clues": [
+    "出租屋",
+    "红眼病",
+    "隔壁",
+    "洞里",
+    "红色"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "经典"
+    ],
+    "forbidden_reveal": [
+      "出租屋墙上有个洞，女人看过去洞里是红色的，有一天"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "classic"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "10",
+    "reference_url": "https://soup.ahelumos.com/soups/10",
+    "rating": 2.0,
+    "rating_count": 1,
+    "author": "admin"
+  }
+}

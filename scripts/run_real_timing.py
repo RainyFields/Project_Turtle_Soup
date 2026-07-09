@@ -19,6 +19,7 @@ from dotenv import load_dotenv
 load_dotenv(ROOT / ".env")
 
 from evaluation.api_timing import TimingSession, extrapolate_full_study, patch_agent_timing
+from evaluation.study_report_html import write_json_and_html
 from evaluation.round_studies import ModelSpec, run_round_cap, run_round_curve
 
 
@@ -153,7 +154,7 @@ def main() -> int:
     }
 
     out_path = out_dir / "real_timing.json"
-    out_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    html_path = write_json_and_html(report, out_path, title="Real API Timing Report")
 
     print("--- Per-call timing (measured) ---")
     print(f"  calls: {timing.get('count', 0)}")
@@ -171,6 +172,7 @@ def main() -> int:
     print(f"  Exp2: ~{extrap['exp2_hours']}h ({extrap['exp2_api_calls']:,} calls)")
     print(f"  Combined: ~{extrap['combined_hours']}h")
     print(f"\nReport: {out_path}")
+    print(f"HTML:   {html_path}")
     return 0
 
 

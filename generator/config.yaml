@@ -17,6 +17,7 @@ paths:
   analysis_output: data/generator/analysis
   staging_dir: data/generator/staging
   review_dir: data/generator/review
+  reference_import_dir: data/generator/reference_import
 
 analysis:
   # 高评分汤（≥此分）用于难度分布校准

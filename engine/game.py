@@ -35,10 +35,16 @@ def load_puzzle(puzzle_id: str, puzzles_dir: Optional[Path] = None) -> Dict[str,
         return json.load(f)
 
 
-def list_puzzle_ids(puzzles_dir: Optional[Path] = None) -> List[str]:
+def list_puzzle_ids(puzzles_dir: Optional[Path] = None, *, family: str = "all") -> List[str]:
     root = Path(__file__).resolve().parents[1]
     directory = puzzles_dir or (root / "data" / "puzzles")
-    return sorted(p.stem for p in directory.glob("turtle_*.json"))
+    if family == "turtle":
+        pattern = "turtle_*.json"
+    elif family in ("refsoup", "reference"):
+        pattern = "refsoup_*.json"
+    else:
+        pattern = "*.json"
+    return sorted(p.stem for p in directory.glob(pattern))
 
 
 def format_qa_history(rounds: List[RoundRecord]) -> str:

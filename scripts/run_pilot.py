@@ -63,6 +63,8 @@ def main() -> int:
     print(f"  @ {ext['at_sec_per_call']}s/call → Exp1 ~{ext['exp1_estimated_h']}h | "
           f"Exp2 ~{ext['exp2_estimated_h']}h | Combined ~{ext['combined_estimated_h']}h")
     print(f"Report: {report['output_path']}")
+    if report.get("html_output_path"):
+        print(f"HTML:   {report['html_output_path']}")
     return 0
 
 

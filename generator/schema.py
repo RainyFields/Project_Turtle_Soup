@@ -3,6 +3,9 @@ from __future__ import annotations
 from typing import Any, Dict, List, Tuple
 
 DIFFICULTIES = frozenset({"easy", "medium", "hard"})
+PUBLISH_SOURCES = frozenset({"generated", "reference"})
+GENERATED_ID_PREFIX = "turtle_"
+REFERENCE_ID_PREFIX = "refsoup_"
 REQUIRED_TOP_LEVEL = (
     "id",
     "title",
@@ -51,11 +54,16 @@ def validate_puzzle(data: Dict[str, Any], *, for_publish: bool = False) -> Tuple
         errors.append("metadata must be an object")
 
     if for_publish:
-        if data.get("metadata", {}).get("source") != "generated":
-            errors.append("metadata.source must be 'generated' for published generator output")
+        source = data.get("metadata", {}).get("source")
         pid = data.get("id", "")
-        if not isinstance(pid, str) or not pid.startswith("turtle_"):
-            errors.append("id must match turtle_NNN for publish")
+        if source not in PUBLISH_SOURCES:
+            errors.append("metadata.source must be 'generated' or 'reference' for publish")
+        elif source == "generated":
+            if not isinstance(pid, str) or not pid.startswith(GENERATED_ID_PREFIX):
+                errors.append(f"id must match {GENERATED_ID_PREFIX}NNN for generated publish")
+        elif source == "reference":
+            if not isinstance(pid, str) or not pid.startswith(REFERENCE_ID_PREFIX):
+                errors.append(f"id must match {REFERENCE_ID_PREFIX}NNN for reference publish")
 
     return (len(errors) == 0, errors)
 

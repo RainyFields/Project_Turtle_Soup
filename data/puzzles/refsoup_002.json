@@ -1,0 +1,45 @@
+{
+  "id": "refsoup_002",
+  "title": "沉睡",
+  "difficulty": "medium",
+  "category": "comedy",
+  "surface": "沉睡许久的人醒来，我很想说些什么，却什么也说不出来",
+  "solution": "我是个学生，上课睡觉被老师点起来回答问题，同桌给了我本英语书，但这是语文课，同桌想让我在语文课上读英语，但没想到的是，我是个学渣，根本不会英语，所以一句话也没有说出来",
+  "key_clues": [
+    "语文课",
+    "英语",
+    "同桌",
+    "学渣",
+    "学生"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "搞笑",
+      "经典",
+      "清汤"
+    ],
+    "forbidden_reveal": [
+      "我是个学生，上课睡觉被老师点起来回答问题，同桌给"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "comedy",
+      "classic",
+      "everyday"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "89",
+    "reference_url": "https://soup.ahelumos.com/soups/89",
+    "rating": 8.0,
+    "rating_count": 1,
+    "author": "wtf"
+  }
+}

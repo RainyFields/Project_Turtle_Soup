@@ -12,7 +12,7 @@
 |------|------|
 | **物理隔离** | `data/reference/`（参考原文）与 `data/puzzles/`（发布题库）平级，互不混用 |
 | **单点发布** | 只有 Step E 人工确认后，才调用 `publish` 写入 `data/puzzles/turtle_NNN.json` |
-| **Schema 单源** | 候选与发布题均经 `generator/schema.py` 校验，字段对齐 `turtle_001.json` |
+| **Schema 单源** | 候选与发布题均经 `generator/schema.py` 校验，字段对齐 `refsoup_006.json` 等 benchmark 题 |
 | **来源标记** | 发布题强制 `metadata.source = "generated"`，并记录 `generator_batch` |
 | **分析不喂原文** | Layer B 输出统计/模板；生成 prompt 用脱敏特征，降低洗稿风险 |
 | **git 边界** | `data/reference/`、`data/generator/` 本地 gitignore；**不进仓库、不对外分发** |
@@ -84,6 +84,41 @@ python scripts/review_ui.py     # http://127.0.0.1:8765/
 ```
 
 人工在 E 层完成：读汤面/汤底 → 必要时改 staging JSON → 标记通过/拒绝 → 单条或批量发布。
+
+### 支线 R — 参考站直导入（评测用）
+
+生成题（`turtle_*`）偏难时，可从 Layer A 爬取结果**直接导入** benchmark，与原创题区分命名：
+
+| 原创（E 层） | 参考导入（R 支线） |
+|-------------|-------------------|
+| `turtle_006` … | `refsoup_001` … |
+| `metadata.source: generated` | `metadata.source: reference` |
+| 经 LLM 生成 + 人工审核 | 来自 ahelumos 原文（汤面/汤底） |
+
+```bash
+# 需先 crawl（Layer A）
+python scripts/crawl_reference.py --sort rating_desc --max-pages 3
+
+# 预览：短 + 经典
+python scripts/import_reference_puzzles.py --replace --require-classic \
+  --max-surface-chars 120 --max-solution-chars 200 --limit 10 --dry-run
+
+# 导入 → data/puzzles/refsoup_001.json …
+python scripts/import_reference_puzzles.py --replace --require-classic \
+  --max-surface-chars 120 --max-solution-chars 200 --limit 10
+```
+
+`key_clues` 由 `generator/reference/key_clues.py` 从汤底提取短关键词（过滤汤面重复与无关词）；可用 `scripts/refresh_reference_key_clues.py` 批量刷新。`oracle_rules.forbidden_reveal` 仅用于 D 层泄底检查，**游戏运行时未注入 Oracle**。
+
+导入记录见 `data/generator/reference_import/manifest.json`。
+
+评测选题（默认示例题 `refsoup_006`）：
+
+```bash
+python scripts/run_game.py --puzzle refsoup_006 ...
+python scripts/run_benchmark.py --puzzles refsoup ...
+python scripts/run_pilot.py --puzzles refsoup_006 --mock
+```
 
 ---
 
@@ -235,8 +270,9 @@ python scripts/publish_puzzle.py \
 
 ```text
 data/
-├── puzzles/                          # ✅ 唯一发布面（git 跟踪）
-│   └── turtle_001.json … turtle_NNN.json
+├── puzzles/                          # ✅ 发布面（git 跟踪）
+│   ├── turtle_*.json …
+│   └── refsoup_006.json …          # R 支线参考导入
 ├── reference/                        # 🔒 参考原文（gitignore）
 │   ├── parsed/samples.jsonl
 │   └── raw/                          # 可选 HTML 快照
@@ -253,7 +289,7 @@ data/
 generator/
 ├── config.yaml                       # 路径、provider、filter 阈值
 ├── schema.py                         # 校验单源
-├── reference/                        # A 层
+├── reference/                        # A 层 + R 支线（to_puzzle, key_clues, import_publish）
 ├── analysis/                         # B 层
 ├── create/                           # C 层
 ├── filter/                           # D 层
@@ -265,7 +301,9 @@ scripts/
 ├── generate_puzzles.py               # C
 ├── filter_candidates.py              # D
 ├── review_ui.py                      # E (UI)
-└── publish_puzzle.py                 # E (CLI)
+├── publish_puzzle.py                 # E (CLI)
+├── import_reference_puzzles.py       # R 支线
+└── refresh_reference_key_clues.py    # R 支线 key_clues 刷新
 ```
 
 ---
@@ -296,14 +334,14 @@ scripts/
 
 ## 与 benchmark 的关系
 
-发布后的 `data/puzzles/turtle_NNN.json` 与手工题 `turtle_001`…`005` **格式相同**，可直接用于：
+发布后的 `data/puzzles/turtle_NNN.json` 与 `refsoup_NNN.json` **格式相同**，可直接用于：
 
 ```bash
-python scripts/run_game.py --puzzle turtle_006 --mock
-python scripts/run_benchmark.py --puzzles all --mock
+python scripts/run_game.py --puzzle refsoup_006 --mock
+python scripts/run_benchmark.py --puzzles refsoup --mock
 ```
 
-`engine.load_puzzle` / `list_puzzle_ids` **只读** `data/puzzles/`，不接触 reference 或 staging。
+`engine.load_puzzle` / `list_puzzle_ids(family="all"|"turtle"|"refsoup")` **只读** `data/puzzles/`，不接触 reference 或 staging。
 
 ---
 
@@ -319,14 +357,6 @@ python scripts/run_benchmark.py --puzzles all --mock
 
 ---
 
-## 当前实现状态（2026-06-01）
+## 实现状态
 
-| Layer | 状态 |
-|-------|------|
-| A Reference | ✅ ahelumos 爬虫，~100+ 样本 |
-| B Analysis | ✅ aggregate + patterns + 难度校准 |
-| C Generation | ✅ Qwen / Gemini / Mock；staging 多 batch |
-| D Filter | ✅ CLI + `.filter.json` sidecar |
-| E Review | ✅ Web UI + CLI publish + queue + 批量发布 |
-
-待扩展（非阻塞）：benchmark 报告 M4、更多 provider（Mistral）、Oracle debug 模式、可选 smoke test 发布前跑 mock 对局。
+A→E 与 R 支线均已可用。后续非阻塞：benchmark M4b、更多 provider、发布前 mock smoke test。

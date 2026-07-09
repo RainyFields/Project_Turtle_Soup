@@ -1,0 +1,43 @@
+{
+  "id": "refsoup_006",
+  "title": "沙漠里的尸体",
+  "difficulty": "easy",
+  "category": "classic",
+  "surface": "沙漠里躺着一具男尸，手里紧紧攥着半根火柴，周围散落着一些行李箱、衣物。",
+  "solution": "一行人乘坐热气球穿越沙漠，途中热气球故障、超重，必须扔行李减重。扔完物品还是超重，众人决定抽签：抽中半根短火柴的人，被直接扔下去减重。死者就是倒霉抽中短火柴的人，被扔下高空坠落死亡。",
+  "key_clues": [
+    "抽签",
+    "热气球",
+    "减重",
+    "坠落",
+    "故障"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "经典"
+    ],
+    "forbidden_reveal": [
+      "一行人乘坐热气球穿越沙漠，途中热气球故障、超重，",
+      "扔完物品还是超重，众人决定抽签：抽中半根短火柴的",
+      "死者就是倒霉抽中短火柴的人，被扔下高空坠落死亡"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "classic"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "6",
+    "reference_url": "https://soup.ahelumos.com/soups/6",
+    "rating": 2.0,
+    "rating_count": null,
+    "author": "admin"
+  }
+}

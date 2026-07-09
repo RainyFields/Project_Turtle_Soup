@@ -18,6 +18,7 @@ from engine.game import (
 )
 from engine.trajectory import RoundRecord
 from evaluation.judge import heuristic_judge
+from evaluation.study_report_html import write_json_and_html
 
 
 @dataclass
@@ -298,7 +299,7 @@ def run_pilot(
     }
 
     out_path = output_dir / "pilot_timing.json"
-    with out_path.open("w", encoding="utf-8") as f:
-        json.dump(report, f, ensure_ascii=False, indent=2)
+    html_path = write_json_and_html(report, out_path, title="Pilot Round Study Report")
     report["output_path"] = str(out_path)
+    report["html_output_path"] = str(html_path)
     return report

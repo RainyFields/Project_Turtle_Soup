@@ -1,0 +1,44 @@
+{
+  "id": "refsoup_010",
+  "title": "愿望",
+  "difficulty": "easy",
+  "category": "classic",
+  "surface": "上帝问我，“现在我可以让你许一个愿望，说吧！你想要什么？” 我说：“我想要瞎掉一只眼睛。”",
+  "solution": "实际上，上帝问的是：“现在我可以让你许一个愿望，但无论你想要什么，你的邻居都会得到双倍，说吧！你想要什么？” 我是一个穷人，邻居是一个富人，他心地善良，经常接济我，会给我一些食物以及生活用品，但我依旧很穷。 所以我说：“我想要瞎掉一只眼睛。”这样我的邻居就会比我惨了，1是我比他多一只眼睛，2是他成了盲人，钱也不方便花了 ，也算是一种报复吧",
+  "key_clues": [
+    "邻居",
+    "生活用品",
+    "富人",
+    "报复",
+    "接济"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "经典"
+    ],
+    "forbidden_reveal": [
+      "你想要什么",
+      "” 我是一个穷人，邻居是一个富人，他心地善良，经",
+      "所以我说：“我想要瞎掉一只眼睛",
+      "”这样我的邻居就会比我惨了，1是我比他多一只眼睛"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "classic"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "54",
+    "reference_url": "https://soup.ahelumos.com/soups/54",
+    "rating": 2.0,
+    "rating_count": null,
+    "author": "alfa"
+  }
+}

@@ -4,75 +4,80 @@
 
 - **Never** paste API keys in GitHub issues, PRs, Slack, or AI chat (including Cursor).
 - **Never** commit `.env` or `config.local.yaml` — they are gitignored.
-- Each person uses **their own** subscription (OpenAI, Z.AI / GLM, Qwen, etc.).
+- Each person uses **their own** subscription.
 
 ## First-time setup
 
 ```bash
-python3.11 -m venv .venv
-source .venv/bin/activate
+python3.11 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-
-# 1) Configure your keys locally (interactive, hidden input)
 python scripts/setup_env.py
-
-# 2) Verify — shows which providers are ready, not the secrets
 python scripts/check_env.py
+cp config.local.yaml.example config.local.yaml   # optional
 
-# 3) Optional — personal default models (not shared via git)
-cp config.local.yaml.example config.local.yaml
-# edit provider/model to match the key you added in .env
-
-# 4) Smoke test without spending credits
-python scripts/run_game.py --puzzle turtle_001 --mock
+python scripts/run_game.py --puzzle refsoup_006 --mock
 ```
 
-## Pick any supported provider
+## Providers
 
-| Provider | `.env` variable | Example model | CLI flag |
-|----------|-----------------|---------------|----------|
-| OpenAI | `OPENAI_API_KEY` | `gpt-4o` | `--questioner-provider openai` |
-| Anthropic | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` | `--questioner-provider anthropic` |
-| DeepSeek | `DEEPSEEK_API_KEY` | `deepseek-reasoner` | `--questioner-provider deepseek` |
-| Qwen | `QWEN_API_KEY` | `qwen-plus` | `--questioner-provider qwen` |
-| **Z.AI / GLM** | `ZAI_API_KEY` | `glm-4.7` | `--questioner-provider zai` |
-| Gemini | `GEMINI_API_KEY` | `gemini-2.0-flash` | `--questioner-provider gemini` |
-| Ollama | `OLLAMA_BASE_URL` | `llama3.3:70b` | `--questioner-provider ollama` |
-| Offline | *(none)* | `mock` | `--mock` |
+| Provider | `.env` | Example model | CLI |
+|----------|--------|---------------|-----|
+| OpenAI | `OPENAI_API_KEY` | `gpt-4o` | `openai` |
+| Anthropic | `ANTHROPIC_API_KEY` | `claude-sonnet-4-6` | `anthropic` |
+| DeepSeek | `DEEPSEEK_API_KEY` | `deepseek-reasoner` | `deepseek` |
+| Qwen | `QWEN_API_KEY` | `qwen-plus` | `qwen` |
+| Z.AI / GLM | `ZAI_API_KEY` | `glm-4.7` | `zai` |
+| Gemini | `GEMINI_API_KEY` | `gemini-2.0-flash` | `gemini` |
+| Ollama | `OLLAMA_BASE_URL` | `qwen2.5:7b` | `ollama` |
+| Offline | — | `mock` | `--mock` |
 
-Keys go in **`.env` only**. Model choice goes in **`config.local.yaml`** (optional) or CLI flags.
+### Ollama
 
-### Z.AI / GLM notes
+- Timeout default **600s** (`OLLAMA_TIMEOUT` to override).
+- Slow models (`qwen3.5:4b`) need warmup; budget 40–60 min for full pilot.
 
-- Use the **general API** endpoint (default in code): `https://api.z.ai/api/paas/v4`
-- The **Coding Plan** endpoint (`/api/coding/paas/v4`) is for IDE tools; avoid it for batch benchmark scripts.
-- See [Z.AI docs](https://docs.z.ai/api-reference/introduction).
+### Z.AI / GLM
 
-## Running with your models
+- Coding Plan: `ZAI_USE_CODING_ENDPOINT=1` in `.env`.
+
+## Running
 
 ```bash
-# Uses config.yaml + config.local.yaml + .env
-python scripts/run_game.py --puzzle turtle_001
+python scripts/run_game.py --puzzle refsoup_006
 
-# Or explicit overrides
-python scripts/run_game.py --puzzle turtle_001 \
+python scripts/run_game.py --puzzle refsoup_006 \
   --questioner-provider zai --questioner-model glm-4.7 \
   --oracle-provider zai --oracle-model glm-4.7
 
-# Real timing pilot (one puzzle)
-python scripts/run_real_timing.py --questioner-provider zai --questioner-model glm-4.7
+python scripts/run_pilot.py --puzzles refsoup_006 --mock
+
+python scripts/run_pilot.py --puzzles refsoup_006 \
+  --questioner-provider ollama --questioner-model qwen2.5:7b \
+  --oracle-provider ollama --oracle-model qwen2.5:7b \
+  --max-rounds 12 --round-caps 5 10 12
+
+python scripts/run_real_timing.py \
+  --puzzle refsoup_006 --questioner-provider qwen --questioner-model qwen-plus \
+  --max-rounds 8 --round-caps 5 10
 ```
 
-## What gets committed
+Reports: `results/pilot/` or `results/real_timing/` (JSON + HTML).
+
+## Reference import
+
+```bash
+python scripts/crawl_reference.py --sort rating_desc --max-pages 3
+python scripts/import_reference_puzzles.py --replace --require-classic \
+  --max-surface-chars 120 --max-solution-chars 200 --limit 10
+```
+
+See **`generator/README.md`** § R 支线.
+
+## Git
 
 | File | Commit? |
 |------|---------|
-| `.env.example`, `config.local.yaml.example` | ✅ templates only |
-| `.env`, `config.local.yaml` | ❌ never |
-| `config.yaml` | ✅ shared defaults (no secrets) |
-| `results/`, `data/trajectories/` | ❌ gitignored outputs |
+| `.env.example`, `config.local.yaml.example` | ✅ |
+| `.env`, `config.local.yaml`, `results/`, `data/trajectories/` | ❌ |
 
-## PRs & CI
-
-- Use `--mock` in automated tests (`pytest -q`).
-- Do not add team-wide API keys to the repository or GitHub Actions unless using org-level secrets with explicit approval.
+CI: `pytest -q` with `--mock`.

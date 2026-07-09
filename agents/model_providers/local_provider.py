@@ -12,9 +12,10 @@ class OllamaProvider:
     model example: "llama3.3" or "ollama/llama3.3" (prefix is stripped).
     """
 
-    def __init__(self, base_url: Optional[str] = None, timeout_s: float = 120.0):
+    def __init__(self, base_url: Optional[str] = None, timeout_s: Optional[float] = None):
         self.base_url = (base_url or os.getenv("OLLAMA_BASE_URL") or "http://localhost:11434").rstrip("/")
-        self.timeout_s = timeout_s
+        env_timeout = os.getenv("OLLAMA_TIMEOUT")
+        self.timeout_s = timeout_s if timeout_s is not None else float(env_timeout or 600.0)
 
     def generate(
         self,

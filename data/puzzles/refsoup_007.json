@@ -1,0 +1,44 @@
+{
+  "id": "refsoup_007",
+  "title": "海龟汤",
+  "difficulty": "easy",
+  "category": "classic",
+  "surface": "一个男人走进一家餐馆，点了一碗海龟汤。刚喝了一口，他就崩溃了。为什么？",
+  "solution": "男人曾和好友在海上遇难，濒临饿死。好友声称自己出去找食物，带回一碗“肉汤”救了他。男人获救后得知好友再未归来，并被告知海龟汤是当地的特色菜。他喝下后瞬间明白，当年的“肉汤”其实是好友割下自己的肉为他做的，巨大的愧疚感让他崩溃。",
+  "key_clues": [
+    "好友",
+    "愧疚感",
+    "特色菜",
+    "肉汤",
+    "割下"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "经典"
+    ],
+    "forbidden_reveal": [
+      "男人曾和好友在海上遇难，濒临饿死",
+      "好友声称自己出去找食物，带回一碗“肉汤”救了他",
+      "男人获救后得知好友再未归来，并被告知海龟汤是当地",
+      "他喝下后瞬间明白，当年的“肉汤”其实是好友割下自"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "classic"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "7",
+    "reference_url": "https://soup.ahelumos.com/soups/7",
+    "rating": 2.0,
+    "rating_count": null,
+    "author": "admin"
+  }
+}

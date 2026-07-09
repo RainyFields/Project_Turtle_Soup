@@ -6,7 +6,7 @@
 |----|------|
 | 代号 | `turtle-soup-bench` |
 | PRD | v0.1（2026-06-01） |
-| 默认测试题 | `turtle_001`（餐厅里的男人） |
+| 默认测试题 | `refsoup_006`（沙漠里的尸体） |
 | Python | **3.10+**（推荐 3.11） |
 
 ---
@@ -15,9 +15,10 @@
 
 - **双 Agent 对局**：Questioner 仅见汤面；Oracle 持汤底，仅回答「是 / 不是 / 与此无关」
 - **游戏引擎**：可配置最大轮数、最少提问轮数、token 预算、轨迹保存
-- **评估**：启发式 + 可选 LLM-as-Judge；自动指标（覆盖率、效率、多样性等）
-- **批量评测**：`run_benchmark.py` 多题 × 多模型组合
-- **离线模式**：`--mock` 无需 API Key（CI / 本地开发）
+- **评估**：启发式 + 可选 LLM-as-Judge；轮数研究 Exp 1 / Exp 2（`run_pilot.py`）
+- **批量评测**：`run_benchmark.py`；选题族 `all` / `turtle` / `refsoup`
+- **题库生成（A→E）** + **参考汤导入（R）**：见 [`generator/README.md`](generator/README.md)
+- **离线模式**：`--mock` 无需 API Key
 
 ---
 
@@ -25,52 +26,31 @@
 
 ```bash
 cd Project_Turtle_Soup
-python3.11 -m venv .venv
-source .venv/bin/activate
+python3.11 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-
-# 每位开发者用自己的 API Key（勿提交 .env，勿在聊天里发送 key）
-python scripts/setup_env.py
-python scripts/check_env.py
-
-# 可选：个人默认模型（gitignore）
-cp config.local.yaml.example config.local.yaml
+python scripts/setup_env.py && python scripts/check_env.py
+cp config.local.yaml.example config.local.yaml   # 可选
 ```
 
-详见 **[CONTRIBUTING.md](CONTRIBUTING.md)**（协作者必读）。
-
-**离线单局（推荐首次验证）：**
+详见 **[CONTRIBUTING.md](CONTRIBUTING.md)**。
 
 ```bash
-python scripts/run_game.py --puzzle turtle_001 --mock
-```
+# 离线单局
+python scripts/run_game.py --puzzle refsoup_006 --mock
 
-**真实模型：**
+# 真实模型
+python scripts/run_game.py --puzzle refsoup_006
 
-```bash
-python scripts/run_game.py --puzzle turtle_001
-```
+# 轮数评测 Pilot（Exp 1 + Exp 2）
+python scripts/run_pilot.py --puzzles refsoup_006 --mock
+# → results/pilot/<dir>/pilot_timing.json + pilot_timing.html
 
-**批量 benchmark：**
+# 真实 API 单题计时
+python scripts/run_real_timing.py --puzzle refsoup_006 --questioner-provider qwen --questioner-model qwen-plus
 
-```bash
-python scripts/run_benchmark.py \
-  --puzzles all \
-  --questioner-models claude-opus-4-6 gpt-4o deepseek-v3 \
-  --oracle-model gpt-4o \
-  --runs-per-combo 3 \
-  --output results/benchmark_v1/
-```
+# 批量 benchmark
+python scripts/run_benchmark.py --puzzles refsoup --questioner-models mock --mock
 
-**查看轨迹：**
-
-```bash
-python scripts/visualize_trajectory.py data/trajectories/game_*.json
-```
-
-**测试：**
-
-```bash
 pytest -q
 ```
 
@@ -78,15 +58,14 @@ pytest -q
 
 ## 配置
 
-`config.yaml` 默认：
-
-| 角色 | Provider | Model |
-|------|----------|-------|
+| 角色 | 默认 Provider | 默认 Model |
+|------|---------------|------------|
 | Oracle | openai | gpt-4o |
 | Questioner | anthropic | claude-opus-4-6 |
 
-密钥在 **`.env`**（每人一份）；模型默认可在 **`config.local.yaml`** 覆盖。  
-支持：`openai` · `anthropic` · `deepseek` · `qwen` · **`zai` (GLM)** · `gemini` · `ollama` · `mock`
+密钥：`.env`；模型覆盖：`config.local.yaml` 或 CLI。  
+Provider：`openai` · `anthropic` · `deepseek` · `qwen` · `zai` · `gemini` · `ollama` · `mock`  
+Ollama 慢模型：`OLLAMA_TIMEOUT=600`（默认 600s）。
 
 ---
 
@@ -94,42 +73,31 @@ pytest -q
 
 ```text
 turtle-soup-bench/
-├── README.md
-├── AGENTS.md                 # Cursor Agent 工作指引（含项目记忆）
-├── config.yaml
-├── requirements.txt
-├── .env.example
-├── data/
-│   ├── puzzles/              # turtle_001 … turtle_005
-│   └── trajectories/         # 对局 JSON（gitignored）
-├── agents/                   # Oracle / Questioner + providers
-├── engine/                   # 游戏循环、轨迹
-├── evaluation/               # 指标、judge、报告
-├── scripts/                  # CLI
-└── tests/
+├── README.md · AGENTS.md · plan.md · CONTRIBUTING.md
+├── data/puzzles/          # turtle_* + refsoup_*
+├── agents/ · engine/ · evaluation/ · generator/ · scripts/ · tests/
 ```
 
 ---
 
-## 里程碑（PRD）
+## 题库
 
-| 阶段 | 状态 | 内容 |
-|------|------|------|
-| M0 | ✅ | Repo、README、基础结构 |
-| M1 | ✅ | `data/` 五道题 |
-| M2 | ✅ | `agents/` + `engine/`，单局可跑 |
-| M3 | ✅ | `evaluation/` 启发式 + LLM judge |
-| M4 | 🔲 | benchmark 报告增强、async |
-| M5 | 🔲 | 多 Questioner 协作（Phase 2） |
+| 来源 | ID 前缀 | 说明 |
+|------|---------|------|
+| MVP + Generator（git） | `turtle_*` | 11 题（`005` + `010`–`015`） |
+| 参考站导入（本地） | `refsoup_*` | 经典短汤，如 `refsoup_006` |
 
 ---
 
-## 在 Cursor 中继续开发
+## 里程碑
 
-打开本项目后，Agent 会自动加载 **`.cursor/rules/`** 与 **`AGENTS.md`** 中的项目记忆。  
-新开对话时可以说：
-
-> Continue turtle-soup-bench — 查看 AGENTS.md 与当前里程碑。
+| 阶段 | 状态 | 内容 |
+|------|------|------|
+| M0–M3 | ✅ | 框架、11 题、评测、测试 |
+| Generator | ✅ | A→E + R 支线 |
+| M4a | 🔶 | Pilot 可跑；全量 11×3×3 + 绘图未做 |
+| M4b | 🔲 | benchmark CSV、async |
+| M5 | 🔲 | 多 Questioner |
 
 ---
 

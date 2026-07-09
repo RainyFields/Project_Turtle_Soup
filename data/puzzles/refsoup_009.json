@@ -1,0 +1,47 @@
+{
+  "id": "refsoup_009",
+  "title": "照顾",
+  "difficulty": "medium",
+  "category": "horror",
+  "surface": "妈妈让六岁的姐姐照顾一岁的我。出门前，她叮嘱了姐姐一件事。 晚上，妈妈和姐姐都死了。",
+  "solution": "好像是前几年的一个新闻，就是说，一个母亲让六岁的女儿帮忙带一岁的儿子，然后她说了一句：“弟弟要是乱尿就把他的小xx剪掉”，她可能觉得是玩笑话，但是她女儿当真了，回来的时候发现儿子血流不止，然后把女儿打死了。最后她自己也服毒自尽了",
+  "key_clues": [
+    "当真",
+    "剪掉",
+    "服毒自尽",
+    "血流不止",
+    "玩笑"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "红汤",
+      "恐怖",
+      "原创",
+      "经典"
+    ],
+    "forbidden_reveal": [
+      "好像是前几年的一个新闻，就是说，一个母亲让六岁的",
+      "最后她自己也服毒自尽了"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "horror",
+      "original",
+      "classic"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "91",
+    "reference_url": "https://soup.ahelumos.com/soups/91",
+    "rating": 5.0,
+    "rating_count": 4,
+    "author": "alfa"
+  }
+}

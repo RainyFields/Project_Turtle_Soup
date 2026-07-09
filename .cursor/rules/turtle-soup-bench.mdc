@@ -7,37 +7,27 @@ alwaysApply: true
 
 ## What this repo is
 
-海龟汤 **双 Agent** 评测框架：`Oracle`（汤主，三值回答）+ `Questioner`（猜题者，主动提问）。代号 `turtle-soup-bench`，PRD v0.1。
+海龟汤双 Agent 评测：Oracle + Questioner。代号 `turtle-soup-bench`。
 
-## Status (as of 2026-06-11)
+## Status (2026-07-08)
 
-- ✅ M0–M3：框架 + `tests/`（7 passed）
-- ✅ 题库 11 题：`turtle_001`–`005` + `turtle_010`–`015`
-- 🔲 M4a：轮数评测 Exp1/Exp2 — see **`plan.md`**
-- 🔲 M4b：benchmark 报告、async
-- 🔲 M5：多 Questioner（Phase 2）
+- ✅ M0–M3、Generator A→E+R、round-study pilot（34 tests）
+- 🔶 全量 Exp1/Exp2（11×3×3）未跑
+- 🔲 M4b benchmark CSV；M5 多 Questioner
 
 ## Entry points
 
-- Single game: `python scripts/run_game.py --puzzle turtle_001 --mock`
-- Benchmark: `python scripts/run_benchmark.py --mock ...`
-- Full guide: `AGENTS.md` at repo root
+- `python scripts/run_game.py --puzzle refsoup_006 --mock`
+- `python scripts/run_pilot.py --puzzles refsoup_006 --mock`
+- `python scripts/run_benchmark.py --puzzles refsoup --mock`
+- `AGENTS.md` · `plan.md` · `generator/README.md`
 
 ## Code map
 
-- Game loop: `engine/game.py` → `TurtleSoupGame`
-- Providers: `agents/provider_factory.py` (mock for offline)
-- Puzzles: `turtle_001`–`005`, `turtle_010`–`015` (11 total)
-- Evaluation plan: `plan.md`
-- Trajectories: `data/trajectories/*.json` (gitignored)
+- `engine/game.py` · `evaluation/round_studies.py`
+- Puzzles: `turtle_*` (11 git) + `refsoup_*` (local import)
+- Default test puzzle: **`refsoup_006`**
 
-## When user says "continue"
+## Conventions
 
-1. Read `AGENTS.md` for backlog and conventions
-2. Run `pytest -q` before/after substantive changes
-3. Use `--mock` unless testing real APIs
-4. Python **3.10+** only
-
-## Style
-
-Minimal diff; match existing patterns; no over-engineering.
+- `--mock` unless real APIs; `pytest -q`; Python 3.10+; minimal diff.

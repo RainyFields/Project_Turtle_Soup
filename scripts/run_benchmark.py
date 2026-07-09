@@ -43,6 +43,10 @@ def build_parser() -> argparse.ArgumentParser:
 def resolve_puzzles(names: List[str]) -> List[str]:
     if len(names) == 1 and names[0] == "all":
         return list_puzzle_ids()
+    if len(names) == 1 and names[0] in ("turtle", "generated"):
+        return list_puzzle_ids(family="turtle")
+    if len(names) == 1 and names[0] in ("refsoup", "reference"):
+        return list_puzzle_ids(family="refsoup")
     return names
 
 
