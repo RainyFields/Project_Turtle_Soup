@@ -74,6 +74,8 @@ Ollama 慢模型：`OLLAMA_TIMEOUT=600`（默认 600s）。
 ```text
 turtle-soup-bench/
 ├── README.md · AGENTS.md · plan.md · CONTRIBUTING.md
+├── docs/proposals/        # TurtleSoup-Creativity proposal v0.1
+├── docs/plans/            # creativity toy experiment plan (M6)
 ├── data/puzzles/          # turtle_* + refsoup_*
 ├── agents/ · engine/ · evaluation/ · generator/ · scripts/ · tests/
 ```
@@ -98,6 +100,7 @@ turtle-soup-bench/
 | M4a | 🔶 | Pilot 可跑；全量 11×3×3 + 绘图未做 |
 | M4b | 🔲 | benchmark CSV、async |
 | M5 | 🔲 | 多 Questioner |
+| M6 | 🔲 | TurtleSoup-Creativity toy 实验（见 `docs/plans/creativity-toy-experiment-plan.md`） |
 
 ---
 
