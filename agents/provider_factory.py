@@ -32,6 +32,10 @@ def get_provider(provider_name: str) -> BaseProvider:
         from .model_providers.qwen_provider import QwenProvider
 
         return QwenProvider()
+    if name in ("openrouter", "or"):
+        from .model_providers.openrouter_provider import OpenRouterProvider
+
+        return OpenRouterProvider()
     if name in ("zai", "glm", "z.ai"):
         from .model_providers.zai_provider import ZaiProvider
 

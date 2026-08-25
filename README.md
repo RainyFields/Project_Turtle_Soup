@@ -15,7 +15,8 @@
 
 - **双 Agent 对局**：Questioner 仅见汤面；Oracle 持汤底，仅回答「是 / 不是 / 与此无关」
 - **游戏引擎**：可配置最大轮数、最少提问轮数、token 预算、轨迹保存
-- **评估**：启发式 + 可选 LLM-as-Judge；轮数研究 Exp 1 / Exp 2（`run_pilot.py`）
+- **评估**：启发式 / LLM-as-Judge / `composite_judge`（关键词 70 + 逻辑 30，满分 100）；
+  轮数研究 Exp 1 / Exp 2（`run_pilot.py`）
 - **批量评测**：`run_benchmark.py`；选题族 `all` / `turtle` / `refsoup`
 - **题库生成（A→E）** + **参考汤导入（R）**：见 [`generator/README.md`](generator/README.md)
 - **离线模式**：`--mock` 无需 API Key
@@ -64,8 +65,12 @@ pytest -q
 | Questioner | anthropic | claude-opus-4-6 |
 
 密钥：`.env`；模型覆盖：`config.local.yaml` 或 CLI。  
-Provider：`openai` · `anthropic` · `deepseek` · `qwen` · `zai` · `gemini` · `ollama` · `mock`  
-Ollama 慢模型：`OLLAMA_TIMEOUT=600`（默认 600s）。
+Provider：`openai` · `anthropic` · `deepseek` · `qwen` · `zai` · `gemini` · `openrouter` · `ollama` · `mock`  
+Ollama 慢模型：`OLLAMA_TIMEOUT=600`（默认 600s）。推理模型（qwen3.5、deepseek-r1）设
+`OLLAMA_THINK=0` 关闭思考，否则延迟涨约 100 倍。
+
+> **换 Oracle / Questioner 前请先读 [AGENTS.md](AGENTS.md)「模型选型」** —— 有各模型的
+> Oracle 准确率实测、推理模型空回复陷阱，以及交接用的最短上手路径。
 
 ---
 

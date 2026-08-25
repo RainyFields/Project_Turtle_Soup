@@ -360,3 +360,32 @@ python scripts/run_benchmark.py --puzzles refsoup --mock
 ## 实现状态
 
 A→E 与 R 支线均已可用。后续非阻塞：benchmark M4b、更多 provider、发布前 mock smoke test。
+
+---
+
+## 下一阶段：题库的深度与广度
+
+当前管线只产出与参考站同类的**经典短汤（单解、线性推理）**。Benchmark 需要两个新维度
+（完整计划见仓库根 [`plan.md`](../plan.md)「下一阶段」）：
+
+### 深度 — 刁钻问题题库
+
+目标：朴素提问路径走不通，必须做非平凡的假设跳跃。
+
+- **Layer C**：`create/controllers.py` 目前只按 B 层统计抽样 category/difficulty，
+  没有「刁钻度」控制维度，需要新增可控机制。
+- **Layer D**：可加自动筛选 —— 用一个强 Questioner 试解候选，N 轮内被解出的判为深度不足。
+  实测参照：`refsoup_006` 被 `stealth/ox-alpha` 5 轮线性推到底。
+
+### 广度 — 一个汤面多个成立的解答
+
+**这不是加个字段就行**，`solution` 是单个字符串，整条链路按单解写死：
+
+| 位置 | 需要改什么 |
+|------|-----------|
+| `schema.py` | `REQUIRED_TOP_LEVEL` 含 `solution: str`，需扩成多解结构并向后兼容 |
+| `../agents/oracle_agent.py` | 模板只注入一个 `solution`；多解下是非判定规则需重新定义 |
+| `../evaluation/judge.py` | `composite_judge` 需按**最佳匹配解**打分 |
+| `key_clues` | 需按解分组，否则关键词分会跨解混算 |
+
+**待决**：多解时 Oracle 对「A 解成立、B 解不成立」的问题该答什么？这决定 schema 怎么设计。

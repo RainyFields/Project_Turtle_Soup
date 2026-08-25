@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from agents.base_agent import ModelConfig
+from agents.base_agent import EmptyResponseError, ModelConfig
 from agents.oracle_agent import OracleAgent, OracleInputs
 from agents.provider_factory import get_provider
 from agents.questioner_agent import QuestionerAgent, QuestionerInputs
@@ -147,8 +147,10 @@ class TurtleSoupGame:
 
         final_answer: Optional[str] = None
         terminated_by = "max_rounds"
+        empty_turns = 0
 
-        for round_idx in range(1, self.game_config.max_rounds + 1):
+        round_idx = 0
+        while round_idx < self.game_config.max_rounds:
             if self._budget_exceeded():
                 terminated_by = "token_budget"
                 if verbose:
@@ -156,8 +158,23 @@ class TurtleSoupGame:
                 break
 
             history = format_qa_history(traj.trajectory)
-            question = self.questioner.next_turn(history)
+            try:
+                question = self.questioner.next_turn(history)
+            except EmptyResponseError:
+                question = ""
             self._record_tokens(history, question)
+
+            # An empty turn carries no question, so it must not spend a round.
+            if not question.strip():
+                empty_turns += 1
+                if verbose:
+                    print(f"⚠️ Questioner 返回空回复（第 {empty_turns} 次），不计入轮次")
+                if empty_turns >= self.game_config.max_empty_turns:
+                    terminated_by = "empty_response"
+                    break
+                continue
+
+            round_idx += 1
 
             at_last_round = round_idx == self.game_config.max_rounds
             if (

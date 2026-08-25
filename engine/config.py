@@ -19,6 +19,7 @@ class GameConfig:
     token_budget: int = 50_000
     seed: Optional[int] = None
     force_final_answer_on_max_rounds: bool = False
+    max_empty_turns: int = 3
 
 
 @dataclass
@@ -75,6 +76,10 @@ def load_app_config(config_path: Optional[Path] = None) -> AppConfig:
             language=str(game_raw.get("language", "zh")),
             token_budget=int(game_raw.get("token_budget", 50_000)),
             seed=game_raw.get("seed"),
+            force_final_answer_on_max_rounds=bool(
+                game_raw.get("force_final_answer_on_max_rounds", False)
+            ),
+            max_empty_turns=int(game_raw.get("max_empty_turns", 3)),
         ),
         config_path=path,
     )

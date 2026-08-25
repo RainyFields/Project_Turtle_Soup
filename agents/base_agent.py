@@ -4,6 +4,15 @@ from dataclasses import dataclass
 from typing import Any, Dict, Optional, Protocol
 
 
+class EmptyResponseError(RuntimeError):
+    """A provider returned a success response with no usable content.
+
+    Reasoning models can spend their whole token budget thinking and reply with
+    an empty message. Callers must treat this as a failed turn rather than a
+    real (blank) answer.
+    """
+
+
 @dataclass(frozen=True)
 class ModelConfig:
     provider: str

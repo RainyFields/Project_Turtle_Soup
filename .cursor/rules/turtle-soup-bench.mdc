@@ -9,11 +9,14 @@ alwaysApply: true
 
 海龟汤双 Agent 评测：Oracle + Questioner。代号 `turtle-soup-bench`。
 
-## Status (2026-07-08)
+## Status (2026-08-25)
 
-- ✅ M0–M3、Generator A→E+R、round-study pilot（34 tests）
+- ✅ M0–M3、Generator A→E+R、round-study pilot（58 tests）
+- ✅ Provider 加固：重试 + 空回复处理；复合评分 `composite_judge`
 - 🔶 全量 Exp1/Exp2（11×3×3）未跑
 - 🔲 M4b benchmark CSV；M5 多 Questioner
+- 🔲 **下一阶段**：题库深度×广度（多解需改 schema）、Exp 3 联想轨迹（embedding）
+  → 见 `plan.md`「下一阶段」与 `AGENTS.md`
 
 ## Entry points
 
@@ -24,10 +27,21 @@ alwaysApply: true
 
 ## Code map
 
-- `engine/game.py` · `evaluation/round_studies.py`
-- Puzzles: `turtle_*` (11 git) + `refsoup_*` (local import)
+- `engine/game.py` · `evaluation/round_studies.py` · `evaluation/judge.py`
+- Providers: `agents/model_providers/`（含 `openrouter_provider.py`）
+- Puzzles: `turtle_*` (11 git) + `refsoup_*` (local import) —— 目前**只有经典短汤（单解）**
 - Default test puzzle: **`refsoup_006`**
+
+## 换模型时必读（AGENTS.md「模型选型」有实测数据）
+
+- **Oracle 必须强**：它是基准真值。弱模型会把答不出的问题全塌陷成「与此无关」，
+  Questioner 拿不到反馈，整题无解 —— 那种全 0 分测的是 Oracle 坏掉，不是 Questioner 弱。
+- **推理模型两个坑**：思考 token 算进 `max_tokens`/`num_predict` 预算，给小了会返回
+  **空 content**（静默错答）；思考还会让延迟涨 ~100 倍。
+- 本地 Ollama：`.env` 设 `OLLAMA_THINK=0`。
 
 ## Conventions
 
 - `--mock` unless real APIs; `pytest -q`; Python 3.10+; minimal diff.
+- 密钥只进 `.env`（gitignored）；**绝不在对话/PR 里粘贴 key**。
+- 新增 provider：照 `zai_provider.py` 写，接进 `provider_factory.py` + `scripts/check_env.py`。

@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from agents.base_agent import ModelConfig
+from agents.base_agent import EmptyResponseError, ModelConfig
 from agents.questioner_agent import QuestionerInputs
 from engine.config import AppConfig, GameConfig
 from engine.game import (
@@ -96,9 +96,22 @@ def run_round_curve(
     natural_end_round: Optional[int] = None
     natural_final_answer: Optional[str] = None
 
-    for round_idx in range(1, max_checkpoint_round + 1):
+    empty_turns = 0
+    round_idx = 0
+    while round_idx < max_checkpoint_round:
         history = format_qa_history(traj_rounds)
-        question = game.questioner.next_turn(history)
+        try:
+            question = game.questioner.next_turn(history)
+        except EmptyResponseError:
+            question = ""
+
+        # Exp 1 measures accuracy per *asked* round; a blank turn is not one.
+        if not question.strip():
+            empty_turns += 1
+            if empty_turns >= cfg.max_empty_turns:
+                break
+            continue
+        round_idx += 1
 
         if is_final_answer_turn(question):
             parsed = parse_final_answer(question)
@@ -114,7 +127,10 @@ def run_round_curve(
         answer = game.oracle.answer(question)
         traj_rounds.append(RoundRecord(round=round_idx, question=question, answer=answer))
 
-        checkpoint = game.questioner.request_final_answer(format_qa_history(traj_rounds))
+        try:
+            checkpoint = game.questioner.request_final_answer(format_qa_history(traj_rounds))
+        except EmptyResponseError:
+            checkpoint = ""  # no checkpoint answer this round → scores 0
         checkpoint_answer = parse_final_answer(checkpoint)
         accuracy_by_round[round_idx] = _judge_score(puzzle, checkpoint_answer)
 

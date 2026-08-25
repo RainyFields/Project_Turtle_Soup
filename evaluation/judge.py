@@ -27,6 +27,64 @@ JUDGE_PROMPT = """你是海龟汤游戏的裁判。请比较猜题者的最终�
 """
 
 
+# Composite scoring: key clues carry most of the weight because they are
+# objectively checkable; the remainder rewards a coherent causal story, which
+# only a model can assess — and only unreliably, hence repeated sampling.
+KEY_CLUE_POINTS = 70.0
+LOGIC_POINTS = 30.0
+
+LOGIC_PROMPT = """你是海龟汤裁判。请只评估「猜题者答案」的**因果逻辑**与「标准汤底」是否一致。
+
+【标准汤底】：{solution}
+【猜题者答案】：{final_answer}
+
+评分只看逻辑链条是否还原，不要因为用词不同而扣分：
+- 1.0：核心因果链完全一致（起因、机制、结果都对）
+- 0.7：主要机制对，个别环节缺失或含糊
+- 0.4：方向对但关键机制错误
+- 0.1：只有零星相关，整体逻辑不成立
+- 0.0：完全不相关
+
+请只返回 JSON：{{"logic": 0.7, "reasoning": "..."}}
+"""
+
+
+@dataclass
+class CompositeScore:
+    """0-100 score: key-clue recall (70) + averaged logic rating (30)."""
+
+    key_clue_score: float
+    logic_score: float
+    total: float
+    hit_clues: List[str]
+    missed_clues: List[str]
+    logic_samples: List[float]
+    key_clue_count: int
+
+    @property
+    def difficulty_band(self) -> str:
+        """Puzzle difficulty follows how many clues must be recovered."""
+        n = self.key_clue_count
+        if n <= 2:
+            return "easy"
+        if n <= 4:
+            return "medium"
+        return "hard"
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "score": round(self.total / 100.0, 4),  # 0-1, for existing consumers
+            "total_score": round(self.total, 2),
+            "key_clue_score": round(self.key_clue_score, 2),
+            "logic_score": round(self.logic_score, 2),
+            "logic_samples": self.logic_samples,
+            "key_elements_hit": self.hit_clues,
+            "key_elements_missed": self.missed_clues,
+            "key_clue_count": self.key_clue_count,
+            "difficulty_band": self.difficulty_band,
+        }
+
+
 @dataclass
 class JudgeResult:
     score: float
@@ -95,6 +153,73 @@ def heuristic_judge(
         reasoning="启发式评分（基于 key_clues 子串匹配）",
         hit_elements=hit,
         missed_elements=missed,
+    )
+
+
+def _parse_logic_score(text: str) -> Optional[float]:
+    try:
+        data = _parse_judge_json(text)
+    except (json.JSONDecodeError, ValueError):
+        return None
+    try:
+        return max(0.0, min(1.0, float(data.get("logic"))))
+    except (TypeError, ValueError):
+        return None
+
+
+def composite_judge(
+    *,
+    solution: str,
+    final_answer: Optional[str],
+    key_clues: List[str],
+    logic_rater: Optional[Any] = None,
+    logic_samples: int = 3,
+) -> CompositeScore:
+    """Score a run out of 100: clue recall (70) plus averaged logic rating (30).
+
+    `logic_rater` is any object with .complete(system=, user=) -> str; pass None
+    to skip the model calls and score clues only. Sampling repeatedly matters
+    because a single rating is unstable on borderline answers.
+    """
+    clues = [c for c in key_clues if c]
+    if not final_answer:
+        return CompositeScore(
+            key_clue_score=0.0,
+            logic_score=0.0,
+            total=0.0,
+            hit_clues=[],
+            missed_clues=list(clues),
+            logic_samples=[],
+            key_clue_count=len(clues),
+        )
+
+    hit = [c for c in clues if _clue_matches_answer(c, final_answer)]
+    missed = [c for c in clues if c not in hit]
+    clue_ratio = (len(hit) / len(clues)) if clues else 0.0
+    clue_score = clue_ratio * KEY_CLUE_POINTS
+
+    samples: List[float] = []
+    if logic_rater is not None and logic_samples > 0:
+        prompt = LOGIC_PROMPT.format(solution=solution, final_answer=final_answer)
+        for _ in range(logic_samples):
+            try:
+                raw = logic_rater.complete(system="你是严格的海龟汤裁判。", user=prompt)
+            except Exception:
+                continue
+            value = _parse_logic_score(raw)
+            if value is not None:
+                samples.append(value)
+    logic_mean = (sum(samples) / len(samples)) if samples else 0.0
+    logic_score = logic_mean * LOGIC_POINTS
+
+    return CompositeScore(
+        key_clue_score=clue_score,
+        logic_score=logic_score,
+        total=clue_score + logic_score,
+        hit_clues=hit,
+        missed_clues=missed,
+        logic_samples=[round(v, 3) for v in samples],
+        key_clue_count=len(clues),
     )
 
 

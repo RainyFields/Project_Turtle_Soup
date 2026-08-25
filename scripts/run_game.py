@@ -33,6 +33,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--max-rounds", type=int, default=None)
     p.add_argument("--min-rounds", type=int, default=None, help="Min rounds before final answer")
     p.add_argument("--debug", action="store_true")
+    p.add_argument(
+        "--force-final-answer",
+        action="store_true",
+        help="On the last round, require a FINAL_ANSWER instead of ending unanswered",
+    )
     p.add_argument("--mock", action="store_true", help="Use mock providers for both agents")
     p.add_argument("--no-save", action="store_true", help="Do not write trajectory json")
     p.add_argument("--no-judge", action="store_true", help="Skip LLM judge (heuristic only)")
@@ -79,6 +84,8 @@ def apply_overrides(app: AppConfig, args: argparse.Namespace) -> AppConfig:
         app.game.max_rounds = args.max_rounds
     if args.min_rounds is not None:
         app.game.min_rounds_before_answer = args.min_rounds
+    if args.force_final_answer:
+        app.game.force_final_answer_on_max_rounds = True
     if args.debug:
         app.game.debug_mode = True
     if args.no_save:
