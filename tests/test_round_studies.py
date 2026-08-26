@@ -1,7 +1,14 @@
 from agents.base_agent import ModelConfig
 from engine.config import AppConfig, GameConfig
 from engine.game import TurtleSoupGame, load_puzzle
-from evaluation.round_studies import ModelSpec, run_round_cap, run_round_curve
+from evaluation.judge import composite_judge
+from evaluation.round_studies import (
+    JudgeSpec,
+    ModelSpec,
+    _judge_score,
+    run_round_cap,
+    run_round_curve,
+)
 
 
 def _mock_app(max_rounds: int, *, force: bool = False) -> AppConfig:
@@ -41,4 +48,45 @@ def test_round_cap_sweep():
     row = run_round_cap(puzzle, app_config=_mock_app(5, force=True), round_cap=5)
     assert row["round_cap"] == 5
     assert row["final_answer"]
+    assert 0.0 <= row["score"] <= 1.0
+
+
+class _FixedRater:
+    """Always rates the causal logic 1.0."""
+
+    def complete(self, *, system, user):
+        return '{"logic": 1.0}'
+
+
+def test_composite_spec_matches_direct_composite_call():
+    puzzle = load_puzzle("turtle_001")
+    spec = JudgeSpec(mode="composite")
+    answer = puzzle["solution"]
+    expected = composite_judge(
+        solution=puzzle["solution"],
+        final_answer=answer,
+        key_clues=puzzle.get("key_clues", []),
+        logic_rater=None,
+        logic_samples=0,
+    ).to_dict()["score"]
+    assert _judge_score(puzzle, answer, judge=spec) == expected
+
+
+def test_composite_spec_rater_adds_logic_points():
+    puzzle = load_puzzle("turtle_001")
+    spec = JudgeSpec(mode="composite", logic_samples=2)
+    answer = "一个与线索无关的答案"
+    clue_only = _judge_score(puzzle, answer, judge=spec)
+    with_rater = _judge_score(puzzle, answer, judge=spec, rater=_FixedRater())
+    assert abs((with_rater - clue_only) - 0.3) < 1e-6  # logic contributes 30/100
+
+
+def test_round_cap_accepts_composite_judge():
+    puzzle = load_puzzle("turtle_001")
+    row = run_round_cap(
+        puzzle,
+        app_config=_mock_app(4, force=True),
+        round_cap=4,
+        judge=JudgeSpec(mode="composite"),
+    )
     assert 0.0 <= row["score"] <= 1.0

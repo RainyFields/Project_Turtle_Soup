@@ -65,11 +65,14 @@ python scripts/run_real_timing.py \
 
 ## 待做（当前阶段）
 
-- [ ] 独立 CLI：`run_round_curve.py`、`run_round_cap_sweep.py`
-- [ ] `evaluation/plot_round_studies.py`
+- [x] 独立 CLI：`run_round_curve.py`、`run_round_cap_sweep.py`（支持 `--seeds`、`--judge composite`、`--mock`）
+- [x] `evaluation/plot_round_studies.py`（吃 `pilot_timing.json` / 两个新 CLI 的 JSON，出 PNG）
+- [x] 把 `composite_judge` 接进 `run_game.py` / `round_studies.py`
+  - `run_game.py --composite-judge [--logic-samples N]`；judge provider/model 复用现有 flag
+  - `round_studies.py` 走 `JudgeSpec(mode="composite", provider=..., model=...)`；
+    不给 provider 则只算关键词 70 分（Exp 1 checkpoint 逐轮打分时可保持零额外调用）
 - [ ] 全量：11 puzzles × 3 models × 3 seeds
-- [ ] 把 `composite_judge` 接进 `run_game.py` / `round_studies.py`（目前只有函数，未接线）
-- [ ] 可选：pilot 切换 LLM judge；Exp 1 每 5 轮 checkpoint
+- [ ] 可选：Exp 1 每 5 轮 checkpoint（降低 checkpoint 调用量）
 
 ---
 
@@ -145,6 +148,26 @@ python scripts/run_real_timing.py \
 | 单题 pilot（12 轮 + 3 caps，Ollama） | ~93 calls，~270s |
 
 @ 12s/call 规划：全量合计约 **31h** API 时间。
+
+### Tinker（$2k 预算）可行性 — 2026-08-25
+
+Tinker 支持对开源大模型直接采样推理（SamplingClient），按 token 计费
+（prefill / sample / train 三档，cached prefill 打 2 折）。代表性价格（$/M tokens，prefill/sample）：
+Qwen3.5-397B-A17B $3.00/$7.50，Kimi-K2.6 $2.21/$5.49，DeepSeek-V3.1 $1.70/$4.22，
+GPT-OSS-120B $0.33/$0.84。
+
+全量 11×3×3 的 Questioner 侧 token 粗算：Exp2 594 games（~18 轮/game，历史随轮增长）
+≈ 12.5M prefill + 思考型输出 ~11M sample；Exp1 99 games（30 轮 × 3 调用）≈ 8M + 6M。
+合计 ~20M prefill + ~17M sample →
+**Qwen3.5-397B 全量约 $190，Kimi-K2.6 约 $140**；就算思考 token 放大 5 倍也 <$700。
+**结论：$2k 足够在最大档位模型上跑数遍全量。**
+
+注意：
+1. Tinker 是 SDK 接口（非 OpenAI 兼容 REST），需新增 `agents/model_providers/tinker_provider.py`
+   （参照 `openrouter_provider.py`，实现 `BaseProvider.generate` → SamplingClient）。
+2. 纯推理 OpenRouter 已接好且同类开源模型往往更便宜；Tinker 预算的**独特价值在 train 档**
+   （LoRA 微调/RL 训练 Questioner，composite score 可直接作 reward）。建议推理基准走
+   OpenRouter/qwen，Tinker 额度留给训练实验。
 
 ---
 

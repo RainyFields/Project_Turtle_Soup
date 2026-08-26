@@ -17,7 +17,7 @@ from agents.base_agent import ModelConfig
 from engine.config import AppConfig, load_app_config
 from engine.game import TurtleSoupGame, load_puzzle
 from engine.trajectory import save_trajectory
-from evaluation.judge import LLMJudge, heuristic_judge
+from evaluation.judge import JudgeResult, LLMJudge, composite_judge, heuristic_judge
 from evaluation.metrics import compute_metrics
 from evaluation.report import print_evaluation_report
 
@@ -43,6 +43,13 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--no-judge", action="store_true", help="Skip LLM judge (heuristic only)")
     p.add_argument("--judge-provider", default="openai")
     p.add_argument("--judge-model", default="gpt-4o")
+    p.add_argument(
+        "--composite-judge",
+        action="store_true",
+        help="Score with composite_judge (clue recall 70 + logic 30) instead of "
+        "the single-call LLM judge; --no-judge/--mock drops the logic 30",
+    )
+    p.add_argument("--logic-samples", type=int, default=3, help="Logic ratings to average")
     p.add_argument("--seed", type=int, default=None)
     p.add_argument("--quiet", action="store_true")
     return p
@@ -105,12 +112,38 @@ def main() -> int:
     result = game.run(verbose=not args.quiet)
     traj = result.trajectory
 
+    extra_evaluation: dict = {}
     judge = heuristic_judge(
         solution=puzzle["solution"],
         final_answer=traj.final_answer,
         key_clues=puzzle.get("key_clues", []),
     )
-    if not args.no_judge and traj.final_answer and not args.mock:
+    if args.composite_judge:
+        rater = None
+        if not args.no_judge and traj.final_answer and not args.mock:
+            try:
+                rater = LLMJudge(provider_name=args.judge_provider, model=args.judge_model)
+            except Exception:
+                rater = None
+        comp = composite_judge(
+            solution=puzzle["solution"],
+            final_answer=traj.final_answer,
+            key_clues=puzzle.get("key_clues", []),
+            logic_rater=rater,
+            logic_samples=args.logic_samples,
+        )
+        extra_evaluation = comp.to_dict()
+        judge = JudgeResult(
+            score=extra_evaluation["score"],
+            reasoning=(
+                f"composite：关键词 {comp.key_clue_score:.1f}/70"
+                f" + 逻辑 {comp.logic_score:.1f}/30"
+                f"（难度 {comp.difficulty_band}，逻辑采样 {len(comp.logic_samples)} 次）"
+            ),
+            hit_elements=comp.hit_clues,
+            missed_elements=comp.missed_clues,
+        )
+    elif not args.no_judge and traj.final_answer and not args.mock:
         try:
             llm_judge = LLMJudge(provider_name=args.judge_provider, model=args.judge_model)
             judge = llm_judge.judge(
@@ -126,6 +159,7 @@ def main() -> int:
     traj.evaluation = {
         "score": judge.score,
         **judge.to_dict(),
+        **extra_evaluation,
     }
 
     if result.trajectory_path:
