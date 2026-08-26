@@ -1,14 +1,14 @@
 # Thinking Sideways, Observed: Interpreting the Lateral-Thinking Search Behavior of LLM Agents with Turtle Soup Puzzles
 
 **Target venue:** IAB — Interpreting Agent Behavior, Workshop @ NeurIPS 2026 (https://iab-agents.github.io/)
-**Draft:** v0.1 — 2026-08-25 — 4-page workshop format (content sized for ~4 pages + references in NeurIPS style)
+**Draft:** v0.2 — 2026-08-26 — full E1–E3 results on the 11 puzzles × 3 models × 3 seeds grid (693 games); PDF at `docs/paper/iab2026.pdf`
 **Status:** awaiting author feedback; see "Open questions for the authors" at the end.
 
 ---
 
 ## Abstract
 
-When an LLM agent fails a lateral-thinking task, outcome metrics report *that* it failed — not *how*. We present a behavioral-interpretation framework built on Turtle Soup (海龟汤, situation puzzles), an interactive game whose yes/no questioning protocol externalizes an agent's hypothesis-space search, turn by turn. Our central hypothesis is that **lateral-thinking failures are legible in the geometry of the interaction trace**: embedding each round's question into a semantic space anchored by human word-association norms separates two failure modes that identical outcome scores conflate — *stalling* (association step size collapsing toward zero: the agent circles one hypothesis) and *drifting* (normal step size but monotonically increasing distance from human association paths). We instantiate the framework in a dual-agent benchmark harness (Questioner vs. solution-holding Oracle), contribute a composite scoring scheme that decouples objective clue recall from judged causal-logic recovery, and design three experiments: round-curve and round-budget studies of how behavior evolves with interaction length, and an association-trajectory study adapting forward-flow and divergent-association psychometrics from human creativity research to agent traces. Pilot observations already exhibit both hypothesized failure modes — including a small model that lapses into verbatim question repetition and a frontier model whose correct causal chain scores zero under surface-matching metrics — and reveal a methodological trap for interactive evaluation at large: a weak Oracle silently converts the task into one that is information-theoretically unsolvable, so the observed "agent failure" is actually environment failure.
+When an LLM agent fails a lateral-thinking task, outcome metrics report *that* it failed — not *how*. We present a behavioral-interpretation framework built on Turtle Soup (海龟汤, situation puzzles), an interactive game whose yes/no questioning protocol externalizes an agent's hypothesis-space search, turn by turn. Our central hypothesis is that **lateral-thinking failures are legible in the geometry of the interaction trace**: embedding each round's question into a semantic space anchored by human word-association norms separates two failure modes that identical outcome scores conflate — *stalling* (association step size collapsing toward zero: the agent circles one hypothesis) and *drifting* (normal step size but monotonically increasing distance from human association paths). We instantiate the framework in a dual-agent benchmark harness (Questioner vs. solution-holding Oracle), contribute a composite scoring scheme that decouples objective clue recall from judged causal-logic recovery, and design three experiments: round-curve and round-budget studies of how behavior evolves with interaction length, and an association-trajectory study adapting forward-flow and divergent-association psychometrics from human creativity research to agent traces. On a 693-game grid (11 puzzles × three model scales × three seeds) we find that outcome curves are strikingly flat — checkpoint accuracy does not improve over 30 rounds for any model, and added round budget leaves large models unchanged while actively degrading the 4B — and that trajectory geometry explains the flatness: drift away from the human manifold predicts failure (r = −0.28 pooled, −0.43 for the mid-size model), while stride's sign *inverts with scale* (the small model's large jumps are noise, ρ = −0.46; the largest model's are productive exploration). We also document a methodological trap for interactive evaluation at large: a weak Oracle silently converts the task into one that is information-theoretically unsolvable, so observed "agent failure" is actually environment failure.
 
 ---
 
@@ -92,7 +92,30 @@ For every E1/E2 game: compute \(\{s_t\}, \{h_t\}\); test H1/H2 by clustering fai
 
 Before any agent claim: probe candidate Oracles on held-out (question, ground-truth) pairs. Pilot: a 4B Oracle answered 30% correctly (thinking disabled) — collapsing most questions to "irrelevant", after which *no* Questioner can succeed and all scores measure Oracle noise; raising Oracle accuracy 30% → 100% left the 4B Questioner's score unchanged, confirming the environment (not the agent) had been the bottleneck. All experiments fix a ≥90%-accuracy Oracle.
 
-## 5. Pilot Observations (evidence the framework detects something real)
+## 5. Results (full grid: 11 puzzles × {4B, 27B, 397B} × 3 seeds; 99 E1 + 594 E2 games)
+
+**Page budget: ~0.8 page (net of trimming §4's predictions now that results exist).**
+
+### 5.1 E1 — interaction does not improve the working hypothesis
+
+Checkpoint accuracy is **flat across all 30 rounds for every model** (`fig_e1_curves.png`): Qwen3.6-27B ≈ 0.20, Qwen3.5-397B ≈ 0.18, Qwen3.5-4B ≈ 0.14 (clue recall; SEM bands overlap round 1 vs round 30 for all three). Whatever evidence the Oracle's answers provide, none of the models integrates it into a measurably better running hypothesis. Commitment behavior, however, separates sharply: the 4B **never** voluntarily commits a final answer (0/33 games), the 27B commits most readily (9/33, mean round 8.7), the 397B rarely and late (2/33, mean round 19.5) — the calibration axis of the exploration profile is already discriminative even where accuracy is not.
+
+### 5.2 E2 — budget buys the small model degradation, not accuracy
+
+End accuracy vs. round cap (`fig_e2_caps.png`, composite scoring with logic rater): the 27B and 397B are **flat** (0.32–0.36 across caps 5→30; every game ends in a committed final answer under forcing). The 4B peaks at cap 15 (0.23) then **declines monotonically to 0.10 at cap 30** — longer interaction actively hurts it — and 29/198 of its games die by token-budget exhaustion (verbosity as a failure mode). Consistent with E1: no model converts additional rounds into accuracy; the smallest converts them into noise.
+
+### 5.3 E3 — trajectory geometry explains the flatness, capacity-dependently
+
+Over the 99 E1 traces (`fig_e3_scatter.png`, `e3_geometry.json`):
+
+- **Drift predicts failure (H2, direction confirmed):** human-distance slope vs. best accuracy r = −0.28 pooled; strongest for the 27B (r = −0.43). Traces that move *away* from the human association manifold end worse.
+- **Stride is capacity-dependent (H1 refined, not confirmed as stated):** pooled stride–outcome correlation is ~0; per model it *inverts with scale* — 4B ρ = −0.46 (its large jumps are incoherent, not exploratory), 397B r = +0.21 (its large jumps are productive exploration). Raw step size is not a univariate health signal; step size *conditioned on capability tier* is.
+- **Signatures are vivid at the trace level** (Figure 1, turtle_002 seed 0): the 4B plays all 30 rounds with late-game step size **0.003** — near-total stall; the 397B strides at 0.16 for 13 rounds, then narrows to 0.02 as it converges — a clean explore-then-commit arc; the 27B lands on the correct hypothesis at round 1 and commits by round 4.
+- **H3 (predictivity beyond covariates): partially supported** — drift slope adds signal, stride only interacted with model tier; the mixed-effects analysis with puzzle/model random effects is the remaining step before claiming H3.
+
+**Interpretation.** The flat E1/E2 curves are the *outcome shadow* of two different behaviors the geometry separates: small models stall (and degrade with budget), larger models explore but do not accumulate — their strides are real, yet checkpoint accuracy stays flat, meaning exploration is not being *banked* into an improving hypothesis. That diagnosis — not visible in any outcome metric — is the paper's case for trajectory-level interpretation.
+
+## 6. Pilot Observations (evidence the framework detects something real)
 
 **Page budget: ~0.4 page.** All from the current harness; full logs in the repository.
 
@@ -101,11 +124,11 @@ Before any agent claim: probe candidate Oracles on held-out (question, ground-tr
 3. **Thinking-budget truncation masquerades as behavior.** With a 512-token budget, a hybrid reasoning model's visible "questions" were truncated chain-of-thought, and every Oracle reply was "irrelevant" — a failure mode of the *instrumentation* (budget), not the agent; disabling template thinking recovered an 8-round solve (composite 0.58). Behavioral interpretation requires auditing the decoding configuration as part of the environment.
 4. **Linear-solvable puzzles are poor probes.** A strong model solved a classic puzzle in 5 straight-line rounds — motivating E4(b)'s structure-graded puzzle bank.
 
-## 6. Limitations & Ethics
+## 7. Limitations & Ethics
 
 **Page budget: ~0.2 page.** Keyword extraction and encoders are themselves models (audited, dual-encoder reporting); SWOW norms are population averages, not a normative standard for "correct" association — distance from them is a *descriptive* behavioral coordinate, and we explicitly do not equate human-unlike with wrong (H2 is about failure *correlation*, tested, not assumed); judge biases mitigated per [7, 8]; puzzles involve death/dark themes — content-flagged; contamination handled by memorization probes and fresh/novel puzzle sourcing.
 
-## 7. Conclusion
+## 8. Conclusion
 
 Turtle soup turns hypothesis-space search into observable text; trajectory geometry over a human-association anchor turns that text into interpretable behavioral signatures. If H1–H3 hold, "why did the agent fail" becomes a measurement, not a vibe — and the same instruments give RL training on the Questioner (enabled by our token-billed provider for large open models and trained-checkpoint evaluation) a behaviorally grounded reward-shaping target.
 
@@ -128,10 +151,12 @@ Turtle soup turns hypothesis-space search into observable text; trajectory geome
 
 ---
 
-## Open questions for the authors (feedback wanted before v0.2)
+## Open questions for the authors (feedback wanted before v0.3)
 
-1. **Story check:** the draft leads with *interpretation of failure modes* (fits IAB) and demotes the dual-track creativity benchmark (the July proposal's centerpiece) to E4(b). Is that the right emphasis for this venue, or should the divergent track be a co-equal pillar?
-2. **Scope of claims:** should v0.2 commit to running E1–E3 in full for the paper (11×3×3 ≈ $150–200 on Tinker per §cost analysis in plan.md), with E4 as "future work" — or present E1–E2 results + E3 design only?
-3. **Human data:** H2 needs the human association manifold. SWOW-EN is verified; a Chinese SWOW equivalent needs sourcing (the zh norms in the SWOW family exist but I have not yet verified coverage for our puzzle vocabulary). Is collecting a small set of human player traces (e.g., 5 humans × 6 puzzles) feasible for you within the timeline?
-4. **Naming:** current running title "Thinking Sideways, Observed" — alternatives: "Trace of a Sideways Thought", "TurtleSoup-Trace". Preference?
-5. **Figure 1** requires a real trajectory projection — fine to build from E1 pilot data on 2 models × 3 puzzles before full runs?
+*(Resolved in v0.2: decision 2 — E1–E3 ran in full, 693 games; decision 5 — Figure 1 built from real traces.)*
+
+1. **Story check (still open):** v0.2 leads with failure-mode interpretation; the headline finding turned out to be *flat outcome curves + capacity-dependent geometry*. Should the abstract lead with the flatness result instead of the framework?
+2. **H1 as stated is refuted-and-refined:** raw stride does not predict failure univariately — its sign inverts with scale. I have written this honestly as "H1 refined." Comfortable, or do you want H1 restated in the intro so the refinement isn't framed as a miss?
+3. **Human data (still open):** the manifold is still the proxy (surface/solution/clue words). SWOW-zh sourcing or a small human-trace collection would upgrade H2 from "direction confirmed vs proxy" to the real claim. Feasible before the deadline?
+4. **Title (still open):** "Thinking Sideways, Observed" — alternatives welcome.
+5. **H3 completion:** the mixed-effects analysis (puzzle/model random effects) is the remaining step before claiming predictivity beyond covariates. Run it for v0.3, or soften H3 to descriptive?
