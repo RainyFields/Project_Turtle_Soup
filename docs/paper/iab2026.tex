@@ -1,0 +1,120 @@
+% Thinking Sideways, Observed — IAB @ NeurIPS 2026 workshop draft
+% Build: tectonic iab2026.tex   (XeTeX; needs macOS CJK font "Songti SC")
+% NOTE: self-contained approximation of the NeurIPS preprint layout; swap in
+% the official workshop .sty before submission.
+\documentclass[10pt]{article}
+\usepackage[letterpaper,margin=1in,top=0.9in]{geometry}
+\usepackage{fontspec}
+\usepackage{xeCJK}
+\setmainfont{Times New Roman}
+\setCJKmainfont{Songti SC}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{9pt}{4pt}
+\titlespacing*{\subsection}{0pt}{7pt}{3pt}
+\titleformat*{\section}{\large\bfseries}
+\titleformat*{\subsection}{\normalsize\bfseries}
+\captionsetup{font=small,labelfont=bf}
+\setlength{\parskip}{2pt}
+\usepackage{enumitem}
+\setlist{nosep,leftmargin=1.4em}
+
+\title{\bfseries Thinking Sideways, Observed: Interpreting the Lateral-Thinking\\ Search Behavior of LLM Agents with Turtle Soup Puzzles}
+\author{Xiaoxuan Lei \and (co-authors TBD)\\
+\small Draft v0.2 --- IAB: Interpreting Agent Behavior, Workshop @ NeurIPS 2026}
+\date{}
+
+\begin{document}
+\maketitle
+\vspace{-1.5em}
+
+\begin{abstract}
+When an LLM agent fails a lateral-thinking task, outcome metrics report \emph{that} it failed---not \emph{how}. We present a behavioral-interpretation framework built on Turtle Soup (海龟汤, situation puzzles), an interactive game whose yes/no questioning protocol externalizes an agent's hypothesis-space search, turn by turn. Our central hypothesis is that lateral-thinking failures are legible in the geometry of the interaction trace: embedding each round's question into a semantic space anchored by human word-association norms separates two failure modes that identical outcome scores conflate---\emph{stalling} (association step size collapsing toward zero) and \emph{drifting} (normal step size but increasing distance from human association paths). We instantiate the framework in an open-source dual-agent harness, contribute a composite score that decouples objective clue recall from judged causal-logic recovery, and run three experiments over 11 puzzles $\times$ 3 model sizes $\times$ 3 seeds: round-curve (E1) and round-budget (E2) studies of how behavior evolves with interaction length, and an association-trajectory study (E3) adapting forward-flow and divergent-association psychometrics to agent traces. % TODO v0.2: 1-2 sentence results summary
+We also report a methodological trap for interactive evaluation at large: a weak Oracle silently converts the task into one that is information-theoretically unsolvable, so observed ``agent failure'' can be environment failure.
+\end{abstract}
+
+\section{Introduction}
+Benchmarks for agentic reasoning overwhelmingly score outcomes: solve rate, accuracy, rounds. For \emph{lateral} thinking---abductive reconstruction of a hidden explanation from sparse, surprising observations---outcomes are especially uninformative: two agents scoring $0.0$ may be failing in opposite ways (one never leaves its first hypothesis; one leaves the plausible region entirely). Interpreting agent behavior requires instruments that read the \emph{process}.
+
+Turtle Soup gives the agent a paradoxical scenario (the 汤面, ``surface'') and hides the story (the 汤底, ``base''); the agent asks yes/no questions to reconstruct it. Three properties make it a behavioral microscope: (i) the questioning protocol is a naturally verbalized search trace---no activation access needed, the behavior \emph{is} text; (ii) puzzles are deliberately under-determined, so the direction of each associative jump is diagnostic; (iii) games are short, language-only, and cheap at scale. Prior turtle-soup benchmarks score verification correctness, solve efficiency, or consistency with the intended story (\S\ref{sec:rw}); none interprets the search behavior itself.
+
+\textbf{Central hypothesis.} An agent's per-round questions, embedded jointly with human word-association norms, form a trajectory whose geometry predicts and explains success:
+\begin{itemize}
+\item \textbf{H1 (stalling).} Failure trajectories with step size $\to 0$ identify agents that cannot leave a hypothesis basin; lexical novelty heuristics detect only the verbatim extreme.
+\item \textbf{H2 (drifting).} Failure trajectories with normal step size but increasing distance from the human association manifold identify agents exploring where no human path goes---invisible to lexical novelty, since synonym-shuffled re-asks look ``new.''
+\item \textbf{H3 (predictivity).} Trajectory features predict final solve quality beyond outcome-adjacent covariates, and the two failure modes have distinct signatures.
+\end{itemize}
+
+\textbf{Contributions.} (1) A behavioral-interpretation framework and open-source dual-agent harness; (2) a composite outcome score decoupling clue recall from judged causal logic, exposing when surface metrics mislead; (3) experiments E1--E3 with results on a 3-size model sweep; (4) a methodological finding: Oracle competence must be audited first, else agent scores measure the environment.
+
+\section{Related Work}\label{sec:rw}
+\textbf{Turtle soup as LLM benchmark.} TurtleBench~\cite{turtlebench} collects 1{,}532 real user guesses and evaluates models as yes/no judges---verification, not exploration. SPLAT~\cite{splat} introduces 975 graded situation puzzles and the interactive player--judge protocol we adopt, scored by accuracy and rounds. TurtleSoup-Bench~\cite{tsbench} frames 800 bilingual puzzles as ``imaginative reasoning'' with multi-dimensional scoring, still rewarding faithfulness to the single intended story. Our delta: we score the \emph{trajectory}, not only the destination.
+
+\textbf{Divergent thinking in agents.} MUTATE~\cite{mutate} shows frontier agents discover far fewer mechanism-distinct alternative paths than humans, and localizes a cause: divergent generation and convergent selection under one conditioning. Its diverge-then-narrow agent (ReDNA) is a candidate intervention to test against our metrics: does it lengthen steps (H1) or re-anchor toward human paths (H2)? Cross-domain creativity evaluations~\cite{creativityprism,refcreativity} supply the novelty$\times$appropriateness consensus our composite score implements.
+
+\textbf{Human creativity psychometrics we adapt.} Forward flow~\cite{forwardflow} quantifies how far free-association chains travel in semantic space and predicts human creativity; the Divergent Association Task~\cite{dat} shows semantic distance among generated words is itself a robust creativity measure, applied to LLMs by~\cite{datllm}. The Small World of Words norms~\cite{swow} give an empirical human association manifold to anchor ``human-path distance,'' rather than assuming any model embedding is human-like.
+
+\textbf{LLM-as-judge reliability.} Bias catalogues~\cite{calm,posbias} motivate our judge design: rubric-anchored pointwise scoring, blinding, and confining the judge to the one subscore (causal-logic identity) that objective matching cannot reach.
+
+\section{Framework}
+\subsection{Task and harness}
+A \textbf{Questioner} sees only the 汤面 and asks one yes/no question per round; an \textbf{Oracle} holds the 汤底 and answers 是/不是/与此无关; the Questioner may commit a final story at any round, or is forced to at the budget. The open-source harness has pluggable providers (local, gateway, and token-billed sampling of large open models, including RL-trained checkpoints), full trajectory logging, and per-game seeds.
+
+\subsection{Outcome scoring: composite, not surface}
+Judged outcome $=$ \textbf{clue recall (70)} $+$ \textbf{causal-logic identity (30)}. Clue recall matches per-puzzle annotated key clues (with a character-bigram-recall fallback for sentence-form clues; \S\ref{sec:pilot}); the logic judge rates only whether cause$\to$mechanism$\to$outcome matches, ignoring wording, sampled $k$ times and averaged. Distance without validity scores zero, per the novelty$\times$appropriateness consensus.
+
+\subsection{Association-trajectory instrumentation}
+Per round $t$: extract question keywords (fixed extractor), embed, aggregate to a unit vector $q_t$. Signals: \textbf{step size} $s_t = d(q_t, q_{t-1})$ (forward-flow analogue) and \textbf{human-path distance} $h_t = d(q_t, \mathcal{H})$, where $\mathcal{H}$ is the puzzle's human association anchor---SWOW-seeded in the full design; a documented proxy (surface/solution/clue content words) in this draft. Hypothesized signatures: stalling $=$ $\bar{s}\to 0$, $h$ flat; drifting $=$ $\bar{s}$ normal, $h_t$ increasing.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.72\linewidth]{figures/fig1_turtle_002_pilot.png}
+\caption{Question trajectories of three model sizes on one puzzle (2-D PCA; gray cloud: proxy association manifold). The failed 4B model (red) circles its first hypothesis (mean step $0.06$); the solving 397B (green) strides across the manifold (mean step $0.35$) before converging. The 27B solves with small steps because round~1 already lands on the correct hypothesis---stride requires convergence context (\S\ref{sec:results}).}
+\label{fig:one}
+\end{figure}
+
+\section{Experiments}
+\textbf{Setup.} 11 Chinese puzzles with annotated key clues; Questioners Qwen3.5-4B, Qwen3.6-27B, Qwen3.5-397B-A17B (sampled via a token-billed API for open models); Oracle and logic judge fixed to Qwen3.5-397B-A17B, thinking disabled. \textbf{Oracle audit (prerequisite):} on held-out probe pairs the Oracle scores 15/15 (100\%) on yes/no items. In an earlier pilot, a 4B Oracle answered 30\% correctly, collapsing most questions to ``irrelevant''---after which no Questioner can succeed; raising Oracle accuracy $30\%\to100\%$ left the 4B Questioner's score unchanged: the environment, not the agent, was the bottleneck.
+
+\textbf{E1 (round curve).} Play to 30 rounds; after each round force a checkpoint answer, scored by clue recall. 11 puzzles $\times$ 3 models $\times$ 3 seeds $=99$ games.
+% TODO v0.2: E1 results paragraph + fig_e1_curves
+
+\textbf{E2 (round budget).} Hard caps $\{5,10,15,20,25,30\}$ with forced final answer, composite scoring with logic rater; 594 games.
+% TODO v0.2: E2 results paragraph + fig_e2_caps
+
+\textbf{E3 (association trajectory).} For every game: $\{s_t\}$, $\{h_t\}$; test H1/H2 by clustering failure traces on (step profile, human-distance profile); test H3 by predicting outcome from trajectory features vs. covariates.
+% TODO v0.2: E3 results paragraph + fig_e3_scatter + correlation table
+
+\section{Results}\label{sec:results}
+% TODO v0.2: filled from analyze_grid.py output
+\emph{[Being filled from the completed 11$\times$3$\times$3 grid: E1 curves, E2 budget curves, E3 geometry statistics and H1--H3 tests.]}
+
+\section{Pilot Observations}\label{sec:pilot}
+(1)~\textbf{Stalling exists.} A 4B model re-asks earlier questions verbatim in later rounds---the lexical extreme of step-size collapse. (2)~\textbf{Surface scoring misleads.} A frontier model reconstructed a hidden story's full causal chain yet scored $0.00$ under clue-string matching; the composite score separated its logic (30/30) from its terminology (28/70). Relatedly, sentence-form clues degenerate token matching to exact substring---a correct paraphrase scored $0.00$ until a bigram-recall fallback was added. (3)~\textbf{Truncated thinking masquerades as behavior.} With a 512-token budget, a hybrid reasoning model's visible ``questions'' were truncated chain-of-thought; disabling template thinking recovered an 8-round solve. Decoding configuration is part of the environment. (4)~\textbf{Linear-solvable puzzles are poor probes}, motivating structure-graded puzzle construction.
+
+\section{Limitations and Ethics}
+Keyword extraction and encoders are themselves models (dual-encoder reporting planned). SWOW norms are population averages, not a normative standard: human-path distance is a descriptive coordinate, and H2 is a tested correlation, not an assumption that human-unlike is wrong. The proxy manifold used in this draft is explicitly provisional. Judge biases are mitigated per~\cite{calm,posbias}. Puzzles involve dark themes (content-flagged); contamination is handled by memorization probes and fresh/novel sourcing.
+
+\section{Conclusion}
+Turtle soup turns hypothesis-space search into observable text; trajectory geometry over a human-association anchor turns that text into interpretable behavioral signatures. If H1--H3 hold, ``why did the agent fail'' becomes a measurement---and gives RL training of Questioners a behaviorally grounded reward-shaping target.
+
+\begin{thebibliography}{12}\small
+\bibitem{turtlebench} Q.~Yu \emph{et al.} TurtleBench: Evaluating Top Language Models via Real-World Yes/No Puzzles. arXiv:2410.05262. \url{https://arxiv.org/abs/2410.05262}
+\bibitem{splat} Q.~Chen, B.~Zhang, G.~Wang, Q.~Wu. Weak-eval-Strong: Evaluating and Eliciting Lateral Thinking of LLMs with Situation Puzzles. arXiv:2410.06733. \url{https://arxiv.org/abs/2410.06733}
+\bibitem{tsbench} M.~Zhou, S.~Wu, H.~Zhang, Q.~Sima, B.~Liu. What to Ask Next? Probing the Imaginative Reasoning of LLMs with TurtleSoup Puzzles. arXiv:2508.10358. \url{https://arxiv.org/abs/2508.10358}
+\bibitem{mutate} J.~Park, I.~Baek, J.~Park, H.~Lee. Beyond One Path: Evaluating and Enhancing Divergent Thinking in Interactive LLM Agents. arXiv:2605.28465. \url{https://arxiv.org/abs/2605.28465}
+\bibitem{creativityprism} Z.~J.~Hou \emph{et al.} CreativityPrism: A Cross-Domain Evaluation Framework for Large Language Model Creativity. arXiv:2510.20091. \url{https://arxiv.org/abs/2510.20091}
+\bibitem{refcreativity} R.~Li, C.~Zhu, B.~Xu, X.~Wang, Z.~Mao. Automated Creativity Evaluation for Large Language Models: A Reference-Based Approach. arXiv:2504.15784. \url{https://arxiv.org/abs/2504.15784}
+\bibitem{calm} J.~Ye \emph{et al.} Justice or Prejudice? Quantifying Biases in LLM-as-a-Judge. ICLR 2025. \url{https://arxiv.org/abs/2410.02736}
+\bibitem{posbias} L.~Shi \emph{et al.} Judging the Judges: A Systematic Study of Position Bias in LLM-as-a-Judge. IJCNLP-AACL 2025. \url{https://aclanthology.org/2025.ijcnlp-long.18/}
+\bibitem{forwardflow} K.~Gray \emph{et al.} ``Forward Flow'': A New Measure to Quantify Free Thought and Predict Creativity. \emph{American Psychologist} 74(5), 2019.
+\bibitem{dat} J.~A.~Olson \emph{et al.} Naming Unrelated Words Predicts Creativity. \emph{PNAS} 118(25), 2021. \url{https://www.pnas.org/doi/10.1073/pnas.2022340118}
+\bibitem{swow} S.~De~Deyne \emph{et al.} The ``Small World of Words'' English Word Association Norms for over 12{,}000 Cue Words. \emph{Behavior Research Methods} 51(3), 2019.
+\bibitem{datllm} H.~Chen, N.~Ding. Probing the Creativity of Large Language Models. Findings of EMNLP 2023. \url{https://arxiv.org/abs/2310.11158}
+\end{thebibliography}
+
+\end{document}
