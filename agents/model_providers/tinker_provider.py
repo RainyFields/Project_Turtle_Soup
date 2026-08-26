@@ -19,6 +19,19 @@ _THINK_BLOCK = re.compile(r"<think>.*?</think>", flags=re.DOTALL)
 _THINK_DANGLING = re.compile(r"^.*?</think>", flags=re.DOTALL)
 
 
+def _env_think() -> Optional[bool]:
+    """TINKER_THINK=0 renders the chat template with enable_thinking=False.
+
+    Same trap as Ollama: hybrid reasoning models (Qwen3.x…) think by default,
+    and the thinking spends the max_tokens budget — a 512-token turn can end
+    mid-think and never reach the actual question. Unset → template default.
+    """
+    raw = os.getenv("TINKER_THINK")
+    if raw is None or not raw.strip():
+        return None
+    return raw.strip().lower() not in ("0", "false", "no", "off")
+
+
 def _strip_thinking(text: str) -> str:
     text = _THINK_BLOCK.sub("", text)
     text = _THINK_DANGLING.sub("", text)
@@ -80,9 +93,18 @@ class TinkerProvider:
             {"role": "user", "content": user},
         ]
         if getattr(tokenizer, "chat_template", None):
+            template_kwargs: Dict[str, Any] = {}
+            think = _env_think()
+            if think is not None:
+                template_kwargs["enable_thinking"] = think
             ids = tokenizer.apply_chat_template(
-                messages, add_generation_prompt=True, tokenize=True
+                messages, add_generation_prompt=True, tokenize=True, **template_kwargs
             )
+            # Newer transformers returns a BatchEncoding, not a token list
+            if not isinstance(ids, list):
+                ids = ids["input_ids"]
+            if ids and isinstance(ids[0], list):
+                ids = ids[0]
         else:
             ids = tokenizer.encode(f"{system}\n\n{user}\n")
         return self._types.ModelInput.from_ints(ids)

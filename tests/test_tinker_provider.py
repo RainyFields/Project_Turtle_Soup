@@ -10,11 +10,13 @@ class _FakeTokenizer:
 
     def __init__(self):
         self.rendered = None
+        self.template_kwargs = None
 
-    def apply_chat_template(self, messages, *, add_generation_prompt, tokenize):
+    def apply_chat_template(self, messages, *, add_generation_prompt, tokenize, **kwargs):
         self.rendered = messages
+        self.template_kwargs = kwargs
         assert add_generation_prompt and tokenize
-        return [1, 2, 3]
+        return {"input_ids": [1, 2, 3]}  # newer transformers: BatchEncoding-style
 
     def encode(self, text):  # pragma: no cover - chat template path is used
         return [0]
@@ -101,6 +103,20 @@ def test_transport_error_retries_then_succeeds(monkeypatch):
     )
     assert provider.generate(system="s", user="u", model="m") == "答案是抽签。"
     assert len(client.calls) == 2
+
+
+def test_tinker_think_env_disables_template_thinking(monkeypatch):
+    monkeypatch.setenv("TINKER_THINK", "0")
+    provider, _, tokenizer = _provider(monkeypatch, ["问题？"])
+    provider.generate(system="s", user="u", model="m")
+    assert tokenizer.template_kwargs == {"enable_thinking": False}
+
+
+def test_no_think_env_keeps_template_default(monkeypatch):
+    monkeypatch.delenv("TINKER_THINK", raising=False)
+    provider, _, tokenizer = _provider(monkeypatch, ["问题？"])
+    provider.generate(system="s", user="u", model="m")
+    assert tokenizer.template_kwargs == {}
 
 
 def test_dangling_close_tag_is_stripped():

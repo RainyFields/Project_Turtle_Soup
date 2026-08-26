@@ -90,7 +90,11 @@ Questioner 拿不到任何反馈，整题在信息论意义上无解 —— 此�
   模型名以 [官方列表](https://tinker-docs.thinkingmachines.ai/tinker/models/) 为准；按 token 计费。
 - 走原生 SDK 采样（serverless 的 OpenAI 兼容端点只覆盖 Inkling 系列，不用它）。
   聊天格式用模型 tokenizer 自带 chat template；`<think>…</think>` 会被剥掉。
-- **max_tokens 同样含思考 token**（同上面第 1 个坑），推理模型至少给 1024。
+- **max_tokens 同样含思考 token**（同上面第 1 个坑），且 Qwen3.5 类混合推理模型默认开思考 ——
+  512 预算会在思考中途截断，Questioner 整局输出乱码式思考文本（已实测）。
+  **跑基准务必 `TINKER_THINK=0`**（经 chat template 的 `enable_thinking=False` 关闭），
+  或给 ≥2048。实测 `TINKER_THINK=0` + questioner 2048 / oracle 1024：
+  Qwen3.5-397B 8 轮解出 refsoup_006，composite 0.58（关键词 28/70 + 逻辑 30/30）。
 - 重试：`TINKER_MAX_ATTEMPTS`（默认 4）指数退避，空回复抛 `EmptyResponseError`。
 
 ### 评分：`composite_judge`（推荐，满分 100）
