@@ -163,8 +163,8 @@ GPT-OSS-120B $0.33/$0.84。
 **结论：$2k 足够在最大档位模型上跑数遍全量。**
 
 注意：
-1. Tinker 是 SDK 接口（非 OpenAI 兼容 REST），需新增 `agents/model_providers/tinker_provider.py`
-   （参照 `openrouter_provider.py`，实现 `BaseProvider.generate` → SamplingClient）。
+1. ~~需新增 tinker_provider~~ **已接入**：`--questioner-provider tinker`，
+   支持 base model 名和 `tinker://` 训练 checkpoint（用法见 AGENTS.md Tinker 节）。
 2. 纯推理 OpenRouter 已接好且同类开源模型往往更便宜；Tinker 预算的**独特价值在 train 档**
    （LoRA 微调/RL 训练 Questioner，composite score 可直接作 reward）。建议推理基准走
    OpenRouter/qwen，Tinker 额度留给训练实验。

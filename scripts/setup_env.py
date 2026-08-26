@@ -21,6 +21,7 @@ PROVIDER_FIELDS = [
     ("GEMINI_API_KEY", "Google Gemini"),
     ("MISTRAL_API_KEY", "Mistral"),
     ("OPENROUTER_API_KEY", "OpenRouter (gateway; free stealth models)"),
+    ("TINKER_API_KEY", "Tinker (Thinking Machines; needs: pip install tinker)"),
 ]
 
 

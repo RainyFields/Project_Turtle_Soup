@@ -10,7 +10,7 @@
 
 | 路径 | 职责 |
 |------|------|
-| `agents/` | Oracle / Questioner + providers（openai, anthropic, deepseek, qwen, zai, gemini, **openrouter**, ollama, mock） |
+| `agents/` | Oracle / Questioner + providers（openai, anthropic, deepseek, qwen, zai, gemini, **openrouter**, **tinker**, ollama, mock） |
 | `engine/game.py` | `TurtleSoupGame`；`list_puzzle_ids(family=)` |
 | `evaluation/round_studies.py` | Exp 1 曲线 + Exp 2 cap |
 | `evaluation/judge.py` | `heuristic_judge`、`LLMJudge`、**`composite_judge`（70+30）** |
@@ -82,6 +82,17 @@ Questioner 拿不到任何反馈，整题在信息论意义上无解 —— 此�
 - **Exp 1**：每轮 checkpoint → `heuristic_judge`
 - **Exp 2**：round cap + 强制 `FINAL_ANSWER`
 
+### Tinker provider（大模型采样 / 训练后 checkpoint）
+
+- `--questioner-provider tinker --questioner-model Qwen/Qwen3-235B-A22B-Instruct-2507`；
+  model 也可以是训练产物 `tinker://…/sampler_weights/…`，RL 训出来的 Questioner 直接进评测。
+- 需 `TINKER_API_KEY`（`scripts/setup_env.py` 会问）+ `pip install tinker`（已在 requirements）。
+  模型名以 [官方列表](https://tinker-docs.thinkingmachines.ai/tinker/models/) 为准；按 token 计费。
+- 走原生 SDK 采样（serverless 的 OpenAI 兼容端点只覆盖 Inkling 系列，不用它）。
+  聊天格式用模型 tokenizer 自带 chat template；`<think>…</think>` 会被剥掉。
+- **max_tokens 同样含思考 token**（同上面第 1 个坑），推理模型至少给 1024。
+- 重试：`TINKER_MAX_ATTEMPTS`（默认 4）指数退避，空回复抛 `EmptyResponseError`。
+
 ### 评分：`composite_judge`（推荐，满分 100）
 
 `heuristic_judge` 只做 `key_clues` 子串匹配，**语义正确但换词表述会得 0 分** —— 实测中
@@ -148,7 +159,7 @@ pytest -q
 
 ```yaml
 oracle:
-  provider: openrouter        # openai|anthropic|deepseek|qwen|zai|gemini|openrouter|ollama|mock
+  provider: openrouter        # openai|anthropic|deepseek|qwen|zai|gemini|openrouter|tinker|ollama|mock
   model: stealth/ox-alpha
   max_tokens: 512             # 推理模型别设太小，思考会吃掉预算 → 空回复
 

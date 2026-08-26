@@ -22,6 +22,7 @@ PROVIDERS = [
     ("zai / glm", ["ZAI_API_KEY", "Z_AI_API_KEY"]),
     ("gemini", ["GEMINI_API_KEY", "GOOGLE_API_KEY"]),
     ("openrouter", ["OPENROUTER_API_KEY"]),
+    ("tinker", ["TINKER_API_KEY"]),
     ("mistral", ["MISTRAL_API_KEY"]),
     ("ollama (local)", ["OLLAMA_BASE_URL"]),  # no key; URL defaults to localhost
 ]
