@@ -122,3 +122,22 @@ def test_no_think_env_keeps_template_default(monkeypatch):
 def test_dangling_close_tag_is_stripped():
     # Qwen3-style templates can open <think> inside the generation prompt.
     assert _strip_thinking("推理若干…</think>\n最终答案") == "最终答案"
+
+
+def test_factory_returns_singleton_tinker(monkeypatch):
+    # Tinker caps active sessions; the factory must reuse one provider per process.
+    import agents.provider_factory as pf
+
+    created = []
+
+    class _FakeProvider:
+        def __init__(self):
+            created.append(self)
+
+    monkeypatch.setattr(pf, "_TINKER_SINGLETON", None)
+    import agents.model_providers.tinker_provider as tp
+
+    monkeypatch.setattr(tp, "TinkerProvider", _FakeProvider)
+    a = pf.get_provider("tinker")
+    b = pf.get_provider("thinking-machines")
+    assert a is b and len(created) == 1

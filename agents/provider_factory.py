@@ -3,6 +3,8 @@ from __future__ import annotations
 from .base_agent import BaseProvider
 from .model_providers.mock_provider import MockProvider
 
+_TINKER_SINGLETON = None
+
 
 def get_provider(provider_name: str) -> BaseProvider:
     name = (provider_name or "mock").lower().strip()
@@ -37,9 +39,15 @@ def get_provider(provider_name: str) -> BaseProvider:
 
         return OpenRouterProvider()
     if name in ("tinker", "thinking-machines"):
-        from .model_providers.tinker_provider import TinkerProvider
+        # One ServiceClient per process: Tinker caps active sessions account-wide,
+        # and a fresh client per game accumulates until the server 400s
+        # ("Too many active sessions") — observed killing all E2 shards.
+        global _TINKER_SINGLETON
+        if _TINKER_SINGLETON is None:
+            from .model_providers.tinker_provider import TinkerProvider
 
-        return TinkerProvider()
+            _TINKER_SINGLETON = TinkerProvider()
+        return _TINKER_SINGLETON
     if name in ("zai", "glm", "z.ai"):
         from .model_providers.zai_provider import ZaiProvider
 
