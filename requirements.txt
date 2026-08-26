@@ -11,3 +11,4 @@ tinker>=0.26
 # E3 association-trajectory analysis (evaluation/trajectory.py):
 jieba>=0.42
 sentence-transformers>=3.0
+statsmodels>=0.14

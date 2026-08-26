@@ -1,0 +1,58 @@
+{
+ "n": 99,
+ "models": {
+  "M0_covariates": {
+   "aic": -167.5,
+   "llf": 88.74
+  },
+  "M1_plus_drift": {
+   "aic": -166.6,
+   "llf": 89.32
+  },
+  "M2_plus_stride_x_tier": {
+   "aic": -161.9,
+   "llf": 89.96
+  }
+ },
+ "lrt_M0_vs_M1_drift": {
+  "chi2": 1.157,
+  "df": 1,
+  "p": 0.28219
+ },
+ "lrt_M1_vs_M2_stride_x_tier": {
+  "chi2": 1.294,
+  "df": 3,
+  "p": 0.73047
+ },
+ "m2_fixed_effects": {
+  "Intercept": {
+   "coef": 0.3149,
+   "p": 0.0
+  },
+  "C(tier)[T.Qwen3.5-4B]": {
+   "coef": -0.0638,
+   "p": 0.02144
+  },
+  "C(tier)[T.Qwen3.6-27B]": {
+   "coef": 0.0299,
+   "p": 0.17463
+  },
+  "z_hslope": {
+   "coef": 0.0092,
+   "p": 0.34693
+  },
+  "z_step:C(tier)[Qwen3.5-397B]": {
+   "coef": -0.0085,
+   "p": 0.68039
+  },
+  "z_step:C(tier)[Qwen3.5-4B]": {
+   "coef": -0.0258,
+   "p": 0.29461
+  },
+  "z_step:C(tier)[Qwen3.6-27B]": {
+   "coef": 0.0007,
+   "p": 0.96382
+  }
+ },
+ "random_intercept_var_puzzle": 0.05022
+}
