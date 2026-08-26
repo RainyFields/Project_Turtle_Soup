@@ -138,6 +138,7 @@ def run_round_curve(
 
     traj_rounds: List[RoundRecord] = []
     accuracy_by_round: Dict[int, float] = {}
+    checkpoints_by_round: Dict[int, str] = {}
     natural_end_round: Optional[int] = None
     natural_final_answer: Optional[str] = None
 
@@ -178,6 +179,7 @@ def run_round_curve(
         except EmptyResponseError:
             checkpoint = ""  # no checkpoint answer this round → scores 0
         checkpoint_answer = parse_final_answer(checkpoint)
+        checkpoints_by_round[round_idx] = checkpoint_answer or ""
         accuracy_by_round[round_idx] = _judge_score(
             puzzle, checkpoint_answer, judge=judge, rater=rater
         )
@@ -185,6 +187,12 @@ def run_round_curve(
     api_calls = len(traj_rounds) * 3  # question + oracle + checkpoint per round played
     return {
         "puzzle_id": puzzle["id"],
+        # Full text per round — the association-trajectory study (E3) reads these.
+        "qa_rounds": [
+            {"round": r.round, "question": r.question, "answer": r.answer}
+            for r in traj_rounds
+        ],
+        "checkpoints_by_round": checkpoints_by_round,
         "accuracy_by_round": accuracy_by_round,
         "natural_end_round": natural_end_round,
         "natural_final_answer": natural_final_answer,
@@ -224,6 +232,10 @@ def run_round_cap(
     api_calls = traj.total_rounds * 2 + (1 if traj.final_answer else 0)
     return {
         "puzzle_id": puzzle["id"],
+        "qa_rounds": [
+            {"round": r.round, "question": r.question, "answer": r.answer}
+            for r in traj.trajectory
+        ],
         "round_cap": round_cap,
         "score": score,
         "final_answer": traj.final_answer,

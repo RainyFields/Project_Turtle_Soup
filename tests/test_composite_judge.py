@@ -21,6 +21,21 @@ class _Rater:
         return self.replies.pop(0) if self.replies else '{"logic": 0.0}'
 
 
+def test_sentence_clue_matches_paraphrase_not_nonsense():
+    # Sentence-style clues form one contiguous Chinese run; the bigram-recall
+    # fallback must accept a correct paraphrase and still reject nonsense.
+    clues = ["矮个子够不到高楼层按钮", "平时只能按到中途楼层", "下雨天有工具（伞）能按到顶层"]
+    right = (
+        "这个矮个子身高不够，够不到电梯高楼层的按钮，平时只能按到中途楼层再走楼梯；"
+        "下雨天他带伞，用伞柄按到顶层按钮。"
+    )
+    wrong = "矮个子其实是幽灵，他害怕水，下雨天必须回到顶楼的祭坛。"
+    r_right = composite_judge(solution=right, final_answer=right, key_clues=clues)
+    r_wrong = composite_judge(solution=right, final_answer=wrong, key_clues=clues)
+    assert r_right.key_clue_score == KEY_CLUE_POINTS
+    assert r_wrong.key_clue_score == 0.0
+
+
 def test_no_answer_scores_zero():
     r = composite_judge(solution=SOLUTION, final_answer=None, key_clues=CLUES)
     assert r.total == 0.0

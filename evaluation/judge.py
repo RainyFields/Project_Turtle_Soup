@@ -121,7 +121,16 @@ def _clue_matches_answer(clue: str, answer: str) -> bool:
     if not tokens:
         return False
     hits = sum(1 for t in tokens if t in answer)
-    return hits >= max(1, (len(tokens) + 1) // 2)
+    if hits >= max(1, (len(tokens) + 1) // 2):
+        return True
+    # Sentence-style clues (e.g. "\u77ee\u4e2a\u5b50\u591f\u4e0d\u5230\u9ad8\u697c\u5c42\u6309\u94ae") form ONE contiguous
+    # Chinese run, so the token test above degenerates to exact substring and
+    # correct paraphrases score 0. Fall back to character-bigram recall.
+    bigrams = {c[i : i + 2] for c in re.findall(r"[\u4e00-\u9fff]{2,}", clue) for i in range(len(c) - 1)}
+    if len(bigrams) < 4:  # too short for shingle statistics to mean anything
+        return False
+    covered = sum(1 for b in bigrams if b in answer)
+    return covered / len(bigrams) >= 0.5
 
 
 def heuristic_judge(

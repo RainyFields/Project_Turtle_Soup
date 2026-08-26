@@ -86,12 +86,30 @@ python scripts/run_real_timing.py \
 
 | 版本 | 日期 | 内容 | 状态 |
 |------|------|------|------|
-| v0.1 | 2026-08-25 | 完整 4 页结构：故事线 = "失败模式在交互轨迹几何中可读"（H1 stalling / H2 drifting / H3 predictivity）；E1–E4 实验设计；pilot 观察作初步证据；12 篇参考文献全部逐一核验（每条带链接）；文末 5 个待作者决策的问题 | ⏸ 等作者反馈 |
+| v0.1 | 2026-08-25 | 完整 4 页结构：故事线 = "失败模式在交互轨迹几何中可读"（H1 stalling / H2 drifting / H3 predictivity）；E1–E4 实验设计；pilot 观察作初步证据；12 篇参考文献全部逐一核验（每条带链接）；文末 5 个待作者决策的问题 | ✅ 已收到部分反馈 |
 
-## 待反馈决策（阻塞 v0.2）
+## 作者反馈（2026-08-26）
 
-见草稿末尾 "Open questions"：故事侧重（解释性 vs 创意基准）、是否为论文跑满 E1–E3、
-中文联想 norms 数据源、标题、Figure 1 数据来源。
+- ✅ 决策 2：**跑满 E1–E3**（Tinker 预算已批）
+- ✅ 决策 5：**Figure 1 用 pilot 数据先做**
+- ✅ 新要求：**最终交付 PDF**（本机已有 tectonic，走 LaTeX；官方 pdf skill 已装）
+- ⏳ 决策 1（故事侧重）、3（中文联想 norms）、4（标题）仍待反馈
+
+## 执行状态（2026-08-26）
+
+- **Oracle 审计通过**：Tinker Qwen3.5-397B（thinking off），yes/no 探针 15/15=100%
+  （`scripts/audit_oracle.py`，三条"与此无关"探针答"不是"，属软通过）
+- **评分修复（跑全量前的关键 bug）**：句子式 key_clues 是连续中文串，token 匹配退化为
+  精确子串 → 正确的意译答案得 0（实测 397B 解对 turtle_002 得 0.00）。已加
+  **字符 bigram 召回 ≥0.5 兜底**（`_clue_matches_answer`），修复后正确答案 70/70、
+  错误答案 0/70
+- **E1/E2 全量已启动**：9 个并行 shard（3 模型 × 3 seeds），11 puzzles；
+  Questioner = Qwen3.5-4B / Qwen3.6-27B / Qwen3.5-397B-A17B；Oracle/judge = 397B；
+  E1 clue-only checkpoint 评分，E2 composite + 397B 逻辑评分（2 samples）；
+  输出 `results/full_20260826/`；`qa_rounds`（逐轮 Q/A 全文）已随报告落盘供 E3 用
+- **E3 工具链**：`evaluation/trajectory.py`（jieba 关键词 → bge-small-zh 嵌入 →
+  step size + 代理人类流形距离）+ `scripts/plot_figure1.py`；
+  ⚠️ 流形目前是代理版（汤面/汤底/key_clues 词），SWOW 版待决策 3
 
 ---
 

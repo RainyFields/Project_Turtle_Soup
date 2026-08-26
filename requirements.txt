@@ -8,3 +8,6 @@ flask>=3.0.0
 matplotlib>=3.5
 pytest>=7.0.0
 tinker>=0.26
+# E3 association-trajectory analysis (evaluation/trajectory.py):
+jieba>=0.42
+sentence-transformers>=3.0
