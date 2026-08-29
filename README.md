@@ -6,7 +6,7 @@
 |----|------|
 | 代号 | `turtle-soup-bench` |
 | PRD | v0.1（2026-06-01） |
-| 默认测试题 | `refsoup_006`（沙漠里的尸体） |
+| 默认测试题 | `refsoup_008`（沙漠里的尸体） |
 | Python | **3.10+**（推荐 3.11） |
 
 ---
@@ -37,17 +37,17 @@ cp config.local.yaml.example config.local.yaml   # 可选
 
 ```bash
 # 离线单局
-python scripts/run_game.py --puzzle refsoup_006 --mock
+python scripts/run_game.py --puzzle refsoup_008 --mock
 
 # 真实模型
-python scripts/run_game.py --puzzle refsoup_006
+python scripts/run_game.py --puzzle refsoup_008
 
 # 轮数评测 Pilot（Exp 1 + Exp 2）
-python scripts/run_pilot.py --puzzles refsoup_006 --mock
+python scripts/run_pilot.py --puzzles refsoup_008 --mock
 # → results/pilot/<dir>/pilot_timing.json + pilot_timing.html
 
 # 真实 API 单题计时
-python scripts/run_real_timing.py --puzzle refsoup_006 --questioner-provider qwen --questioner-model qwen-plus
+python scripts/run_real_timing.py --puzzle refsoup_008 --questioner-provider qwen --questioner-model qwen-plus
 
 # 批量 benchmark
 python scripts/run_benchmark.py --puzzles refsoup --questioner-models mock --mock
@@ -92,7 +92,7 @@ turtle-soup-bench/
 | 来源 | ID 前缀 | 说明 |
 |------|---------|------|
 | MVP + Generator（git） | `turtle_*` | 11 题（`005` + `010`–`015`） |
-| 参考站导入（本地） | `refsoup_*` | 经典短汤，如 `refsoup_006` |
+| 参考站导入（本地） | `refsoup_*` | 经典短汤，如 `refsoup_008` |
 
 ---
 

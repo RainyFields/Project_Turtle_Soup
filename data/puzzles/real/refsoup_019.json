@@ -1,0 +1,47 @@
+{
+  "id": "refsoup_019",
+  "title": "最出色的表演",
+  "difficulty": "medium",
+  "category": "horror",
+  "surface": "手脚高低不同，身体形状不同，个子高矮不同。 啪啪啪，众人看。有趣欣赏，嘻嘻。 咚咚咚，无人应。金钱戏码，哈哈。 这里会一直进行最出色的表演。",
+  "solution": "这里是一场地下畸形秀，在这里的人有人手被砍得少所以长，有人被砍得多所以手短，个子高矮也不同，畸形程度自然也不同。畸形们被送上台前。台下的众人以打他们羞辱他们为趣，就算他们无数次撞击地板墙壁，也不会有人救下他们，这本就是权贵的狂欢，他们会一直进行最出色的表演。",
+  "key_clues": [
+    "地下畸形秀",
+    "手被砍",
+    "打他们羞辱他们",
+    "撞击地板墙壁",
+    "权贵的狂欢"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "恐怖",
+      "原创",
+      "经典"
+    ],
+    "forbidden_reveal": [
+      "这里是一场地下畸形秀，在这里的人有人手被砍得少所",
+      "畸形们被送上台前",
+      "台下的众人以打他们羞辱他们为趣，就算他们无数次撞"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "horror",
+      "original",
+      "classic"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "136",
+    "reference_url": "https://soup.ahelumos.com/soups/136",
+    "rating": 6.0,
+    "rating_count": 3,
+    "author": "interstellar"
+  }
+}

@@ -23,7 +23,7 @@ from engine.game import load_puzzle
 
 
 def add_common_study_args(p: argparse.ArgumentParser) -> None:
-    p.add_argument("--puzzles", nargs="+", default=["refsoup_006"])
+    p.add_argument("--puzzles", nargs="+", default=["refsoup_008"])
     p.add_argument("--questioner-provider", default="mock")
     p.add_argument("--questioner-model", default="mock")
     p.add_argument("--oracle-provider", default="mock")

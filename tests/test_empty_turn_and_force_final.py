@@ -118,3 +118,35 @@ def test_config_loader_reads_max_empty_turns(tmp_path):
     cfg = tmp_path / "c.yaml"
     cfg.write_text("game:\n  max_empty_turns: 9\n", encoding="utf-8")
     assert load_app_config(cfg).game.max_empty_turns == 9
+
+
+def test_real_and_generated_puzzle_sets_are_disjoint():
+    """The experiment set must never pick up an unvalidated puzzle."""
+    from engine.game import list_puzzle_ids
+
+    real = set(list_puzzle_ids(family="real"))
+    generated = set(list_puzzle_ids(family="generated"))
+    assert real and generated
+    assert not (real & generated)
+
+
+def test_real_puzzles_all_come_from_the_reference_site():
+    """The experiment set is reference-site records only — those are the ones
+    with evidence that humans have actually played and solved them."""
+    from engine.game import list_puzzle_ids, load_puzzle
+
+    ids = list_puzzle_ids(family="real")
+    assert ids
+    for pid in ids:
+        puzzle = load_puzzle(pid)
+        assert puzzle["metadata"]["source"] == "reference", pid
+        assert puzzle["metadata"].get("reference_url"), f"{pid} has no source URL"
+        assert pid.startswith("refsoup_"), pid
+
+
+def test_no_generated_puzzle_leaks_into_the_real_set():
+    from engine.game import list_puzzle_ids, load_puzzle
+
+    for pid in list_puzzle_ids(family="generated"):
+        source = load_puzzle(pid)["metadata"]["source"]
+        assert source in {"generated", "original"}, f"{pid} has source={source}"

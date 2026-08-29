@@ -26,7 +26,7 @@ from engine.game import TurtleSoupGame, load_puzzle
 
 # Hand-crafted probes; expected in {是, 不是, 与此无关}.
 PROBES = {
-    "refsoup_006": [
+    "refsoup_008": [
         ("死者是从高处坠落死亡的吗？", "是"),
         ("死者生前参与了抽签吗？", "是"),
         ("死者是渴死的吗？", "不是"),

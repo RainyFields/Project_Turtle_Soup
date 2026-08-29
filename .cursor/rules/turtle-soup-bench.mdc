@@ -20,8 +20,8 @@ alwaysApply: true
 
 ## Entry points
 
-- `python scripts/run_game.py --puzzle refsoup_006 --mock`
-- `python scripts/run_pilot.py --puzzles refsoup_006 --mock`
+- `python scripts/run_game.py --puzzle refsoup_008 --mock`
+- `python scripts/run_pilot.py --puzzles refsoup_008 --mock`
 - `python scripts/run_benchmark.py --puzzles refsoup --mock`
 - `AGENTS.md` · `plan.md` · `generator/README.md`
 
@@ -30,7 +30,7 @@ alwaysApply: true
 - `engine/game.py` · `evaluation/round_studies.py` · `evaluation/judge.py`
 - Providers: `agents/model_providers/`（含 `openrouter_provider.py`）
 - Puzzles: `turtle_*` (11 git) + `refsoup_*` (local import) —— 目前**只有经典短汤（单解）**
-- Default test puzzle: **`refsoup_006`**
+- Default test puzzle: **`refsoup_008`**
 
 ## 换模型时必读（AGENTS.md「模型选型」有实测数据）
 

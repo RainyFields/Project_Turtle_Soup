@@ -15,7 +15,7 @@ python scripts/setup_env.py
 python scripts/check_env.py
 cp config.local.yaml.example config.local.yaml   # optional
 
-python scripts/run_game.py --puzzle refsoup_006 --mock
+python scripts/run_game.py --puzzle refsoup_008 --mock
 ```
 
 ## Providers
@@ -43,21 +43,21 @@ python scripts/run_game.py --puzzle refsoup_006 --mock
 ## Running
 
 ```bash
-python scripts/run_game.py --puzzle refsoup_006
+python scripts/run_game.py --puzzle refsoup_008
 
-python scripts/run_game.py --puzzle refsoup_006 \
+python scripts/run_game.py --puzzle refsoup_008 \
   --questioner-provider zai --questioner-model glm-4.7 \
   --oracle-provider zai --oracle-model glm-4.7
 
-python scripts/run_pilot.py --puzzles refsoup_006 --mock
+python scripts/run_pilot.py --puzzles refsoup_008 --mock
 
-python scripts/run_pilot.py --puzzles refsoup_006 \
+python scripts/run_pilot.py --puzzles refsoup_008 \
   --questioner-provider ollama --questioner-model qwen2.5:7b \
   --oracle-provider ollama --oracle-model qwen2.5:7b \
   --max-rounds 12 --round-caps 5 10 12
 
 python scripts/run_real_timing.py \
-  --puzzle refsoup_006 --questioner-provider qwen --questioner-model qwen-plus \
+  --puzzle refsoup_008 --questioner-provider qwen --questioner-model qwen-plus \
   --max-rounds 8 --round-caps 5 10
 ```
 

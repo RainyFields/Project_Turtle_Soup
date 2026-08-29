@@ -12,7 +12,7 @@
 |------|------|
 | **物理隔离** | `data/reference/`（参考原文）与 `data/puzzles/`（发布题库）平级，互不混用 |
 | **单点发布** | 只有 Step E 人工确认后，才调用 `publish` 写入 `data/puzzles/turtle_NNN.json` |
-| **Schema 单源** | 候选与发布题均经 `generator/schema.py` 校验，字段对齐 `refsoup_006.json` 等 benchmark 题 |
+| **Schema 单源** | 候选与发布题均经 `generator/schema.py` 校验，字段对齐 `refsoup_008.json` 等 benchmark 题 |
 | **来源标记** | 发布题强制 `metadata.source = "generated"`，并记录 `generator_batch` |
 | **分析不喂原文** | Layer B 输出统计/模板；生成 prompt 用脱敏特征，降低洗稿风险 |
 | **git 边界** | `data/reference/`、`data/generator/` 本地 gitignore；**不进仓库、不对外分发** |
@@ -112,12 +112,12 @@ python scripts/import_reference_puzzles.py --replace --require-classic \
 
 导入记录见 `data/generator/reference_import/manifest.json`。
 
-评测选题（默认示例题 `refsoup_006`）：
+评测选题（默认示例题 `refsoup_008`）：
 
 ```bash
-python scripts/run_game.py --puzzle refsoup_006 ...
+python scripts/run_game.py --puzzle refsoup_008 ...
 python scripts/run_benchmark.py --puzzles refsoup ...
-python scripts/run_pilot.py --puzzles refsoup_006 --mock
+python scripts/run_pilot.py --puzzles refsoup_008 --mock
 ```
 
 ---
@@ -272,7 +272,7 @@ python scripts/publish_puzzle.py \
 data/
 ├── puzzles/                          # ✅ 发布面（git 跟踪）
 │   ├── turtle_*.json …
-│   └── refsoup_006.json …          # R 支线参考导入
+│   └── refsoup_008.json …          # R 支线参考导入
 ├── reference/                        # 🔒 参考原文（gitignore）
 │   ├── parsed/samples.jsonl
 │   └── raw/                          # 可选 HTML 快照
@@ -337,7 +337,7 @@ scripts/
 发布后的 `data/puzzles/turtle_NNN.json` 与 `refsoup_NNN.json` **格式相同**，可直接用于：
 
 ```bash
-python scripts/run_game.py --puzzle refsoup_006 --mock
+python scripts/run_game.py --puzzle refsoup_008 --mock
 python scripts/run_benchmark.py --puzzles refsoup --mock
 ```
 
@@ -375,7 +375,7 @@ A→E 与 R 支线均已可用。后续非阻塞：benchmark M4b、更多 provid
 - **Layer C**：`create/controllers.py` 目前只按 B 层统计抽样 category/difficulty，
   没有「刁钻度」控制维度，需要新增可控机制。
 - **Layer D**：可加自动筛选 —— 用一个强 Questioner 试解候选，N 轮内被解出的判为深度不足。
-  实测参照：`refsoup_006` 被 `stealth/ox-alpha` 5 轮线性推到底。
+  实测参照：`refsoup_008` 被 `z-ai/glm-5.3-flash` 5 轮线性推到底。
 
 ### 广度 — 一个汤面多个成立的解答
 

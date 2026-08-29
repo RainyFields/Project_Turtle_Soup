@@ -1,0 +1,38 @@
+{
+  "id": "refsoup_018",
+  "title": "巧克力",
+  "difficulty": "medium",
+  "category": "classic",
+  "surface": "小明的弟弟养了一只仓鼠，有一天，小明弟弟的仓鼠死了，小明的弟弟很伤心，妈妈奖励她一块仓鼠形状的巧克力，过了不久，小明死了，这是为什么？",
+  "solution": "弟弟想要更大的巧克力于是杀死小明。",
+  "key_clues": [
+    "想要更大的巧克力",
+    "杀死小明"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "经典"
+    ],
+    "forbidden_reveal": [
+      "弟弟想要更大的巧克力于是杀死小明"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "classic"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "11",
+    "reference_url": "https://soup.ahelumos.com/soups/11",
+    "rating": null,
+    "rating_count": null,
+    "author": "admin"
+  }
+}

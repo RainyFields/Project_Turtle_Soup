@@ -1,0 +1,44 @@
+{
+  "id": "refsoup_021",
+  "title": "墙上的照片",
+  "difficulty": "medium",
+  "category": "horror",
+  "surface": "黑夜，雷雨交加。 电动车没电的我走在小道上。 突然我发现了一座破旧的寺庙，走投无路的我只好走进去避雨。 墙上挂着两张照片，好像在盯着我看。 我感到有点不适，但因为太累，一会就睡着了。 第二天醒来，我只看到了两扇窗户。",
+  "solution": "墙上根本没有照片，是有人在贴着窗户往里看",
+  "key_clues": [
+    "没有照片",
+    "有人",
+    "贴着窗户",
+    "往里看"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "恐怖",
+      "原创",
+      "经典"
+    ],
+    "forbidden_reveal": [
+      "墙上根本没有照片，是有人在贴着窗户往里看"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "horror",
+      "original",
+      "classic"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "90",
+    "reference_url": "https://soup.ahelumos.com/soups/90",
+    "rating": 6.0,
+    "rating_count": 1,
+    "author": "alfa"
+  }
+}

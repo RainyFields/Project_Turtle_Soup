@@ -87,12 +87,41 @@ class TraceGeometry:
         }
 
 
-def proxy_manifold_terms(puzzle: Dict[str, Any]) -> List[str]:
-    """Proxy for the human association manifold H (pending SWOW norms)."""
-    text = " ".join(
-        [puzzle.get("surface", ""), puzzle.get("solution", "")] + list(puzzle.get("key_clues", []))
-    )
-    return extract_keywords(text)
+# Which puzzle fields seed the anchor manifold.
+#   "surface_only" — only what the Questioner can see. The distance is then a
+#                    clean divergence-from-premise coordinate.
+#   "with_solution" — surface + solution + key_clues. NOTE: the outcome metric
+#                    is key-clue recall, so this anchor shares its vocabulary
+#                    with the score; distance-vs-outcome correlations measured
+#                    against it are partly definitional, not behavioural.
+#   "clues_only"   — diagnostic, to measure how much of an anchor is answer.
+MANIFOLD_SOURCES = ("surface_only", "with_solution", "clues_only")
+# Kept at "with_solution" so the committed 99-trace results stay reproducible.
+# Switching the default is a live decision — see temp_plan.md.
+DEFAULT_MANIFOLD_SOURCE = "with_solution"
+
+
+def proxy_manifold_terms(
+    puzzle: Dict[str, Any], source: str = DEFAULT_MANIFOLD_SOURCE
+) -> List[str]:
+    """Proxy for the human association manifold H (pending SWOW norms).
+
+    `source` selects which puzzle fields seed it — see MANIFOLD_SOURCES. The
+    default excludes the solution: anchoring on words the Questioner is trying
+    to guess makes "distance to H" a restatement of "distance to the answer".
+    """
+    if source not in MANIFOLD_SOURCES:
+        raise ValueError(f"unknown manifold source: {source}")
+    if source == "surface_only":
+        parts = [puzzle.get("surface", "")]
+    elif source == "clues_only":
+        parts = list(puzzle.get("key_clues", []))
+    else:
+        parts = [
+            puzzle.get("surface", ""),
+            puzzle.get("solution", ""),
+        ] + list(puzzle.get("key_clues", []))
+    return extract_keywords(" ".join(parts))
 
 
 def trace_geometry(
@@ -101,6 +130,7 @@ def trace_geometry(
     *,
     label: str,
     encoder_name: str = "BAAI/bge-small-zh-v1.5",
+    manifold_source: str = DEFAULT_MANIFOLD_SOURCE,
 ) -> Optional[TraceGeometry]:
     import numpy as np
 
@@ -122,7 +152,7 @@ def trace_geometry(
 
     steps = [float(1 - Q[t] @ Q[t - 1]) for t in range(1, len(Q))]
 
-    manifold_terms = proxy_manifold_terms(puzzle)
+    manifold_terms = proxy_manifold_terms(puzzle, manifold_source)
     M = embed(manifold_terms, encoder_name)
     # distance to manifold = 1 - mean of top-3 keyword-level similarities
     hdists = []
@@ -137,6 +167,7 @@ def trace_geometry(
         round_keywords=per_round_kw,
         step_sizes=steps,
         human_dists=hdists,
+        extra={"manifold_source": manifold_source},
     )
 
 

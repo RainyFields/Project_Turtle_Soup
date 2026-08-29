@@ -21,3 +21,6 @@ data/generator/
 
 # pytest
 .pytest_cache/
+
+# Working notes not yet merged into plan.md
+temp_plan.md

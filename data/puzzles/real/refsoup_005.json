@@ -1,16 +1,14 @@
 {
-  "id": "refsoup_004",
+  "id": "refsoup_005",
   "title": "爬山",
-  "difficulty": "easy",
+  "difficulty": "medium",
   "category": "horror",
   "surface": "一个男人带着女儿去爬山，在山顶上，女儿说了一句话。男人死了。",
   "solution": "妻子患了绝症，根据家里的经济条件，男人知道，如果继续治疗的话必定会影响到自己的正常生活。于是，他假意带妻子去爬山锻炼，在山顶上，趁四下无人，将她一把推了下去，以“失足摔死”为由逃过了法律的制裁。 不久，男人娶了新的妻子，并生下了一个可爱的女儿。 一天，他带着女儿去爬山。在山顶上，男人正打算抱起女儿看看山下的风景，女儿却突然转过头来，说，“怎么？又打算把我推下去吗？” 男人一惊，失足掉下了山，死了。",
   "key_clues": [
-    "推下去",
-    "妻子",
-    "失足",
-    "摔死",
-    "绝症"
+    "妻子患绝症",
+    "逃过法律制裁",
+    "男人失足掉下山"
   ],
   "oracle_rules": {
     "answerable_topics": [
@@ -40,7 +38,7 @@
     "reference_site": "ahelumos",
     "external_id": "47",
     "reference_url": "https://soup.ahelumos.com/soups/47",
-    "rating": 2.0,
+    "rating": null,
     "rating_count": null,
     "author": "alfa"
   }

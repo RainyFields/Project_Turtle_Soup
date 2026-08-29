@@ -23,28 +23,60 @@ class GameResult:
     trajectory_path: Optional[Path] = None
 
 
-def load_puzzle(puzzle_id: str, puzzles_dir: Optional[Path] = None) -> Dict[str, Any]:
-    root = Path(__file__).resolve().parents[1]
-    directory = puzzles_dir or (root / "data" / "puzzles")
-    path = directory / f"{puzzle_id}.json"
-    if not path.exists():
-        raise FileNotFoundError(f"Puzzle not found: {path}")
-    import json
+# data/puzzles/ is split by provenance so the two can never be silently mixed:
+#   real/      — externally verifiable puzzles (reference-site records, known
+#                classics). Human-solvable by evidence, so agent failure on them
+#                is informative. THIS is the experiment set.
+#   generated/ — LLM-generated or team-written. No external validation, so a
+#                model failing one proves nothing about the model.
+REAL_DIR = "real"
+GENERATED_DIR = "generated"
+_SEARCH_SUBDIRS = (REAL_DIR, GENERATED_DIR)
 
-    with path.open("r", encoding="utf-8") as f:
-        return json.load(f)
+
+def _puzzles_root(puzzles_dir: Optional[Path] = None) -> Path:
+    root = Path(__file__).resolve().parents[1]
+    return puzzles_dir or (root / "data" / "puzzles")
+
+
+def load_puzzle(puzzle_id: str, puzzles_dir: Optional[Path] = None) -> Dict[str, Any]:
+    directory = _puzzles_root(puzzles_dir)
+    # flat layout first so an explicit puzzles_dir still works unchanged
+    candidates = [directory / f"{puzzle_id}.json"]
+    candidates += [directory / sub / f"{puzzle_id}.json" for sub in _SEARCH_SUBDIRS]
+    for path in candidates:
+        if path.exists():
+            import json
+
+            with path.open("r", encoding="utf-8") as f:
+                return json.load(f)
+    raise FileNotFoundError(
+        f"Puzzle not found: {puzzle_id} (looked in {directory} and {list(_SEARCH_SUBDIRS)})"
+    )
 
 
 def list_puzzle_ids(puzzles_dir: Optional[Path] = None, *, family: str = "all") -> List[str]:
-    root = Path(__file__).resolve().parents[1]
-    directory = puzzles_dir or (root / "data" / "puzzles")
+    """Puzzle ids by family.
+
+    "real" / "generated" select by provenance folder — prefer these. The older
+    "turtle" / "refsoup" families match by id prefix and span both folders, so
+    they can mix verified and generated puzzles; "all" does too.
+    """
+    directory = _puzzles_root(puzzles_dir)
+    if family == REAL_DIR:
+        return sorted(p.stem for p in (directory / REAL_DIR).glob("*.json"))
+    if family == GENERATED_DIR:
+        return sorted(p.stem for p in (directory / GENERATED_DIR).glob("*.json"))
     if family == "turtle":
         pattern = "turtle_*.json"
     elif family in ("refsoup", "reference"):
         pattern = "refsoup_*.json"
     else:
         pattern = "*.json"
-    return sorted(p.stem for p in directory.glob(pattern))
+    found = list(directory.glob(pattern))
+    for sub in _SEARCH_SUBDIRS:
+        found += list((directory / sub).glob(pattern))
+    return sorted({p.stem for p in found})
 
 
 def format_qa_history(rounds: List[RoundRecord]) -> str:

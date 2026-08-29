@@ -1,0 +1,43 @@
+{
+  "id": "refsoup_013",
+  "title": "隧道",
+  "difficulty": "medium",
+  "category": "comedy",
+  "surface": "一个人坐火车去临镇看病，看完之后病全好了。回来的路上火车经过一个隧道，这个人就跳车自杀了。为什么？",
+  "solution": "因为他看好的是眼睛的病。经过隧道，以为眼睛又看不见了。经受不住打击，自杀了。",
+  "key_clues": [
+    "眼睛的病",
+    "以为眼睛又看不见了",
+    "经受不住打击"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "搞笑",
+      "经典"
+    ],
+    "forbidden_reveal": [
+      "因为他看好的是眼睛的病",
+      "经过隧道，以为眼睛又看不见了",
+      "经受不住打击，自杀了"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "comedy",
+      "classic"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "12",
+    "reference_url": "https://soup.ahelumos.com/soups/12",
+    "rating": null,
+    "rating_count": null,
+    "author": "admin"
+  }
+}

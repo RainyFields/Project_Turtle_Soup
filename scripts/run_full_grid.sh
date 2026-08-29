@@ -1,12 +1,16 @@
 #!/bin/bash
 # Full E1+E2 grid, one shard = (questioner model, seed).
 # Usage: run_full_grid.sh <model> <seed> <outdir>
-# E1: round curve, 11 puzzles, 30 checkpoint rounds, clue-only composite.
+# E1: round curve over the verified set, 30 checkpoint rounds, clue-only composite.
 # E2: cap sweep {5..30}, composite with 397B logic rater (2 samples).
 set -u
 MODEL="$1"; SEED="$2"; OUT="$3"
 cd "$(dirname "$0")/.."
-PUZZLES="turtle_001 turtle_002 turtle_003 turtle_004 turtle_005 turtle_010 turtle_011 turtle_012 turtle_013 turtle_014 turtle_015"
+# The verified set only (data/puzzles/real/). Derived at run time so the grid
+# never silently picks up a generated puzzle, and never goes stale on renumber.
+PUZZLES=$(.venv/bin/python -c "from engine.game import list_puzzle_ids; print(' '.join(list_puzzle_ids(family='real')))")
+if [ -z "$PUZZLES" ]; then echo "no puzzles in data/puzzles/real/" >&2; exit 1; fi
+echo "puzzles: $PUZZLES"
 ORACLE="Qwen/Qwen3.5-397B-A17B"
 export TINKER_THINK=0
 

@@ -25,7 +25,7 @@ Oracle 固定；Questioner 为对比变量。
 | Judge | `gpt-4o` LLM | **当前 pilot 用 `heuristic_judge`** |
 | Questioner | deepseek-r1 / qwq-32b / llama3.3:70b | 或本地 Ollama |
 
-**默认 pilot 题**：`refsoup_006`（经典、难度适中）。
+**默认 pilot 题**：`refsoup_008`（经典、难度适中）。
 
 **输出**：`results/pilot/<dir>/pilot_timing.json` + `pilot_timing.html`
 
@@ -45,18 +45,18 @@ Oracle 固定；Questioner 为对比变量。
 
 ```bash
 # Mock 管线验证
-python scripts/run_pilot.py --puzzles refsoup_006 --mock
+python scripts/run_pilot.py --puzzles refsoup_008 --mock
 
-# Ollama（已跑通 refsoup_006 + qwen2.5:7b，~270s）
-python scripts/run_pilot.py --puzzles refsoup_006 \
+# Ollama（已跑通 refsoup_008 + qwen2.5:7b，~270s）
+python scripts/run_pilot.py --puzzles refsoup_008 \
   --max-rounds 12 --round-caps 5 10 12 \
   --questioner-provider ollama --questioner-model qwen2.5:7b \
   --oracle-provider ollama --oracle-model qwen2.5:7b \
-  --output results/pilot/refsoup_006
+  --output results/pilot/refsoup_008
 
 # 真实 API 计时外推
 python scripts/run_real_timing.py \
-  --puzzle refsoup_006 \
+  --puzzle refsoup_008 \
   --questioner-provider qwen --questioner-model qwen-plus \
   --max-rounds 8 --round-caps 5 10
 ```
@@ -126,7 +126,7 @@ python scripts/run_real_timing.py \
 
 | 维度 | 目标 | 现状 |
 |------|------|------|
-| **深度** | 设计**刁钻问题**题库 —— 朴素提问路径走不通，必须做非平凡的假设跳跃 | 反面例子：`refsoup_006` 被 ox-alpha 5 轮线性推到底 |
+| **深度** | 设计**刁钻问题**题库 —— 朴素提问路径走不通，必须做非平凡的假设跳跃 | 反面例子：`refsoup_008` 被 glm-5.3-flash 5 轮线性推到底 |
 | **广度** | 一个汤面**允许多个成立的解答** —— 考察 Agent 能否发现「不止一个答案」并区分 | 反面例子：全部题目单解，Oracle 照单一汤底判是非 |
 
 ### 广度的代码阻塞（不是加字段就行）

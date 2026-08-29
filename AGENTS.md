@@ -23,10 +23,15 @@
 
 ## 数据集
 
-| 来源 | IDs |
-|------|-----|
-| git 发布 | `turtle_*` 11 题 |
-| 本地导入 | `refsoup_001`…（`import_reference_puzzles.py`） |
+**按来源隔离，见 `data/puzzles/README.md`：**
+
+| 目录 | 内容 | 实验可用 |
+|------|------|---------|
+| `real/` | 参考站「经典」标签全量 27 题，每题带 `reference_url` | ✅ |
+| `generated/` | LLM 生成 + 团队自撰 9 题 | ❌ |
+
+取题一律用 `list_puzzle_ids(family="real")`；`"all"` / `"turtle"` / `"refsoup"` 会跨目录。
+`key_clues` 由 `scripts/refresh_key_clues_llm.py` 用 LLM 统一抽取（因果要素，非孤立名词）。
 
 `data/reference/`、`data/generator/`、`results/`、`data/trajectories/` 已 gitignore。
 
@@ -40,7 +45,7 @@ python scripts/refresh_reference_key_clues.py
 
 `key_clues`：`generator/reference/key_clues.py`（词典匹配 + 过滤汤面重复词）。
 
-## 模型选型（2026-08-25 实测，`refsoup_006` 10 题探针）
+## 模型选型（2026-08-25 实测，`refsoup_008` 10 题探针）
 
 **Oracle 是基准真值的来源，必须强。** 弱 Oracle 会把答不出的问题全塌陷成「与此无关」，
 Questioner 拿不到任何反馈，整题在信息论意义上无解 —— 此时的全 0 分测的是 Oracle 坏掉，
@@ -51,7 +56,7 @@ Questioner 拿不到任何反馈，整题在信息论意义上无解 —— 此�
 | ollama `qwen3.5:4b`，thinking off | 30% | 0.7s | 不可用作 Oracle |
 | ollama `qwen3.5:4b`，thinking on | 70% | 136s | 仍有 3/10 错 |
 | qwen `qwen-flash` | 90% | 0.46s | 免费额度内可用 |
-| openrouter `stealth/ox-alpha` | **100%** | ~5s | $0，但有共享池限流 |
+| openrouter `z-ai/glm-5.3-flash` | **100%** | ~5s | $0，但有共享池限流 |
 
 `qwen-plus` / `qwen-turbo` 已被 **403 free quota exhausted** 挡住（需在阿里云控制台补付款信息
 或关闭「仅免费额度」模式）。
@@ -62,8 +67,23 @@ Questioner 拿不到任何反馈，整题在信息论意义上无解 —— 此�
    部分。给小了会返回**空 content** —— Oracle 侧会被 `oracle_agent.py` 的 clamp 兜底成
    「与此无关」，**静默给出错误答案且无任何报错**。
    - Oracle `max_tokens: 8` 只在**关闭思考**时安全；开思考至少给 512。
-   - Questioner 用 `stealth/ox-alpha` 时 256 会返回空，需 ≥1024。
+   - Questioner 用 `z-ai/glm-5.3-flash` 时 256 会返回空，需 ≥1024。
 2. **思考让延迟涨约 100 倍**（qwen3.5:4b：0.67s → 79s）。本地跑务必 `.env` 设 `OLLAMA_THINK=0`。
+
+### token 预算随汤底长度伸缩（新题集尤其重要）
+
+推理模型的思考量随输入增长。`real/` 里有 5 道汤底超过 600 字，最长 1497 字，
+实测 `z-ai/glm-5.3-flash` 在这些题上：
+
+| 汤底长度 | 够用的 max_tokens |
+|---------|------------------|
+| < 200 字 | 4096 |
+| 600–700 字 | 16384 |
+| 1497 字 | 32768 |
+
+预算不足时返回**空 content**，而 `composite_judge` 捕获异常后会**静默跳过**那次逻辑采样，
+均值少一个样本却不报错。一次 27 题的抽取触发了 35 次空回复重试。
+**按汤底长度设 `max_tokens`，不要用固定值。**`LLMJudge(max_tokens=...)` 已支持。
 
 ### 稳健性（已内置，长跑必需）
 
@@ -94,13 +114,13 @@ Questioner 拿不到任何反馈，整题在信息论意义上无解 —— 此�
   512 预算会在思考中途截断，Questioner 整局输出乱码式思考文本（已实测）。
   **跑基准务必 `TINKER_THINK=0`**（经 chat template 的 `enable_thinking=False` 关闭），
   或给 ≥2048。实测 `TINKER_THINK=0` + questioner 2048 / oracle 1024：
-  Qwen3.5-397B 8 轮解出 refsoup_006，composite 0.58（关键词 28/70 + 逻辑 30/30）。
+  Qwen3.5-397B 8 轮解出 refsoup_008，composite 0.58（关键词 28/70 + 逻辑 30/30）。
 - 重试：`TINKER_MAX_ATTEMPTS`（默认 4）指数退避，空回复抛 `EmptyResponseError`。
 
 ### 评分：`composite_judge`（推荐，满分 100）
 
 `heuristic_judge` 只做 `key_clues` 子串匹配，**语义正确但换词表述会得 0 分** —— 实测中
-ox-alpha 已还原完整因果链却被判 0.00。`composite_judge` 解决这点：
+glm-5.3-flash 已还原完整因果链却被判 0.00。`composite_judge` 解决这点：
 
 | 部分 | 计算 |
 |------|------|
@@ -111,16 +131,16 @@ ox-alpha 已还原完整因果链却被判 0.00。`composite_judge` 解决这点
 逻辑 prompt 明确要求「不因用词不同扣分」，避免与前 70 分重复惩罚。解析失败/调用异常的样本
 被丢弃，不拉低均值。`to_dict()["score"]` 仍是归一化 0–1，现有消费方无需改动。
 
-> ⚠️ 难度定义冲突未决：`refsoup_006` 的 JSON 标 `"difficulty": "easy"`，
+> ⚠️ 难度定义冲突未决：`refsoup_008` 的 JSON 标 `"difficulty": "easy"`，
 > 按 `key_clue_count=5` 算却是 `hard`。两套定义并存，尚未统一。
 - Pilot 示例：
 
 ```bash
-python scripts/run_pilot.py --puzzles refsoup_006 \
+python scripts/run_pilot.py --puzzles refsoup_008 \
   --max-rounds 12 --round-caps 5 10 12 \
   --questioner-provider ollama --questioner-model qwen2.5:7b \
   --oracle-provider ollama --oracle-model qwen2.5:7b \
-  --output results/pilot/refsoup_006
+  --output results/pilot/refsoup_008
 ```
 
 报告：`pilot_timing.json` + `pilot_timing.html`。正式全量研究前可切换 LLM judge。
@@ -131,14 +151,14 @@ python scripts/run_pilot.py --puzzles refsoup_006 \
 
 ```bash
 python scripts/setup_env.py && python scripts/check_env.py
-python scripts/run_game.py --puzzle refsoup_006 --mock
+python scripts/run_game.py --puzzle refsoup_008 --mock
 ```
 
 Ollama：`OLLAMA_TIMEOUT`（默认 600）。Z.AI Coding Plan：`ZAI_USE_CODING_ENDPOINT=1`。
 
 ## 关键约定
 
-- **默认测试题**：`refsoup_006`
+- **默认测试题**：`refsoup_008`
 - 离线：`--mock`；测试：`pytest -q`（58 tests）
 - Questioner 每轮收到完整 `qa_history`；Oracle 仅当前问题
 - `forbidden_reveal` 仅 D 层 filter，运行时未注入 Oracle
@@ -150,8 +170,8 @@ Ollama：`OLLAMA_TIMEOUT`（默认 600）。Z.AI Coding Plan：`ZAI_USE_CODING_E
 ## 常用命令
 
 ```bash
-python scripts/run_game.py --puzzle refsoup_006 --mock
-python scripts/run_pilot.py --puzzles refsoup_006 --mock
+python scripts/run_game.py --puzzle refsoup_008 --mock
+python scripts/run_pilot.py --puzzles refsoup_008 --mock
 python scripts/run_benchmark.py --puzzles refsoup --questioner-models mock --mock
 pytest -q
 ```
@@ -164,13 +184,13 @@ pytest -q
 ```yaml
 oracle:
   provider: openrouter        # openai|anthropic|deepseek|qwen|zai|gemini|openrouter|tinker|ollama|mock
-  model: stealth/ox-alpha
+  model: z-ai/glm-5.3-flash
   max_tokens: 512             # 推理模型别设太小，思考会吃掉预算 → 空回复
 
 questioner:
   provider: ollama
   model: qwen3.5:4b
-  max_tokens: 400             # ox-alpha 当 Questioner 需 ≥1024
+  max_tokens: 400             # glm-5.3-flash 当 Questioner 需 ≥1024
 
 game:
   max_rounds: 12
@@ -181,18 +201,18 @@ game:
 
 3. 先验证 Oracle 质量再跑实验（**这一步别跳过**）：拿一组已知答案的探针问 Oracle，
    准确率低于 ~90% 就别用，否则测出来的是 Oracle 而不是 Questioner。
-4. `python scripts/run_game.py --puzzle refsoup_006 --config your.yaml --no-judge`
+4. `python scripts/run_game.py --puzzle refsoup_008 --config your.yaml --no-judge`
 5. 单局合理再跑 `run_pilot.py`。
 
 `run_game.py` 默认用 `gpt-4o` 当裁判；没有 `OPENAI_API_KEY` 时加 `--no-judge`。
 
 ## 已知结果（2026-08-25）
 
-`refsoup_006` + Questioner `qwen3.5:4b`，三种 Oracle 全部 **0 分**，Exp1 曲线贴地、
+`refsoup_008` + Questioner `qwen3.5:4b`，三种 Oracle 全部 **0 分**，Exp1 曲线贴地、
 从未主动交答案 → 结论是 4B 的能力天花板，与反馈信号质量无关。
 结果在 `results/pilot/{qwen35_4b_local,qwen35_4b_vs_qwenflash,qwen35_4b_vs_oxalpha}/`。
 
-`stealth/ox-alpha` 当 Questioner 时**第 6 轮即还原完整汤底**，但因三个管线缺陷记为 0 分
+`z-ai/glm-5.3-flash` 当 Questioner 时**第 6 轮即还原完整汤底**，但因三个管线缺陷记为 0 分
 （Oracle 对长复合问句答错、5 轮空回复、跑满轮数不交答案）。前两条已修，第三条给了开关。
 该局的推理内容用 `composite_judge` 重算是 **72/100**（关键词 3/5=42，逻辑 30/30）。
 
@@ -203,8 +223,8 @@ game:
 
 **A. 题库设计：深度 × 广度**
 
-- **深度** — 设计刁钻问题题库，朴素提问路径走不通。反面例子：`refsoup_006` 被
-  ox-alpha 5 轮线性推到底。抓手在 `generator/create/controllers.py`（目前无「刁钻度」维度）。
+- **深度** — 设计刁钻问题题库，朴素提问路径走不通。反面例子：`refsoup_008` 被
+  glm-5.3-flash 5 轮线性推到底。抓手在 `generator/create/controllers.py`（目前无「刁钻度」维度）。
 - **广度** — 一个汤面允许多个成立的解答。**代码阻塞**：`solution` 是单个字符串，
   `schema.py` / `oracle_agent.py` / `composite_judge` / `key_clues` 全按单解写死。
   待决：多解时 Oracle 对「A 解成立、B 解不成立」的问题该答什么。

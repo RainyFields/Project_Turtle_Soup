@@ -233,9 +233,26 @@ def composite_judge(
 
 
 class LLMJudge(BaseAgent):
-    def __init__(self, *, provider_name: str = "openai", model: str = "gpt-4o"):
+    def __init__(
+        self,
+        *,
+        provider_name: str = "openai",
+        model: str = "gpt-4o",
+        max_tokens: int = 512,
+        temperature: float = 0.2,
+    ):
+        # Reasoning models spend this budget thinking before emitting anything,
+        # so 512 can yield empty content on long prompts — raise it for them.
         provider = get_provider(provider_name)
-        super().__init__(provider=provider, model_cfg=ModelConfig(provider=provider_name, model=model))
+        super().__init__(
+            provider=provider,
+            model_cfg=ModelConfig(
+                provider=provider_name,
+                model=model,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            ),
+        )
 
     def judge(
         self,
