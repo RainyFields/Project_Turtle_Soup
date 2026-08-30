@@ -27,11 +27,28 @@
 
 | 目录 | 内容 | 实验可用 |
 |------|------|---------|
-| `real/` | 参考站「经典」标签全量 27 题，每题带 `reference_url` | ✅ |
+| `real/` | **25 题**，全部来自 soup.ahelumos.com 且带 `reference_url` | ✅ |
 | `generated/` | LLM 生成 + 团队自撰 9 题 | ❌ |
 
+题库经两轮人工审核定稿：站点「经典」标签 27 题 → 删 11 → 补 10（站点经典题已用尽，
+新题来自搞笑/红汤/恐怖/原创/清汤）→ 删 1。构成为 15 题经典标签 + 10 题其他标签。
+
+```
+汤面  中位 35 字   范围 9–108
+汤底  中位 102 字  范围 13–279     ← 全部题目在 4096 token 预算下安全
+线索  中位 5 条    范围 2–6，共 115 条
+```
+
+**编号已重排**：旧 `refsoup_006`（沙漠里的尸体）现为 **`refsoup_008`**。
+
 取题一律用 `list_puzzle_ids(family="real")`；`"all"` / `"turtle"` / `"refsoup"` 会跨目录。
-`key_clues` 由 `scripts/refresh_key_clues_llm.py` 用 LLM 统一抽取（因果要素，非孤立名词）。
+`key_clues` 由 `scripts/refresh_key_clues_llm.py` 用 LLM 统一抽取。旧的词典抽取器
+（`generator/reference/key_clues.py`）**只对最早 10 题有效**，在其他题上退化成机械切分，
+产出句中碎片和空泛词 —— 那会让 composite_judge 的 70 分在给噪声打分。
+新抽取器要求每条线索是因果环节、不出现在汤面、且扎根于汤底用词。
+
+站点数据有三类格式损坏（汤面被截断成占位符而真汤面塞在汤底里、抓取噪声、作者前言），
+用 `scripts/clean_reference_surfaces.py` 修复，幂等且带 `--dry-run`。
 
 `data/reference/`、`data/generator/`、`results/`、`data/trajectories/` 已 gitignore。
 
@@ -45,7 +62,36 @@ python scripts/refresh_reference_key_clues.py
 
 `key_clues`：`generator/reference/key_clues.py`（词典匹配 + 过滤汤面重复词）。
 
-## 模型选型（2026-08-25 实测，`refsoup_008` 10 题探针）
+## ⚠️ 跑实验前的两条硬规则
+
+**规则 1：Oracle 与逻辑裁判必须来自与 Questioner 不同的模型家族。**
+
+不只是"准确率要够"。Oracle 和 Questioner 同家族时，两者共享训练数据、分词器与表述
+习惯，同家族的提问更容易被"听懂"，而这份优势不会平等地给到别家族的模型。当网格
+比较的是同一家族的不同规模时（如 4B / 27B / 397B），其中一个恰好与 Oracle 同款，
+**「规模效应」就和「与 Oracle 的相似度」绑死了，无法分离**。逻辑裁判同理，且风险更大 ——
+那是模型给自己的答案打分。
+
+> 已知问题：2026-08 的 693 局网格中，`Qwen3.5-397B-A17B` 同时担任 Questioner、
+> Oracle 和逻辑裁判。重跑时必须换掉。当前可用的异构 Oracle 是
+> `openrouter` / `z-ai/glm-5.3-flash`（ZAI 家族，实测 90%）。
+> 注意 `qwen-flash` 虽然准确率也是 90%，但**仍属 Qwen 家族，对 Qwen Questioner 不适用**。
+
+**规则 2：Oracle 先审计再跑，不合格不开始。**
+
+```bash
+python scripts/audit_oracle.py --provider openrouter --model z-ai/glm-5.3-flash
+```
+
+通过线 ≥90%（yes/no 项）。脚本退出码非 0 即未通过。探针题目取自当前题库，
+若题库变动导致探针题缺失，脚本会提示并跳过而不是崩溃。
+
+**报准确率不够，要报互信息 `I(Y;Ŷ)`。** 弱 Oracle 的错误会全部塌陷成「与此无关」——
+零信息回答。实测 30% 的 Oracle 在 30 轮只传 8.4 bits，而在 |Z|≈1000 的假设空间里
+识别正解需约 10 bits：**理想 Questioner 也解不出**，此时的 0 分测的是环境不是模型。
+注意准确率 70% 与 90% 的两个 Oracle 互信息完全相同 —— 准确率连排序都不对。
+
+## 模型选型（2026-08 实测，`refsoup_008` 10 题探针）
 
 **Oracle 是基准真值的来源，必须强。** 弱 Oracle 会把答不出的问题全塌陷成「与此无关」，
 Questioner 拿不到任何反馈，整题在信息论意义上无解 —— 此时的全 0 分测的是 Oracle 坏掉，
@@ -72,12 +118,12 @@ Questioner 拿不到任何反馈，整题在信息论意义上无解 —— 此�
 
 ### token 预算随汤底长度伸缩（新题集尤其重要）
 
-推理模型的思考量随输入增长。`real/` 里有 5 道汤底超过 600 字，最长 1497 字，
-实测 `z-ai/glm-5.3-flash` 在这些题上：
+推理模型的思考量随输入增长。**当前题集最长汤底 279 字，4096 预算即安全** ——
+这是重建题库的附带收益。历史参考（旧题集含 1497 字汤底时的实测）：
 
 | 汤底长度 | 够用的 max_tokens |
 |---------|------------------|
-| < 200 字 | 4096 |
+| < 300 字 | 4096（当前题集全部落在此档） |
 | 600–700 字 | 16384 |
 | 1497 字 | 32768 |
 

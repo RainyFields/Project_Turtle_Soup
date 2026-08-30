@@ -38,15 +38,24 @@ PROBES = {
         ("这个故事和外星人有关吗？", "与此无关"),
         ("当天下雨了吗？", "与此无关"),
     ],
-    "turtle_001": [
-        ("男人以前喝过所谓的海龟汤吗？", "是"),
-        ("这次的海龟汤味道和他记忆中的不同吗？", "是"),
+    "refsoup_009": [
         ("男人曾经历过海难吗？", "是"),
-        ("男人自杀是因为汤太难喝吗？", "不是"),
-        ("男人的妻子还活着吗？", "不是"),
-        ("餐厅老板毒死了他吗？", "不是"),
-        ("男人自杀与他意识到当年的真相有关吗？", "是"),
+        ("男人在海难中吃过好友的肉吗？", "是"),
+        ("那位好友已经死了吗？", "是"),
+        ("男人崩溃是因为汤太难喝吗？", "不是"),
+        ("好友是被男人杀死的吗？", "不是"),
+        ("男人以前知道那碗肉汤的真相吗？", "不是"),
+        ("餐馆老板下毒了吗？", "不是"),
         ("男人是一名厨师吗？", "与此无关"),
+    ],
+    "refsoup_004": [
+        ("女人透过墙上的洞看到了红色吗？", "是"),
+        ("隔壁住着人吗？", "是"),
+        ("女人发疯与房东的回答有关吗？", "是"),
+        ("洞里的红色是血吗？", "不是"),
+        ("隔壁的人已经死了吗？", "不是"),
+        ("女人是被房东吓疯的吗？", "不是"),
+        ("这栋房子闹鬼吗？", "与此无关"),
     ],
 }
 
@@ -65,10 +74,24 @@ def main() -> int:
     p.add_argument("--provider", required=True)
     p.add_argument("--model", required=True)
     p.add_argument("--max-tokens", type=int, default=1024)
+    p.add_argument(
+        "--puzzles",
+        nargs="*",
+        default=None,
+        help="Subset of probe puzzles to run (default: all)",
+    )
     args = p.parse_args()
 
     hard_total = hard_ok = irr_total = irr_ok = irr_soft = 0
-    for pid, probes in PROBES.items():
+    selected = {k: v for k, v in PROBES.items() if not args.puzzles or k in args.puzzles}
+    missing = [k for k in selected if not (ROOT / "data" / "puzzles" / "real" / f"{k}.json").exists()]
+    if missing:
+        print(f"probe puzzles no longer in the set, skipping: {', '.join(missing)}")
+        selected = {k: v for k, v in selected.items() if k not in missing}
+    if not selected:
+        print("no probe puzzles available — add probes for the current set")
+        return 2
+    for pid, probes in selected.items():
         puzzle = load_puzzle(pid)
         app = AppConfig(
             oracle=ModelConfig(provider=args.provider, model=args.model, max_tokens=args.max_tokens),

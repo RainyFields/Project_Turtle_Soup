@@ -1,0 +1,44 @@
+{
+  "id": "refsoup_029",
+  "title": "致命的光",
+  "difficulty": "medium",
+  "category": "horror",
+  "surface": "小白看到了一束光。第二天，人们发现了两具尸体，一具是睁着眼的，一具是闭着眼的。",
+  "solution": "小白夜晚来到山脚下散步，误打误撞碰上跳崖自杀的人坠死在自己面前。惊恐之时，却见黑暗里亮起了闪光灯。那人以为小白是凶手，想拍照却忘了关闪光灯，看见自己被小白发现，张口就要大喊救命，小白冲上来捂住了他的嘴。结果神经紧张用力过猛，将他活生生捂死。而窒息而亡的人一般是睁着眼的。",
+  "key_clues": [
+    "跳崖自杀坠死",
+    "闪光灯",
+    "以为小白是凶手",
+    "用力过猛捂死",
+    "窒息而亡睁着眼"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "红汤"
+    ],
+    "forbidden_reveal": [
+      "惊恐之时，却见黑暗里亮起了闪光灯",
+      "那人以为小白是凶手，想拍照却忘了关闪光灯，看见自",
+      "结果神经紧张用力过猛，将他活生生捂死",
+      "而窒息而亡的人一般是睁着眼的"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "horror"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "61",
+    "reference_url": "https://soup.ahelumos.com/soups/61",
+    "rating": null,
+    "rating_count": null,
+    "author": "Falconny"
+  }
+}

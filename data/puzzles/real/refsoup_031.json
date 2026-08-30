@@ -1,0 +1,47 @@
+{
+  "id": "refsoup_031",
+  "title": "鬼来了",
+  "difficulty": "medium",
+  "category": "horror",
+  "surface": "梅芳与女儿小花相依为命，后患上了老年痴呆症，整日神志不清，某一日，梅芳看着小花在一旁干家务，突然，她瞪大双眼，直直盯着小花说：“鬼…鬼来了…”",
+  "solution": "梅芳育有一对双胞胎姐妹，姐姐是右撇子，妹妹是左撇子。几年前，妹妹意外去世，梅芳与姐姐小花相依为命。那一天梅芳看着小花在一旁擦镜子，摆动着的右手在镜子里倒映成了左手。患有老年痴呆神志不清醒的梅芳误把镜像当成了去世的左撇子妹妹正朝她招手。",
+  "key_clues": [
+    "双胞胎姐妹",
+    "妹妹是左撇子",
+    "妹妹意外去世",
+    "擦镜子",
+    "右手在镜子里倒映成左手",
+    "误把镜像当成去世的妹妹"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "恐怖",
+      "原创"
+    ],
+    "forbidden_reveal": [
+      "梅芳育有一对双胞胎姐妹，姐姐是右撇子，妹妹是左撇",
+      "几年前，妹妹意外去世，梅芳与姐姐小花相依为命",
+      "那一天梅芳看着小花在一旁擦镜子，摆动着的右手在镜",
+      "患有老年痴呆神志不清醒的梅芳误把镜像当成了去世的"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "horror",
+      "original"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "58",
+    "reference_url": "https://soup.ahelumos.com/soups/58",
+    "rating": null,
+    "rating_count": null,
+    "author": "Falconny"
+  }
+}

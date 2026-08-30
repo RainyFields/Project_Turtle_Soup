@@ -29,13 +29,19 @@ alwaysApply: true
 
 - `engine/game.py` · `evaluation/round_studies.py` · `evaluation/judge.py`
 - Providers: `agents/model_providers/`（含 `openrouter_provider.py`）
-- Puzzles: `turtle_*` (11 git) + `refsoup_*` (local import) —— 目前**只有经典短汤（单解）**
-- Default test puzzle: **`refsoup_008`**
+- Puzzles: `data/puzzles/real/` **25 题**（站点收录，经两轮人工审核）+ `generated/` 9 题（禁用）
+- 取题一律 `list_puzzle_ids(family="real")`；`"all"`/`"turtle"`/`"refsoup"` 会跨目录
+- Default test puzzle: **`refsoup_008`**（沙漠里的尸体，旧编号 refsoup_006）
 
-## 换模型时必读（AGENTS.md「模型选型」有实测数据）
+## 换模型时必读（AGENTS.md「跑实验前的两条硬规则」有完整说明）
 
-- **Oracle 必须强**：它是基准真值。弱模型会把答不出的问题全塌陷成「与此无关」，
-  Questioner 拿不到反馈，整题无解 —— 那种全 0 分测的是 Oracle 坏掉，不是 Questioner 弱。
+- **Oracle / 裁判必须与 Questioner 不同家族**。同家族共享训练数据与表述习惯，
+  同家族的提问更易被「听懂」，会把「规模效应」和「与 Oracle 的相似度」绑死。
+  已知问题：693 局网格里 Qwen3.5-397B 同时是 Questioner、Oracle 和裁判，重跑须换。
+  当前异构选择：`z-ai/glm-5.3-flash`（`qwen-flash` 准确率同为 90% 但仍属 Qwen 家族）。
+- **先审计再跑**：`python scripts/audit_oracle.py --provider <p> --model <m>`，
+  通过线 ≥90%。弱模型会把答不出的问题全塌陷成「与此无关」（零信息），
+  30% 的 Oracle 在 30 轮只传 8.4 bits < 识别正解所需的 ~10 bits —— 理想 Questioner 也解不出。
 - **推理模型两个坑**：思考 token 算进 `max_tokens`/`num_predict` 预算，给小了会返回
   **空 content**（静默错答）；思考还会让延迟涨 ~100 倍。
 - 本地 Ollama：`.env` 设 `OLLAMA_THINK=0`。

@@ -1,0 +1,42 @@
+{
+  "id": "refsoup_028",
+  "title": "三兄弟",
+  "difficulty": "hard",
+  "category": "horror",
+  "surface": "老大出车祸死了，过了几天，老三把老二杀了",
+  "solution": "三兄弟感情很好，长得很像，以至于每天都睡在一起，老大的意外离世让有精神疾病的老三这几天都睡不好，所以他把老二杀了，分成了两半放在床的两边，陪伴自己",
+  "key_clues": [
+    "长得很像",
+    "每天都睡在一起",
+    "有精神疾病",
+    "分成两半放在床的两边",
+    "陪伴自己"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "红汤",
+      "恐怖"
+    ],
+    "forbidden_reveal": [
+      "三兄弟感情很好，长得很像，以至于每天都睡在一起，"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "horror"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "36",
+    "reference_url": "https://soup.ahelumos.com/soups/36",
+    "rating": 10.0,
+    "rating_count": 1,
+    "author": "XiaoXiao"
+  }
+}

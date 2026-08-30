@@ -1,128 +1,143 @@
-% Thinking Sideways, Observed — IAB @ NeurIPS 2026 workshop draft
+% Thinking Sideways, Observed — IAB @ NeurIPS 2026 workshop draft (4-page body)
 % Build: tectonic iab2026.tex   (XeTeX; needs macOS CJK font "Songti SC")
-% NOTE: self-contained approximation of the NeurIPS preprint layout; swap in
-% the official workshop .sty before submission.
 \documentclass[10pt]{article}
-\usepackage[letterpaper,margin=1in,top=0.9in]{geometry}
+\usepackage[letterpaper,margin=1in,top=0.85in]{geometry}
 \usepackage{fontspec}
 \usepackage{xeCJK}
 \setmainfont{Times New Roman}
 \setCJKmainfont{Songti SC}
-\usepackage{amsmath}
+\usepackage{amsmath,amssymb}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{caption}
 \usepackage[hidelinks]{hyperref}
 \usepackage{titlesec}
-\titlespacing*{\section}{0pt}{9pt}{4pt}
-\titlespacing*{\subsection}{0pt}{7pt}{3pt}
+\titlespacing*{\section}{0pt}{7pt}{2pt}
+\titlespacing*{\subsection}{0pt}{6pt}{2pt}
 \titleformat*{\section}{\large\bfseries}
 \titleformat*{\subsection}{\normalsize\bfseries}
 \captionsetup{font=small,labelfont=bf}
-\setlength{\parskip}{2pt}
+\setlength{\parskip}{1.5pt}
+\linespread{0.98}\selectfont
 \usepackage{enumitem}
-\setlist{nosep,leftmargin=1.4em}
+\setlist{nosep,leftmargin=1.3em}
 
-\title{\bfseries Thinking Sideways, Observed: Interpreting the Lateral-Thinking\\ Search Behavior of LLM Agents with Turtle Soup Puzzles}
+\title{\bfseries Thinking Sideways, Observed:\\ Interpreting the Lateral-Thinking Search Behavior of LLM Agents}
 \author{Xiaoxuan Lei \and (co-authors TBD)\\
-\small Draft v0.3 --- IAB: Interpreting Agent Behavior, Workshop @ NeurIPS 2026}
+\small Draft v0.7 --- IAB: Interpreting Agent Behavior, Workshop @ NeurIPS 2026}
 \date{}
 
 \begin{document}
 \maketitle
-\vspace{-1.5em}
+\vspace{-1.6em}
 
 \begin{abstract}
-\textbf{More interaction does not make LLM agents better lateral thinkers.} Across 693 games of Turtle Soup (海龟汤, situation puzzles) spanning 11 puzzles, three model scales (4B--397B), and three seeds, checkpoint accuracy is flat across all 30 rounds of yes/no questioning for every model, and additional round budget leaves the larger models unchanged (0.32--0.36 from cap 5 to 30) while actively \emph{degrading} the smallest (0.23 $\to$ 0.10). To explain the flatness we read the interaction traces themselves: each round's question is embedded in a semantic space anchored to human word-association structure, yielding two geometric signals---association \emph{step size} and \emph{drift} from the human manifold. The geometry separates failure modes that identical outcome scores conflate: the 4B stalls (late-game step size 0.003, circling one hypothesis and never committing an answer), while the 397B explores widely (stride 0.16) yet fails to \emph{bank} its exploration into an improving hypothesis. Stride's correlation with outcome inverts with scale ($\rho=-0.46$ at 4B vs.\ $+0.21$ at 397B), and drift correlates with failure across puzzles ($r=-0.28$ pooled, $-0.43$ mid-scale)---but a mixed-effects analysis shows puzzle identity absorbs this predictive signal (likelihood-ratio $p=0.28$), so we position trajectory geometry as an \emph{interpretive} instrument for reading agent behavior, not an outcome predictor. We also document a methodological trap for interactive evaluation at large: a weak Oracle silently converts the task into one that is information-theoretically unsolvable, so observed ``agent failure'' can be environment failure.
+\noindent \textbf{More interaction does not make LLM agents better lateral thinkers.} We ran 693 games of Turtle Soup---Chinese situation puzzles solved by asking yes/no questions---across three model scales and thirty rounds of questioning. Accuracy after each round is flat from the first round to the thirtieth, for every model. A larger round budget changes nothing for the two larger models and actively hurts the smallest. Flat curves say interaction is not helping; they cannot say why. So we read the transcripts instead. Embedding each question and tracking it over the dialogue gives two signals---how far the search moves each round, and in what direction---and those separate failure modes that identical scores hide. The 4B model \emph{stalls}: its late-game questions move 0.003 in semantic space, circling one hypothesis it never commits to. The 397B model \emph{explores without banking}: it strides 0.16 per round, covering real ground, and still never converts any of it into a better story. Both score zero. We also report what the geometry does not do: a mixed-effects analysis shows puzzle identity absorbs its predictive signal ($p=0.28$), so we offer it as an instrument for reading behavior, not for forecasting success. Finally, a warning for anyone building benchmarks of this shape: a weak answering model quietly makes the task unsolvable, so what looks like agent failure can be environment failure.
 \end{abstract}
 
 \section{Introduction}
-Give an LLM agent thirty rounds of yes/no questions to crack a lateral-thinking puzzle and it does not get better as the dialogue grows: on our 693-game grid, checkpoint accuracy is flat from round~1 to round~30 for every model we test, and a larger round budget helps no one---it actively hurts the smallest model. Outcome metrics can state this flatness but cannot explain it: two agents scoring $0.0$ may be failing in opposite ways (one never leaves its first hypothesis; one leaves the plausible region entirely). Explaining the flatness requires instruments that read the \emph{process}---which is this paper's contribution.
+Here is a Turtle Soup puzzle. \emph{A man's body lies in the desert, clutching half a matchstick; luggage and clothing are scattered around him.} That is all the solver sees. The hidden story is that a hot-air balloon was losing altitude, the passengers threw out their luggage and still could not stay up, so they drew lots with matchsticks---and the man who drew the short one was thrown out. The solver recovers this by asking yes/no questions, one per round.
 
-Turtle Soup gives the agent a paradoxical scenario (the 汤面, ``surface'') and hides the story (the 汤底, ``base''); the agent asks yes/no questions to reconstruct it. Three properties make it a behavioral microscope: (i) the questioning protocol is a naturally verbalized search trace---no activation access needed, the behavior \emph{is} text; (ii) puzzles are deliberately under-determined, so the direction of each associative jump is diagnostic; (iii) games are short, language-only, and cheap at scale. Prior turtle-soup benchmarks score verification correctness, solve efficiency, or consistency with the intended story (\S\ref{sec:rw}); none interprets the search behavior itself.
+Give a language model thirty such rounds and it does not get better as the dialogue grows. On our 693-game grid, accuracy after each round is flat from round~1 to round~30 for every model we test, and a larger round budget helps no one---it actively hurts the smallest model. Outcome metrics can state this flatness. They cannot explain it. Two agents scoring $0.0$ on the same puzzle may be failing in opposite ways: one never leaves its first hypothesis, the other leaves the plausible region entirely. Explaining the flatness needs instruments that read the process, and that is this paper's contribution.
 
-\textbf{Central hypothesis.} An agent's per-round questions, embedded jointly with human word-association norms, form a trajectory whose geometry predicts and explains success:
+\textbf{Why Turtle Soup.} Three properties make it a good behavioral microscope. The questioning protocol is a naturally verbalized search trace---no probing or activation access needed, the behavior \emph{is} text. Puzzles are deliberately under-determined, so the direction of each associative jump is diagnostic. And games are short, language-only, and cheap to run at scale.
+
+\textbf{The gap.} Prior turtle-soup benchmarks score verification correctness, solve efficiency, or consistency with the single intended story~\cite{turtlebench,splat,tsbench}. None interprets the search behavior itself.
+
+\textbf{Central hypothesis.} An agent's per-round questions, embedded in a semantic space, form a trajectory whose geometry explains success and failure.
 \begin{itemize}
-\item \textbf{H1 (stalling).} Failure trajectories with step size $\to 0$ identify agents that cannot leave a hypothesis basin; lexical novelty heuristics detect only the verbatim extreme.
-\item \textbf{H2 (drifting).} Failure trajectories with normal step size but increasing distance from the human association manifold identify agents exploring where no human path goes---invisible to lexical novelty, since synonym-shuffled re-asks look ``new.''
+\item \textbf{H1 (stalling).} An agent that cannot leave a hypothesis basin shows step size going to zero: successive questions are semantically near-identical. Lexical novelty heuristics catch only the verbatim extreme of this.
+\item \textbf{H2 (drifting).} An agent that explores in directions no human path takes shows normal step size but growing distance from a human association anchor. Lexical novelty misses this entirely, because synonym-shuffled re-asks look new.
 \item \textbf{H3 (predictivity).} Trajectory features predict final solve quality beyond outcome-adjacent covariates, and the two failure modes have distinct signatures.
 \end{itemize}
 
-\textbf{Contributions.} (1) The flatness result: on 693 games across three model scales, interaction length buys no accuracy---and degrades the smallest model; (2) a behavioral-interpretation framework (trajectory geometry over a human-association anchor) that explains the flatness by separating stalling from unbanked exploration, with an honest mixed-effects account of what the geometry does and does not predict; (3) an open-source dual-agent harness and a composite score decoupling clue recall from judged causal logic; (4) a methodological finding: Oracle competence must be audited first, else agent scores measure the environment.
+\textbf{Contributions.} (1)~The flatness result: across three model scales, interaction length buys no accuracy and degrades the smallest model. (2)~A behavioral-interpretation framework that explains the flatness by separating stalling from unbanked exploration, with an honest account of what the geometry does and does not predict. (3)~An open-source harness, a 25-puzzle benchmark restricted to puzzles humans have played and solved, and a composite score that separates clue recall from judged causal logic. (4)~A methodological finding: Oracle competence must be audited first, or agent scores measure the environment.
 
 \section{Related Work}\label{sec:rw}
-\textbf{Turtle soup as LLM benchmark.} TurtleBench~\cite{turtlebench} collects 1{,}532 real user guesses and evaluates models as yes/no judges---verification, not exploration. SPLAT~\cite{splat} introduces 975 graded situation puzzles and the interactive player--judge protocol we adopt, scored by accuracy and rounds. TurtleSoup-Bench~\cite{tsbench} frames 800 bilingual puzzles as ``imaginative reasoning'' with multi-dimensional scoring, still rewarding faithfulness to the single intended story. Our delta: we score the \emph{trajectory}, not only the destination.
+TurtleBench~\cite{turtlebench} collects 1{,}532 real user guesses and evaluates models as yes/no judges---verification, not exploration. SPLAT~\cite{splat} introduces 975 graded puzzles and the interactive player--judge protocol we adopt, scored by accuracy and rounds. TurtleSoup-Bench~\cite{tsbench} frames 800 bilingual puzzles with multi-dimensional scoring, still rewarding faithfulness to the single intended story. All three score the destination; we score the trajectory.
 
-\textbf{Divergent thinking in agents.} MUTATE~\cite{mutate} shows frontier agents discover far fewer mechanism-distinct alternative paths than humans, and localizes a cause: divergent generation and convergent selection under one conditioning. Its diverge-then-narrow agent (ReDNA) is a candidate intervention to test against our metrics: does it lengthen steps (H1) or re-anchor toward human paths (H2)? Cross-domain creativity evaluations~\cite{creativityprism,refcreativity} supply the novelty$\times$appropriateness consensus our composite score implements.
+MUTATE~\cite{mutate} shows frontier agents find far fewer mechanism-distinct paths than humans; its diverge-then-narrow agent is a natural intervention to test against our metrics. Our instrument adapts two human-psychometric ideas: forward flow~\cite{forwardflow}, which measures how far free-association chains travel and predicts creativity, and the Divergent Association Task~\cite{dat}, where semantic distance among generated words is itself the measure. The Small World of Words norms~\cite{swow} would supply an empirical human anchor---\S\ref{sec:framework} says why ours is not yet that. Judge-bias catalogues~\cite{calm,posbias} shape our scoring: the model judge is confined to the one subscore objective matching cannot reach.
 
-\textbf{Human creativity psychometrics we adapt.} Forward flow~\cite{forwardflow} quantifies how far free-association chains travel in semantic space and predicts human creativity; the Divergent Association Task~\cite{dat} shows semantic distance among generated words is itself a robust creativity measure, applied to LLMs by~\cite{datllm}. The Small World of Words norms~\cite{swow} give an empirical human association manifold to anchor ``human-path distance,'' rather than assuming any model embedding is human-like.
-
-\textbf{LLM-as-judge reliability.} Bias catalogues~\cite{calm,posbias} motivate our judge design: rubric-anchored pointwise scoring, blinding, and confining the judge to the one subscore (causal-logic identity) that objective matching cannot reach.
-
-\section{Framework}
+\section{Framework}\label{sec:framework}
 \subsection{Task and harness}
-A \textbf{Questioner} sees only the 汤面 and asks one yes/no question per round; an \textbf{Oracle} holds the 汤底 and answers 是/不是/与此无关; the Questioner may commit a final story at any round, or is forced to at the budget. The open-source harness has pluggable providers (local, gateway, and token-billed sampling of large open models, including RL-trained checkpoints), full trajectory logging, and per-game seeds.
+A \textbf{Questioner} sees only the 汤面 and asks one yes/no question per round. An \textbf{Oracle} holds the 汤底 and answers 是/不是/与此无关 (yes/no/irrelevant). The Questioner may commit a final story at any round, or is forced to at the budget. The harness has pluggable providers---local, gateway, and token-billed sampling including RL-trained checkpoints---with full per-round logging and per-game seeds.
+
+\subsection{Puzzles}
+A puzzle nobody has solved carries no evidence that its clues suffice or that its intended leap is findable, so an agent failing it teaches us nothing. Our benchmark takes puzzles with a public record of human play: 25 items from a Chinese Turtle Soup community site, each keeping its source URL. Surfaces run 9--108 characters (median 35), solutions 13--279 (median 102), with 115 annotated key clues (median 5 per puzzle). Provenance is enforced in code---a verified family and a quarantined generated family, with tests that fail if they mix.
 
 \subsection{Outcome scoring: composite, not surface}
-Judged outcome $=$ \textbf{clue recall (70)} $+$ \textbf{causal-logic identity (30)}. Clue recall matches per-puzzle annotated key clues (with a character-bigram-recall fallback for sentence-form clues; \S\ref{sec:pilot}); the logic judge rates only whether cause$\to$mechanism$\to$outcome matches, ignoring wording, sampled $k$ times and averaged. Distance without validity scores zero, per the novelty$\times$appropriateness consensus.
+String matching cannot tell a wrong answer from a right one worded differently. We watched a frontier model reconstruct a hidden causal chain completely and score $0.00$. Our composite score is \textbf{clue recall (70)} plus \textbf{causal-logic identity (30)}. Clue recall matches per-puzzle annotated clues: objective and reproducible. The logic judge rates only whether cause $\to$ mechanism $\to$ outcome matches, is told explicitly to ignore wording, and is sampled $k{=}3$ and averaged, since single ratings are unstable on borderline answers. The clue half also blocks ``far $=$ creative'' gaming: distance without validity scores zero.
 
 \subsection{Association-trajectory instrumentation}
-Per round $t$: extract question keywords (fixed extractor), embed, aggregate to a unit vector $q_t$. Signals: \textbf{step size} $s_t = d(q_t, q_{t-1})$ (forward-flow analogue) and \textbf{human-path distance} $h_t = d(q_t, \mathcal{H})$, where $\mathcal{H}$ is the puzzle's human association anchor---SWOW-seeded in the full design; a documented proxy (surface/solution/clue content words) in this draft. Hypothesized signatures: stalling $=$ $\bar{s}\to 0$, $h$ flat; drifting $=$ $\bar{s}$ normal, $h_t$ increasing.
+Each round, we extract the question's keywords, embed them, and aggregate to a unit vector $q_t$. Two signals follow: \textbf{step size} $s_t = d(q_t,q_{t-1})$, the agent's associative stride, and \textbf{anchor distance} $h_t = d(q_t,\mathcal{A})$. Hypothesized signatures: stalling is $\bar{s}\to 0$ with $h$ flat; drifting is normal $\bar{s}$ with $h_t$ rising.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.72\linewidth]{figures/fig1_turtle_002.png}
-\caption{Question trajectories of three model sizes on one puzzle (E1, seed 0; 2-D PCA; gray cloud: proxy association manifold). The 4B (red) plays all 30 rounds with late-game step size $0.003$---near-total stall. The 397B (green) strides at $0.16$ for 13 rounds, narrowing to $0.02$ as it converges---explore-then-commit. The 27B (blue) lands on the correct hypothesis at round~1 and commits by round~4: stride requires convergence context (\S\ref{sec:results}).}
-\label{fig:one}
-\end{figure}
-
-\section{Experiments}
-\textbf{Setup.} 11 Chinese puzzles with annotated key clues; Questioners Qwen3.5-4B, Qwen3.6-27B, Qwen3.5-397B-A17B (sampled via a token-billed API for open models); Oracle and logic judge fixed to Qwen3.5-397B-A17B, thinking disabled. \textbf{Oracle audit (prerequisite):} on held-out probe pairs the Oracle scores 15/15 (100\%) on yes/no items. In an earlier pilot, a 4B Oracle answered 30\% correctly, collapsing most questions to ``irrelevant''---after which no Questioner can succeed; raising Oracle accuracy $30\%\to100\%$ left the 4B Questioner's score unchanged: the environment, not the agent, was the bottleneck.
-
-\textbf{E1 (round curve).} Play to 30 rounds; after each round force a checkpoint answer, scored by clue recall. 11 puzzles $\times$ 3 models $\times$ 3 seeds $=99$ games. \quad
-\textbf{E2 (round budget).} Hard caps $\{5,10,15,20,25,30\}$ with forced final answer, composite scoring with logic rater; 594 games. \quad
-\textbf{E3 (association trajectory).} For every E1 game: $\{s_t\}$, $\{h_t\}$; correlate trace geometry with outcome.
-
-\section{Results}\label{sec:results}
+\textbf{On the anchor.} Ours is built from the puzzle's surface, solution, and clues, and we report that plainly rather than call it a human manifold. Two consequences we measured: 41--69\% of its terms come only from the solution and clues, and clue recall is the outcome, so the two are partly definitionally linked; and rebuilding the anchor from the surface alone flips the sign of the drift slope in 4 of 11 held-out traces. We report both anchors and treat a SWOW-based version~\cite{swow} as the correct future form.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.49\linewidth]{figures/fig_e1_curves.png}\hfill
 \includegraphics[width=0.49\linewidth]{figures/fig_e2_caps.png}
-\caption{\textbf{Left (E1):} checkpoint accuracy is flat across 30 rounds for all models (mean $\pm$ SEM over 33 games each). \textbf{Right (E2):} end accuracy vs. round budget---the 27B and 397B are flat (0.32--0.36); the 4B peaks at cap~15 then degrades to 0.10.}
+\caption{\textbf{E1 (left):} accuracy after each round, flat across 30 rounds for all three models (mean $\pm$ SEM, 33 games each). \textbf{E2 (right):} accuracy against round budget---the two larger models flat at 0.32--0.36, the 4B peaking at a budget of 15 and then degrading to 0.10.}
 \label{fig:e1e2}
 \end{figure}
 
-\textbf{E1: interaction does not improve the working hypothesis.} Checkpoint accuracy is flat across all 30 rounds for every model (Fig.~\ref{fig:e1e2}, left): 27B $\approx 0.20$, 397B $\approx 0.18$, 4B $\approx 0.14$; SEM bands overlap between round~1 and round~30 throughout. Commitment behavior, however, separates sharply: the 4B \emph{never} voluntarily commits a final answer (0/33 games), the 27B commits readily (9/33, mean round 8.7), the 397B rarely and late (2/33, mean round 19.5)---the calibration axis of the behavioral profile discriminates even where accuracy does not.
+\section{Experiments}
+\textbf{E1 --- Round curve.} Play to 30 rounds; after each round force a checkpoint answer and score it. Does interaction help, and where does behavior degrade?
 
-\textbf{E2: budget buys the small model degradation, not accuracy.} The 27B and 397B are flat across caps (0.32--0.36; all 198 games each end in a committed answer under forcing). The 4B peaks at cap~15 (0.23) then declines monotonically to 0.10 at cap~30, with 29/198 games dying by token-budget exhaustion (Fig.~\ref{fig:e1e2}, right). No model converts additional rounds into accuracy; the smallest converts them into noise.
+\textbf{E2 --- Round budget.} Hard caps $\{5,10,15,20,25,30\}$ with a forced final answer. How does behavior change under pressure?
 
-\textbf{E3: geometry explains the flatness, capacity-dependently.} Over the 99 E1 traces: \emph{drift predicts failure} (H2, direction confirmed vs.\ the proxy manifold)---human-distance slope vs.\ best accuracy $r=-0.28$ pooled, $-0.43$ for the 27B. \emph{Stride is capacity-dependent} (H1 refined): the pooled stride--outcome correlation is $\approx 0$, but per model it inverts with scale---4B $\rho=-0.46$ (large jumps are incoherent), 397B $r=+0.21$ (large jumps are productive exploration). Raw step size is not a univariate health signal; step size conditioned on capability tier is. At the trace level the signatures are vivid (Fig.~\ref{fig:one}). \emph{H3 (predictivity beyond covariates) is not supported---informatively}: mixed-effects models (puzzle as random intercept, tier fixed, ML, $n=99$) show trajectory features add no significant within-puzzle predictive power (drift: LRT $\chi^2=1.16$, $p=0.28$; stride$\times$tier: $\chi^2=1.29$, $p=0.73$), while the puzzle random-intercept variance is large (0.050 on a 0--1 outcome). The pooled drift--failure correlation is thus substantially a between-puzzle phenomenon: hard puzzles both induce drift and defeat agents. We therefore claim trajectory geometry as an \emph{interpretive} instrument---it reads how an agent is failing---not an outcome predictor.
+\textbf{E3 --- Association trajectory.} For every E1 game compute $\{s_t\}$ and $\{h_t\}$ and test H1--H3. The keyword extractor is held fixed across models, so no model is scored through its own vocabulary. We report under two encoders, and keep the lexical \texttt{question\_novelty} metric as the ablation baseline H2 predicts will fail: it catches verbatim repetition but not synonym-shuffled re-asks of the same hypothesis.
 
-\textbf{Interpretation.} The flat outcome curves are the \emph{outcome shadow} of two different behaviors the geometry separates: small models stall (and degrade with budget); larger models explore but do not \emph{bank} their exploration into an improving hypothesis. That diagnosis is invisible to every outcome metric and is the case for trajectory-level interpretation.
+\textbf{E4 (exploratory).} Diverge-then-narrow prompting~\cite{mutate}---which trajectory feature does it move? And do signatures shift on puzzles admitting many distinct stories versus one?
 
-\section{Pilot Observations}\label{sec:pilot}
-(1)~\textbf{Stalling exists.} A 4B model re-asks earlier questions verbatim in later rounds---the lexical extreme of step-size collapse. (2)~\textbf{Surface scoring misleads.} A frontier model reconstructed a hidden story's full causal chain yet scored $0.00$ under clue-string matching; the composite score separated its logic (30/30) from its terminology (28/70). Relatedly, sentence-form clues degenerate token matching to exact substring---a correct paraphrase scored $0.00$ until a bigram-recall fallback was added. (3)~\textbf{Truncated thinking masquerades as behavior.} With a 512-token budget, a hybrid reasoning model's visible ``questions'' were truncated chain-of-thought; disabling template thinking recovered an 8-round solve. Decoding configuration is part of the environment. (4)~\textbf{Linear-solvable puzzles are poor probes}, motivating structure-graded puzzle construction.
+\textbf{Prerequisite --- the Oracle audit.} The Oracle is the sole information channel, so its competence caps what any Questioner can learn. In an early pilot ours was a 4B model that answered 3 of 10 probe questions correctly, with all seven errors collapsing to ``irrelevant''---the one reply carrying no information. Raising the Oracle to 90\% and then 100\% left the Questioner's score at $0.00$ throughout: the environment had been a bottleneck, and removing it revealed a second one. Every experiment below fixes an Oracle above 90\%, audited on held-out probe pairs before any agent claim.
 
-\section{Limitations and Ethics}
-Keyword extraction and encoders are themselves models (dual-encoder reporting planned). SWOW norms are population averages, not a normative standard: human-path distance is a descriptive coordinate, and H2 is a tested correlation, not an assumption that human-unlike is wrong. The proxy manifold used in this draft is explicitly provisional. Judge biases are mitigated per~\cite{calm,posbias}. Puzzles involve dark themes (content-flagged); contamination is handled by memorization probes and fresh/novel sourcing.
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.50\linewidth]{figures/fig1_turtle_002.png}
+\caption{\textbf{Two ways to score zero, on one puzzle} (E1, seed 0; questions projected to 2-D; shaded region: the association anchor). The 4B (red) plays all 30 rounds inside a tight loop---late-game step size $0.003$---and never commits. The 397B (green) strides at $0.16$ for thirteen rounds before narrowing to $0.02$ as it converges: explore-then-commit. The 27B (blue) lands on the right hypothesis at round~1 and commits by round~4. \emph{This puzzle was hand-added rather than sourced from the community site and is no longer in the released set (\S\ref{sec:framework}); the figure illustrates the signatures and will be regenerated.}}
+\label{fig:one}
+\end{figure}
 
-\section{Conclusion}
-Turtle soup turns hypothesis-space search into observable text; trajectory geometry over a human-association anchor turns that text into interpretable behavioral signatures. If H1--H3 hold, ``why did the agent fail'' becomes a measurement---and gives RL training of Questioners a behaviorally grounded reward-shaping target.
+\section{Results}\label{sec:results}
+\textbf{Scope.} 693 games (99 E1, 594 E2): 11 puzzles $\times$ \{4B, 27B, 397B\} $\times$ 3 seeds, strong fixed Oracle. This grid predates the puzzle-set rebuild in \S\ref{sec:framework} and has no overlap with it, so we report it as preliminary evidence of the phenomena and of what the instruments detect.
 
-\begin{thebibliography}{12}\small
-\bibitem{turtlebench} Q.~Yu \emph{et al.} TurtleBench: Evaluating Top Language Models via Real-World Yes/No Puzzles. arXiv:2410.05262. \url{https://arxiv.org/abs/2410.05262}
-\bibitem{splat} Q.~Chen, B.~Zhang, G.~Wang, Q.~Wu. Weak-eval-Strong: Evaluating and Eliciting Lateral Thinking of LLMs with Situation Puzzles. arXiv:2410.06733. \url{https://arxiv.org/abs/2410.06733}
-\bibitem{tsbench} M.~Zhou, S.~Wu, H.~Zhang, Q.~Sima, B.~Liu. What to Ask Next? Probing the Imaginative Reasoning of LLMs with TurtleSoup Puzzles. arXiv:2508.10358. \url{https://arxiv.org/abs/2508.10358}
-\bibitem{mutate} J.~Park, I.~Baek, J.~Park, H.~Lee. Beyond One Path: Evaluating and Enhancing Divergent Thinking in Interactive LLM Agents. arXiv:2605.28465. \url{https://arxiv.org/abs/2605.28465}
-\bibitem{creativityprism} Z.~J.~Hou \emph{et al.} CreativityPrism: A Cross-Domain Evaluation Framework for Large Language Model Creativity. arXiv:2510.20091. \url{https://arxiv.org/abs/2510.20091}
-\bibitem{refcreativity} R.~Li, C.~Zhu, B.~Xu, X.~Wang, Z.~Mao. Automated Creativity Evaluation for Large Language Models: A Reference-Based Approach. arXiv:2504.15784. \url{https://arxiv.org/abs/2504.15784}
-\bibitem{calm} J.~Ye \emph{et al.} Justice or Prejudice? Quantifying Biases in LLM-as-a-Judge. ICLR 2025. \url{https://arxiv.org/abs/2410.02736}
-\bibitem{posbias} L.~Shi \emph{et al.} Judging the Judges: A Systematic Study of Position Bias in LLM-as-a-Judge. IJCNLP-AACL 2025. \url{https://aclanthology.org/2025.ijcnlp-long.18/}
+\textbf{E1: interaction does not improve the working hypothesis.} Accuracy is flat across all 30 rounds for every model (Fig.~\ref{fig:e1e2}, left): 27B ${\approx}0.20$, 397B ${\approx}0.18$, 4B ${\approx}0.14$, with SEM bands overlapping between round 1 and round 30 throughout. What does separate the models is when they will commit. The 4B never volunteers a final answer in 33 games. The 27B commits readily (9/33, mean round 8.7). The 397B commits rarely and late (2/33, mean round 19.5). Calibration discriminates where accuracy does not.
+
+\textbf{E2: budget buys the small model degradation, not accuracy.} The 27B and 397B sit at 0.32--0.36 from a cap of 5 to a cap of 30. The 4B peaks at cap 15 (0.23) and then declines monotonically to 0.10, with 29 of 198 games dying by token exhaustion. No model converts extra rounds into accuracy; the smallest converts them into noise.
+
+\textbf{E3: the geometry separates the two failures.} Over 99 traces, movement away from the anchor co-occurs with failure ($r=-0.28$ pooled, $-0.43$ for the 27B), subject to the anchor caveat above. Stride is capacity-dependent: pooled it correlates with nothing, but per model it inverts with scale---4B $\rho=-0.46$, where large jumps are incoherence, and 397B $r=+0.21$, where they are exploration. Raw step size is not a health signal on its own; step size read against capability tier is. At the trace level the signatures are unmistakable (Fig.~\ref{fig:one}): the 4B's late-game stride of 0.003, the 397B's 0.16 for thirteen rounds narrowing to 0.02 as it converges, and a 27B run that lands on the right hypothesis at round 1 and commits by round 4.
+
+\textbf{H3 is not supported, and that is informative.} Trajectory features add no significant predictive power \emph{within} a puzzle (mixed-effects, puzzle random intercept, $n=99$: drift $\chi^2=1.16$, $p=0.28$; stride$\times$tier $\chi^2=1.29$, $p=0.73$), while the puzzle random-intercept variance is large (0.050 on a 0--1 outcome). A pooled correlation splits into a within-puzzle term, which is about the agent, and a between-puzzle term, which is about difficulty---and hard puzzles both induce drift and defeat agents, producing the pooled correlation for free. A metric can separate behaviors reliably while predicting outcomes poorly. We therefore claim the geometry as an interpretive instrument, for reading \emph{how} an agent is failing, not for forecasting whether it will.
+
+\textbf{Interpretation.} Flat outcome curves are the shadow of two different behaviors. Small models stall and degrade with budget. Larger models explore but do not bank exploration into an improving hypothesis. Neither diagnosis is visible in any outcome metric.
+
+\section{Pilot Observations}
+Four findings from the harness, each showing the framework detects something real---and three of them are traps for anyone building a benchmark of this shape.
+
+\textbf{Stalling is real, and lexical metrics only half-see it.} A 4B model re-asks earlier questions \emph{verbatim} in later rounds. A lexical novelty metric catches that---but only because it is verbatim. Earlier the same model re-asks one hypothesis in fresh words, which that metric scores as new and the geometry does not.
+
+\textbf{Surface scoring misleads; the composite fixes it.} A frontier model reconstructed a hidden story's full causal chain and scored $0.00$ under clue-string matching. The composite separated its logic (30/30) from its terminology (28/70)---and that gap is itself interpretable: right story, wrong vocabulary.
+
+\textbf{Truncated thinking masquerades as behavior.} Under a 512-token budget, a hybrid reasoning model's logged ``questions'' were fragments of chain-of-thought, and every Oracle reply to them was ``irrelevant.'' From the transcript this is indistinguishable from an agent that cannot form a question. Disabling template thinking recovered an 8-round solve. Decoding configuration is part of the environment.
+
+\textbf{Linearly solvable puzzles are poor probes.} A strong model solved a classic puzzle in five straight-line rounds---no reframing, no dead ends. Puzzles like this cannot discriminate between agents, which is what motivates grading the item set by how much of the solution the surface leaves under-determined.
+
+\section{Limitations and Conclusion}
+\textbf{Limitations.} The grid predates the puzzle-set rebuild and must be re-run on the released 25 items; we say so rather than narrow the claims to fit the data in hand. The anchor is not yet human-derived. The coordinate that would settle stalling versus unbanked exploration most directly---whether the next question depends on the last answer---is definable but unmeasured. In the pilot grid the largest model was Questioner, Oracle, and judge: the answering role is mechanical, the judging role is not. Puzzles carry dark themes (content-flagged) and the source site is public, so memorization probes are required.
+
+\textbf{Conclusion.} Turtle Soup turns hypothesis-space search into observable text, and trajectory geometry turns that text into behavioral signatures. An endpoint score projects that search onto one number, destroying what you need to improve an interactive agent: one that stalls and one that explores without banking need opposite interventions. Reading the trajectory tells you which you have.
+
+\begin{thebibliography}{9}\small
+\bibitem{turtlebench} Q.~Yu \emph{et al.} TurtleBench: Evaluating Top Language Models via Real-World Yes/No Puzzles. arXiv:2410.05262.
+\bibitem{splat} Q.~Chen, B.~Zhang, G.~Wang, Q.~Wu. Weak-eval-Strong: Evaluating and Eliciting Lateral Thinking of LLMs with Situation Puzzles. arXiv:2410.06733.
+\bibitem{tsbench} M.~Zhou \emph{et al.} What to Ask Next? Probing the Imaginative Reasoning of LLMs with TurtleSoup Puzzles. arXiv:2508.10358.
+\bibitem{mutate} J.~Park, I.~Baek, J.~Park, H.~Lee. Beyond One Path: Evaluating and Enhancing Divergent Thinking in Interactive LLM Agents. arXiv:2605.28465.
+\bibitem{calm} J.~Ye \emph{et al.} Justice or Prejudice? Quantifying Biases in LLM-as-a-Judge. ICLR 2025. arXiv:2410.02736.
+\bibitem{posbias} L.~Shi \emph{et al.} Judging the Judges: A Systematic Study of Position Bias in LLM-as-a-Judge. IJCNLP-AACL 2025.
 \bibitem{forwardflow} K.~Gray \emph{et al.} ``Forward Flow'': A New Measure to Quantify Free Thought and Predict Creativity. \emph{American Psychologist} 74(5), 2019.
-\bibitem{dat} J.~A.~Olson \emph{et al.} Naming Unrelated Words Predicts Creativity. \emph{PNAS} 118(25), 2021. \url{https://www.pnas.org/doi/10.1073/pnas.2022340118}
-\bibitem{swow} S.~De~Deyne \emph{et al.} The ``Small World of Words'' English Word Association Norms for over 12{,}000 Cue Words. \emph{Behavior Research Methods} 51(3), 2019.
-\bibitem{datllm} H.~Chen, N.~Ding. Probing the Creativity of Large Language Models. Findings of EMNLP 2023. \url{https://arxiv.org/abs/2310.11158}
+\bibitem{dat} J.~A.~Olson \emph{et al.} Naming Unrelated Words Predicts Creativity. \emph{PNAS} 118(25), 2021.
+\bibitem{swow} S.~De~Deyne \emph{et al.} The ``Small World of Words'' English Word Association Norms. \emph{Behavior Research Methods} 51(3), 2019.
 \end{thebibliography}
 
 \end{document}

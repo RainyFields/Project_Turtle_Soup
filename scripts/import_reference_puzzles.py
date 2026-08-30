@@ -28,6 +28,12 @@ def main() -> int:
     p.add_argument("--limit", type=int, default=10, help="Max puzzles to import this run")
     p.add_argument("--min-rating", type=float, default=None, help="Only import rated soups ≥ this")
     p.add_argument("--require-classic", action="store_true", help="Only soups tagged 经典")
+    p.add_argument(
+        "--external-ids",
+        nargs="*",
+        default=None,
+        help="Import exactly these source-site ids, bypassing the other filters",
+    )
     p.add_argument("--max-surface-chars", type=int, default=None, help="Max 汤面 character length")
     p.add_argument("--max-solution-chars", type=int, default=None, help="Max 汤底 character length")
     p.add_argument(
@@ -57,15 +63,29 @@ def main() -> int:
         print(f"Removed {n} existing refsoup_* puzzle(s); manifest reset.")
         skip = set()
 
-    picked = select_samples_for_import(
-        samples,
-        limit=args.limit,
-        min_rating=args.min_rating,
-        skip_external_ids=skip,
-        require_classic=args.require_classic,
-        max_surface_chars=args.max_surface_chars,
-        max_solution_chars=args.max_solution_chars,
-    )
+    if args.external_ids:
+        # Explicit hand-picked set: honour it exactly, in the order given, and
+        # bypass the heuristic filters (they exist to *find* candidates, and a
+        # human has already done that job here).
+        wanted = [str(x) for x in args.external_ids]
+        by_id = {str(s.get("external_id")): s for s in samples}
+        missing = [x for x in wanted if x not in by_id]
+        if missing:
+            print(f"WARNING: not found in crawled samples: {', '.join(missing)}")
+        already = [x for x in wanted if x in skip]
+        if already:
+            print(f"WARNING: already imported, skipping: {', '.join(already)}")
+        picked = [by_id[x] for x in wanted if x in by_id and x not in skip]
+    else:
+        picked = select_samples_for_import(
+            samples,
+            limit=args.limit,
+            min_rating=args.min_rating,
+            skip_external_ids=skip,
+            require_classic=args.require_classic,
+            max_surface_chars=args.max_surface_chars,
+            max_solution_chars=args.max_solution_chars,
+        )
 
     if not picked:
         print("No importable samples matched filters (or all already imported).")
