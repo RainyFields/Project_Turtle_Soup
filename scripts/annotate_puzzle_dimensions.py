@@ -64,31 +64,42 @@ def main() -> int:
         puzzle = load_puzzle(pid)
         surface, solution = puzzle["surface"], puzzle["solution"]
         try:
-            stories = sample_candidate_stories(surface, rater=rater, n=args.candidates)
-            distinct = count_distinct(stories) if stories else None
-            depth = rate_depth(surface, solution, rater=rater, samples=args.depth_samples)
-        except Exception as exc:
+            ud = under_determination(
+                surface, solution, puzzle.get("key_clues", []),
+                rater=rater, n=args.candidates,
+            )
+            dangling = (
+                count_dangling_details(
+                    surface, solution, rater=rater, samples=args.dangling_samples
+                )
+                if args.with_dangling
+                else {}
+            )
+        except Exception as exc:  # keep going; a partial run is still useful
             print(f"FAIL {pid}: {type(exc).__name__}: {exc}", flush=True)
             continue
 
         row = {
             "id": pid,
             "title": puzzle.get("title"),
-            "depth": depth["depth"],
-            "depth_samples": depth.get("samples"),
-            "depth_spread": depth.get("spread"),
-            "depth_leaps": depth.get("leaps"),
-            "depth_reason": depth.get("reason"),
-            "breadth_distinct": distinct,
-            "breadth_generated": len(stories),
-            "candidate_stories": stories,
+            # primary dimension: how far the surface alone leaves you from the answer
+            "under_determination": ud["index"],
+            "cold_best": ud.get("cold_best"),
+            "cold_mean": ud.get("cold_mean"),
+            "cold_scores": ud.get("scores"),
+            "distinct_stories": ud.get("distinct"),
+            "candidate_stories": ud.get("stories"),
+            "dangling_count": dangling.get("dangling_count"),
+            "dangling_items": dangling.get("items"),
             "key_clue_count": len(puzzle.get("key_clues", [])),
+            "surface_chars": len(surface),
+            "solution_chars": len(solution),
         }
         out[pid] = row
         print(
             f"{pid} [{str(puzzle.get('title'))[:14]}] "
-            f"depth={depth['depth']} (samples {depth.get('samples')}) "
-            f"breadth={distinct}/{len(stories)}",
+            f"UD={ud['index']} cold_best={ud.get('cold_best')} "
+            f"distinct={ud.get('distinct')}/{args.candidates}",
             flush=True,
         )
         if not args.dry_run:
