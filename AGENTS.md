@@ -177,8 +177,45 @@ glm-5.3-flash 已还原完整因果链却被判 0.00。`composite_judge` 解决�
 逻辑 prompt 明确要求「不因用词不同扣分」，避免与前 70 分重复惩罚。解析失败/调用异常的样本
 被丢弃，不拉低均值。`to_dict()["score"]` 仍是归一化 0–1，现有消费方无需改动。
 
-> ⚠️ 难度定义冲突未决：`refsoup_008` 的 JSON 标 `"difficulty": "easy"`，
-> 按 `key_clue_count=5` 算却是 `hard`。两套定义并存，尚未统一。
+> ⚠️ **不要用这两套里的任何一套当难度。**`difficulty_band` 只是 `composite_judge`
+> 内部给分数分档用的副产品，不是题目难度的度量。
+
+## 题目难度：用欠定度，不要用现有的两个字段
+
+题库里并存着三套「难度」，前两套互相矛盾且都不可用：
+
+| 来源 | 取值 | 为什么不能用 |
+|------|------|-------------|
+| puzzle JSON 的 `difficulty` | hard 3 / medium 17 / easy 5 | 来自站点评分，测的是「好不好玩」不是「好不好解」 |
+| `composite_judge.difficulty_band` | hard 15 / medium 9 / easy 1 | 只按线索条数分档，与推理难度无关；同一批题给出与上一行几乎相反的分布 |
+| **欠定度**（`generator/analysis/puzzle_dimensions.py`） | 连续 [0,1] | ✅ 用这个 |
+
+**欠定度 = 汤面单独留给你的距离有多远。**只给汤面、不给任何 Oracle 反馈，
+让模型独立冷猜 N 次（默认 12），取最接近正解的一次，`欠定度 = 1 − 最佳接近度`。
+接近度用候选与汤底的 embedding 相似度，不用关键词召回 —— 冷猜若用自己的话说对了机制
+（「抽火柴定谁跳下」对线索「抽签」）字面对不上，那样测的是用词不是难度。
+
+```bash
+python scripts/annotate_puzzle_dimensions.py            # → data/puzzles/dimensions.json
+```
+
+**为什么是这个量**：它同时吃掉了原本设想的两个维度 —— 跳跃越非显然（深）冷猜越猜不到，
+可能性越多（广）任一次命中概率越低。而且**完全不碰轮数**，因此可以安全地作为
+「accuracy vs 所需轮数」图的分组变量；若用「需要多少轮」来定义难度，横轴与分组变量同源，
+图会自证。
+
+**已被否决的做法**（勿重走）：
+
+| 做法 | 否决原因 |
+|------|---------|
+| 汤面–汤底 embedding 单点距离 | 与实测成绩 ρ = −0.005；`refsoup_008` 被判最深，实际是五轮直线可解的最浅题 |
+| 依次加入 `key_clues` 看距离落差 | 距离**不单调**，多个线索是负贡献 |
+| 深度 1–5 绝对打分 | 5 道全打 4 分，无区分度（模型没有校准过的标尺） |
+| 候选去重计数（广度） | 恒为满值（12/12），被候选数上限锁死 |
+| 悬置细节计数 | 值域 1–3，被汤面长度锁死；**定性上仍有用**，可用 `--with-dangling` 开启 |
+
+首批实测跨度 0.197–0.528，排序与独立证据一致（`refsoup_008` 最好猜，正是 ox-alpha
+五轮解出的那道）。**标注由 LLM 产出，投稿前需人工复核 8–10 道报 agreement。**
 - Pilot 示例：
 
 ```bash
@@ -290,7 +327,7 @@ game:
 1. 全量 Exp 1/2（11×3×3）+ `plot_round_studies.py`
 2. benchmark CSV / async（M4b）
 3. 把 `composite_judge` 接进 `run_game.py` / `round_studies.py`（目前仅提供函数，未接线）
-4. 统一难度定义：puzzle JSON 的 `difficulty` vs `key_clue_count`
+4. 清理遗留难度字段：puzzle JSON 的 `difficulty` 与 `difficulty_band` 都不该被当作难度用（见「题目难度」一节），考虑移除或改名
 5. `convergence_speed` 指标方向是反的：它数「是」的比例，会**奖励**退化局
    （退化局 0.667 > 正常局 0.000）。需改为只统计有新词的轮次
 6. 可选：Oracle 注入历史；pilot 切换 LLM judge

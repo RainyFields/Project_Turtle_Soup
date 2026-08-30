@@ -46,6 +46,13 @@ alwaysApply: true
   **空 content**（静默错答）；思考还会让延迟涨 ~100 倍。
 - 本地 Ollama：`.env` 设 `OLLAMA_THINK=0`。
 
+## 题目难度
+
+- 用**欠定度**（`scripts/annotate_puzzle_dimensions.py` → `data/puzzles/dimensions.json`）
+- **不要**用 puzzle JSON 的 `difficulty` 字段（来自站点评分＝好不好玩）
+  或 `composite_judge.difficulty_band`（只按线索条数分档）——两者对同一批题给出相反分布
+- 难度必须与「所需轮数」独立，否则 accuracy-vs-rounds 的分组图会自证
+
 ## Conventions
 
 - `--mock` unless real APIs; `pytest -q`; Python 3.10+; minimal diff.
