@@ -250,7 +250,7 @@ Ollama：`OLLAMA_TIMEOUT`（默认 600）。Z.AI Coding Plan：`ZAI_USE_CODING_E
 ## 关键约定
 
 - **默认测试题**：`refsoup_008`
-- 离线：`--mock`；测试：`pytest -q`（58 tests）
+- 离线：`--mock`；测试：`pytest -q`（85 tests）
 - Questioner 每轮收到完整 `qa_history`；Oracle 仅当前问题
 - `forbidden_reveal` 仅 D 层 filter，运行时未注入 Oracle
 - 跑满轮数默认**不**强制交答案 → 记为「未提交最终答案」得 0 分。
@@ -382,7 +382,7 @@ draft 里有 **7 处 ⚠️ 待填标记**，§5 附有「需要产生的数据�
 
 ## 待办
 
-1. 全量 Exp 1/2（11×3×3）+ `plot_round_studies.py`
+1. 全量网格（见 `plan.md`「下一阶段 → 怎么跑」）+ `plot_round_studies.py`
 2. benchmark CSV / async（M4b）
 3. 把 `composite_judge` 接进 `run_game.py` / `round_studies.py`（目前仅提供函数，未接线）
 4. 清理遗留难度字段：puzzle JSON 的 `difficulty` 与 `difficulty_band` 都不该被当作难度用（见「题目难度」一节），考虑移除或改名

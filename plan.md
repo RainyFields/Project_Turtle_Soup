@@ -73,8 +73,9 @@ python scripts/run_real_timing.py \
 - [x] 把 `composite_judge` 接进 `run_game.py` / `round_studies.py`
   - `run_game.py --composite-judge [--logic-samples N]`；judge provider/model 复用现有 flag
   - `round_studies.py` 走 `JudgeSpec(mode="composite", provider=..., model=...)`；
-    不给 provider 则只算关键词 70 分（Exp 1 checkpoint 逐轮打分时可保持零额外调用）
-- [ ] 全量：11 puzzles × 3 models × 3 seeds
+    不给 provider 则只算关键词 70 分（满分 0.70）。
+    ⚠️ **网格里 E1 和 E2 现已统一都开逻辑分** —— 否则两条曲线标度不同却被并排讨论
+- [ ] 全量网格 —— 见「下一阶段 → 怎么跑」（22 道 × 模型 × seed）
 - [ ] 可选：Exp 1 每 5 轮 checkpoint（降低 checkpoint 调用量）
 
 ---
@@ -108,7 +109,7 @@ python scripts/run_real_timing.py \
   精确子串 → 正确的意译答案得 0（实测 397B 解对 turtle_002 得 0.00）。已加
   **字符 bigram 召回 ≥0.5 兜底**（`_clue_matches_answer`），修复后正确答案 70/70、
   错误答案 0/70
-- **E1/E2 全量已启动**：9 个并行 shard（3 模型 × 3 seeds），11 puzzles；
+- **E1/E2 全量已启动**（⚠️ 历史记录，该批数据已作废）：9 个并行 shard，11 puzzles；
   Questioner = Qwen3.5-4B / Qwen3.6-27B / Qwen3.5-397B-A17B；Oracle/judge = 397B；
   E1 clue-only checkpoint 评分，E2 composite + 397B 逻辑评分（2 samples）；
   输出 `results/full_20260826/`；`qa_rounds`（逐轮 Q/A 全文）已随报告落盘供 E3 用
@@ -235,7 +236,7 @@ Tinker 支持对开源大模型直接采样推理（SamplingClient），按 toke
 Qwen3.5-397B-A17B $3.00/$7.50，Kimi-K2.6 $2.21/$5.49，DeepSeek-V3.1 $1.70/$4.22，
 GPT-OSS-120B $0.33/$0.84。
 
-全量 11×3×3 的 Questioner 侧 token 粗算：Exp2 594 games（~18 轮/game，历史随轮增长）
+（历史估算，题集已变）全量 11×3×3 的 Questioner 侧 token 粗算：Exp2 594 games（~18 轮/game，历史随轮增长）
 ≈ 12.5M prefill + 思考型输出 ~11M sample；Exp1 99 games（30 轮 × 3 调用）≈ 8M + 6M。
 合计 ~20M prefill + ~17M sample →
 **Qwen3.5-397B 全量约 $190，Kimi-K2.6 约 $140**；就算思考 token 放大 5 倍也 <$700。
