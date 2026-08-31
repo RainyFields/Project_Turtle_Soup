@@ -132,6 +132,19 @@ python scripts/run_real_timing.py \
 
 **论文 §5 的每个数字都需重新建立，不能与新结果并排比较。**
 
+## 需要人决定的只有两件事
+
+其余都有可用的默认值，脚本会自己往下走。
+
+1. **测哪些 Questioner。** 默认是 `Qwen3.5-4B / Qwen3.6-27B / Qwen3.5-397B-A17B`
+   经 tinker 采样，三个 seed。换模型或缩小范围：
+   `MODELS="a b" SEEDS="0" bash scripts/run_all_shards.sh <outdir>`
+2. **预算。** 22 题 × 模型数 × seed 数，E1 每题 30 轮、每轮 3 次调用，
+   E2 六个 cap 各一局。Oracle 与裁判走 OpenRouter，需要余额。
+
+**默认锚点用哪个不需要决定** —— 重跑会把两个锚点都算出来。
+**逻辑分是否保留也不需要现在决定** —— 跑完对比两种排序即可回答。
+
 ## 怎么跑
 
 ```bash
@@ -141,10 +154,16 @@ python scripts/check_puzzle_runnability.py
 # 2. 审计 Oracle：≥90%，且必须与 Questioner 不同家族
 python scripts/audit_oracle.py --provider openrouter --model z-ai/glm-5.3-flash
 
-# 3. 跑一个分片（Oracle 默认已是异构的 glm-5.3-flash；
-#    若把 ORACLE_PROVIDER 设成 tinker，脚本会拒绝启动）
-bash scripts/run_full_grid.sh <questioner-model> <seed> <outdir>
+# 3. 跑完整网格（所有分片，可中断续跑）
+bash scripts/run_all_shards.sh results/grid_2026_09
+
+# 4. 分析
+python scripts/analyze_grid.py results/grid_2026_09
 ```
+
+`run_all_shards.sh` **跳过已完成的分片**，失败后重跑只补失败的那些；
+单个分片失败不会中断其余；结束时列出需要重试的分片。
+E1 失败则跳过该分片的 E2（否则会在坏数据上继续烧钱）。
 
 `run_full_grid.sh` 已改为：题目列表运行时从 `family="real"` 取（不会漏题也不会
 混入生成题）、Oracle 与裁判默认异构且同家族时**拒绝启动**、解释器用当前环境

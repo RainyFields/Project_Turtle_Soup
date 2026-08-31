@@ -8,13 +8,17 @@ set -u
 PY="${PY:-$(command -v python3 || command -v python)}"
 MODEL="$1"; SEED="$2"; OUT="$3"
 cd "$(dirname "$0")/.."
+mkdir -p "$OUT"
 # The verified set only (data/puzzles/real/). Derived at run time so the grid
 # never silently picks up a generated puzzle, and never goes stale on renumber.
+QUESTIONER_PROVIDER="${QUESTIONER_PROVIDER:-tinker}"
 ORACLE_PROVIDER="${ORACLE_PROVIDER:-openrouter}"
 ORACLE="${ORACLE_MODEL:-z-ai/glm-5.3-flash}"
-if [ "$ORACLE_PROVIDER" = "tinker" ]; then
-  echo "refusing to run: the Questioners are sampled through tinker, so a tinker" >&2
-  echo "Oracle shares their family. Set ORACLE_PROVIDER/ORACLE_MODEL." >&2
+if [ "$ORACLE_PROVIDER" = "$QUESTIONER_PROVIDER" ]; then
+  echo "refusing to run: Oracle and Questioner would share a provider" >&2
+  echo "  ($QUESTIONER_PROVIDER). A same-family Oracle reads same-family questions" >&2
+  echo "  more easily, which makes scale and resemblance inseparable." >&2
+  echo "  Set ORACLE_PROVIDER / ORACLE_MODEL to a different family." >&2
   exit 2
 fi
 
@@ -29,15 +33,20 @@ export TINKER_THINK=0
 
 "$PY" scripts/run_round_curve.py \
   --puzzles $PUZZLES --max-rounds 30 --seeds "$SEED" \
-  --questioner-provider tinker --questioner-model "$MODEL" \
+  --questioner-provider "$QUESTIONER_PROVIDER" --questioner-model "$MODEL" \
   --oracle-provider "$ORACLE_PROVIDER" --oracle-model "$ORACLE" \
   --judge composite \
   --output "$OUT/curve" > "$OUT/curve.log" 2>&1
 E1=$?
+if [ "$E1" -ne 0 ]; then
+  echo "E1 failed for model=$MODEL seed=$SEED; skipping E2 for this shard" >&2
+  echo "  see $OUT/curve.log" >&2
+  exit "$E1"
+fi
 
 "$PY" scripts/run_round_cap_sweep.py \
   --puzzles $PUZZLES --round-caps 5 10 15 20 25 30 --seeds "$SEED" \
-  --questioner-provider tinker --questioner-model "$MODEL" \
+  --questioner-provider "$QUESTIONER_PROVIDER" --questioner-model "$MODEL" \
   --oracle-provider "$ORACLE_PROVIDER" --oracle-model "$ORACLE" \
   --judge composite --judge-provider "$ORACLE_PROVIDER" --judge-model "$ORACLE" --logic-samples 2 \
   --output "$OUT/caps" > "$OUT/caps.log" 2>&1
