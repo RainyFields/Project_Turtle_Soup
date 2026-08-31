@@ -2,7 +2,7 @@
 
 **Project**: `turtle-soup-bench`  
 **Updated**: 2026-07-08  
-**Status**: Pilot **可跑**（`run_pilot.py`）；全量 11×3×3 **未跑**
+**Status**: 题集与工具链就绪（22 道，标注 100%）；**全量网格未跑** —— 见「下一阶段」
 
 ---
 
@@ -25,7 +25,10 @@ Oracle 固定；Questioner 为对比变量。
 | Judge | `gpt-4o` LLM | **当前 pilot 用 `heuristic_judge`** |
 | Questioner | deepseek-r1 / qwq-32b / llama3.3:70b | 或本地 Ollama |
 
-**默认 pilot 题**：`refsoup_008`（经典、难度适中）。
+**默认 pilot 题**：`refsoup_008`（沙漠里的尸体）。
+
+> ⚠️ **本节以下的运行示例是历史记录，不要照抄。**它们用 `--mock` 或单题，
+> 且写于题集重建之前。正式重跑请照「下一阶段 → 怎么跑」的四条命令。
 
 **输出**：`results/pilot/<dir>/pilot_timing.json` + `pilot_timing.html`
 

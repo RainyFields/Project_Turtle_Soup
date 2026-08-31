@@ -24,9 +24,9 @@ from engine.game import load_puzzle
 
 def add_common_study_args(p: argparse.ArgumentParser) -> None:
     p.add_argument("--puzzles", nargs="+", default=["refsoup_008"])
-    p.add_argument("--questioner-provider", default="mock")
+    p.add_argument("--questioner-provider", default=None)
     p.add_argument("--questioner-model", default="mock")
-    p.add_argument("--oracle-provider", default="mock")
+    p.add_argument("--oracle-provider", default=None)
     p.add_argument("--oracle-model", default="mock")
     p.add_argument("--seeds", nargs="+", type=int, default=[0], help="Recorded per run")
     p.add_argument("--mock", action="store_true", help="Force mock providers for both agents")
@@ -62,6 +62,20 @@ def main() -> int:
     add_common_study_args(p)
     p.add_argument("--max-rounds", type=int, default=30)
     args = p.parse_args()
+
+    # Without this, omitting the providers silently produced a full run of mock
+    # data that looks like a result. --mock stays available for pipeline checks.
+    if not args.mock and not (args.questioner_provider and args.oracle_provider):
+        p.error(
+            "--questioner-provider and --oracle-provider are required "
+            "(or pass --mock for an offline pipeline check)"
+        )
+    if not args.mock and args.questioner_provider == args.oracle_provider:
+        p.error(
+            f"Oracle and Questioner would share a provider ({args.oracle_provider}); "
+            "a same-family Oracle reads same-family questions more easily, which "
+            "makes scale and resemblance inseparable"
+        )
 
     questioner = resolve_models(args)
     judge = build_judge_spec(args)

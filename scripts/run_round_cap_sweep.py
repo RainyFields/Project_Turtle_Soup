@@ -28,6 +28,20 @@ def main() -> int:
     p.add_argument("--round-caps", nargs="+", type=int, default=[5, 10, 15, 20, 25, 30])
     args = p.parse_args()
 
+    # Without this, omitting the providers silently produced a full run of mock
+    # data that looks like a result. --mock stays available for pipeline checks.
+    if not args.mock and not (args.questioner_provider and args.oracle_provider):
+        p.error(
+            "--questioner-provider and --oracle-provider are required "
+            "(or pass --mock for an offline pipeline check)"
+        )
+    if not args.mock and args.questioner_provider == args.oracle_provider:
+        p.error(
+            f"Oracle and Questioner would share a provider ({args.oracle_provider}); "
+            "a same-family Oracle reads same-family questions more easily, which "
+            "makes scale and resemblance inseparable"
+        )
+
     questioner = resolve_models(args)
     judge = build_judge_spec(args)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")

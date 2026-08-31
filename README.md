@@ -51,6 +51,8 @@ python scripts/run_real_timing.py --puzzle refsoup_008 --questioner-provider qwe
 
 # 批量 benchmark
 python scripts/run_benchmark.py --puzzles refsoup --questioner-models mock --mock
+# ⚠️ 正式实验不要用 --puzzles refsoup（按 id 前缀匹配，会跨目录）。
+#    用 family="real"，或直接跑 scripts/run_all_shards.sh（见 plan.md）
 
 pytest -q
 ```
