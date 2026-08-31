@@ -132,6 +132,25 @@ python scripts/run_real_timing.py \
 
 **论文 §5 的每个数字都需重新建立，不能与新结果并排比较。**
 
+## 怎么跑
+
+```bash
+# 1. 预检：确认 token 预算对全部 22 道够用
+python scripts/check_puzzle_runnability.py
+
+# 2. 审计 Oracle：≥90%，且必须与 Questioner 不同家族
+python scripts/audit_oracle.py --provider openrouter --model z-ai/glm-5.3-flash
+
+# 3. 跑一个分片（Oracle 默认已是异构的 glm-5.3-flash；
+#    若把 ORACLE_PROVIDER 设成 tinker，脚本会拒绝启动）
+bash scripts/run_full_grid.sh <questioner-model> <seed> <outdir>
+```
+
+`run_full_grid.sh` 已改为：题目列表运行时从 `family="real"` 取（不会漏题也不会
+混入生成题）、Oracle 与裁判默认异构且同家族时**拒绝启动**、解释器用当前环境
+（不再硬编码 `.venv/bin/python`）。`analyze_grid.py` 现在会保存**逐轮**
+step 与 anchor 距离，而不只是均值 —— 否则核心图画不出来，跑完还得再跑一遍。
+
 ## 重跑时必须一次做到位（否则要再跑一遍）
 
 - [ ] **两个锚点都算**（`surface_only` 与 `with_solution`），并排报告

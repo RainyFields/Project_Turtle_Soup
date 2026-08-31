@@ -60,11 +60,11 @@
 
 Dual-agent protocol: a **Questioner** sees only the 汤面 and asks one yes/no question per round; an **Oracle** holds the 汤底 and answers 是/不是/与此无关 (yes/no/irrelevant); the Questioner may commit a final story at any round, or is forced to at the budget. Open-source harness with pluggable model providers (local, gateway, and token-billed large-model sampling — including checkpoints of RL-trained questioners), full trajectory logging, and seeds recorded per game.
 
-**Figure 1 (planned):** one annotated game: 汤面 at left; per-round questions plotted as a trajectory in 2-D projected embedding space; human association norms for the puzzle's cue words shaded as a manifold; a stalling trace (tight loop) and a drifting trace (long path leaving the shaded region) contrasted.
+⚠️ **Figures — all three current ones come from the retired grid and are removed.** Two are needed after the re-run: (1) accuracy against round, drawn on the full 0–1 outcome range so that flatness reads as flat rather than as noise; (2) **step size against round beside anchor distance against round** — the pair that separates the failure modes directly, without a 2-D projection that cannot preserve the very distances being claimed.
 
 ### 3.2 Puzzles
 
-A puzzle nobody has solved carries no evidence that its clues suffice, that its solution is unique, or that the intended leap is reachable — an agent scoring zero on one teaches us nothing. Our set therefore takes only puzzles with a public record of human play: 22 items from a Chinese Turtle Soup community site, each keeping its source URL. Surfaces run 9–108 characters (median 34), solutions 13–200 (median 102), with 97 annotated key clues. Provenance is enforced in code — a verified family and a quarantined generated family, with tests that fail if the two mix — because the grid in §5 ran on an earlier set in which only two of eleven puzzles were real.
+A puzzle nobody has solved carries no evidence that its clues suffice, that its solution is unique, or that the intended leap is reachable — an agent scoring zero on one teaches us nothing. Our set is therefore hand-picked from the classic repertoire of a Chinese Turtle Soup community — 22 puzzles that people have actually played and solved, each keeping its source record. Surfaces run 9–108 characters (median 34), solutions 13–200 (median 102), with 97 annotated key clues. Provenance is enforced in code — a verified family and a quarantined generated family, with tests that fail if the two mix — because the grid in §5 ran on an earlier set in which only two of eleven puzzles were real.
 
 Each puzzle carries an **under-determination** score: how far the surface alone leaves you from the solution, measured by sampling twelve cold guesses from the surface with no Oracle feedback and taking the closest. It ranges 0.173–0.577 (median 0.347) over the set and is *not* explained by surface length (r = −0.22, n.s.), so it is available as a puzzle-level covariate — the thing §5.3's mixed-effects model currently lacks.
 
@@ -74,15 +74,17 @@ Judged outcome = **clue recall (70)** + **causal-logic identity (30)**:
 - Clue recall: matching against per-puzzle annotated key clues — objective, reproducible, difficulty-banded by clue count.
 - Causal logic: an LLM judge rates only whether the causal chain (cause → mechanism → outcome) matches, explicitly instructed to ignore wording; sampled k=3 and averaged, since single ratings are unstable on borderline answers.
 
-Motivation (observed, §5): a frontier model reconstructed the hidden story's full causal chain yet scored **0.00** under clue-string matching, while the composite score correctly separated its logic (30/30) from its terminology (28/70). Conversely the gate stops "far = creative" gaming: distance without validity scores zero, per the novelty × appropriateness consensus [5, 6, 9, 10].
+Motivation: string matching cannot tell a wrong answer from a right one worded differently — we watched a frontier model reconstruct a hidden causal chain completely and score **0.00**. Conversely the clue half stops "far = creative" gaming: distance without validity scores zero, per the novelty × appropriateness consensus [5, 6, 9, 10].
 
 ### 3.4 Association-trajectory instrumentation
 
 Per round *t*: extract question keywords → embed → aggregate to a round vector \(q_t\). Two per-trace signals:
 - **Step size** \(s_t = d(q_t, q_{t-1})\): the agent's associative stride (forward-flow analogue [9]).
-- **Human-path distance** \(h_t = d(q_t, \mathcal{H})\): distance to the puzzle's human association set \(\mathcal{H}\), built from SWOW norms [11] seeded with the 汤面's content words (plus, optionally, human player traces where available).
+- **Anchor distance** \(h_t = d(q_t, \mathcal{A})\): distance to a per-puzzle semantic anchor.
 
-Failure-mode classifier (hypothesized signatures): stalling = \(\bar{s} \to 0\), \(h\) flat; drifting = \(\bar{s}\) normal, \(h_t\) increasing. Robustness: report under two encoders; the existing lexical `question_novelty` metric is retained as the ablation baseline that H2 predicts will miss synonym-drift.
+Failure-mode classifier (hypothesized signatures): stalling = \(\bar{s} \to 0\), \(h\) flat; drifting = \(\bar{s}\) normal, \(h_t\) increasing. Robustness: report under two encoders; the lexical `question_novelty` metric is retained as the ablation baseline H2 predicts will miss synonym-drift.
+
+**On the anchor, stated plainly.** Ours is built from the puzzle's surface, solution and clues — it is **not** a human association manifold and we no longer describe it as one. Two consequences we measured rather than papered over: a large share of its terms come only from the solution and clues, and clue recall is the outcome, so the two are partly definitionally linked; and rebuilding the anchor from the surface alone flips the sign of the drift slope on a substantial minority of traces. We report both anchors, and treat a SWOW-based version [11] as the correct future form. ⚠️ *The re-run must compute both anchors — computing one means running twice.*
 
 ## 4. Experiment Designs
 
@@ -161,11 +163,11 @@ Before any agent claim: probe candidate Oracles on held-out (question, ground-tr
 
 ## 7. Limitations & Ethics
 
-**Page budget: ~0.2 page.** Keyword extraction and encoders are themselves models (audited, dual-encoder reporting); SWOW norms are population averages, not a normative standard for "correct" association — distance from them is a *descriptive* behavioral coordinate, and we explicitly do not equate human-unlike with wrong (H2 is about failure *correlation*, tested, not assumed); judge biases mitigated per [7, 8]; puzzles involve death/dark themes — content-flagged; contamination handled by memorization probes and fresh/novel puzzle sourcing.
+**Page budget: ~0.2 page.** The anchor is not yet human-derived (§3.4), so H2's framing is descriptive until SWOW norms or collected human traces are in place; we do not equate human-unlike with wrong. Keyword extraction and encoders are themselves models — audited, reported under two encoders. Feedback incorporation, the coordinate that would separate stalling from unbanked exploration most directly, is definable but unmeasured. Judge biases mitigated per [7, 8]. The source site is public, so memorisation probes are required rather than optional — and the two puzzles our difficulty measure rates easiest are the two most widely circulated, which the probe would separate. Puzzles involve death and dark themes; content-flagged.
 
 ## 8. Conclusion
 
-Turtle soup turns hypothesis-space search into observable text; trajectory geometry over a human-association anchor turns that text into interpretable behavioral signatures. If H1–H3 hold, "why did the agent fail" becomes a measurement, not a vibe — and the same instruments give RL training on the Questioner (enabled by our token-billed provider for large open models and trained-checkpoint evaluation) a behaviorally grounded reward-shaping target.
+Turtle soup turns hypothesis-space search into observable text, and trajectory geometry turns that text into behavioral signatures. An endpoint score projects that whole search onto one number, and for interactive agents the projection destroys exactly what you need to improve them: an agent that stalls and an agent that explores without banking need opposite interventions. Reading the trajectory is how you tell which one you have.
 
 ---
 
@@ -186,17 +188,39 @@ Turtle soup turns hypothesis-space search into observable text; trajectory geome
 
 ---
 
-## Appendix A — The validation set
+## Appendix A — The puzzle set
 
-**Where the puzzles come from.** Only items with a public record of human play are used: the 经典-tagged set of a Chinese Turtle Soup community site, each retaining its source URL. Two rounds of human review removed puzzles that were deduction rather than lateral, that had solutions long enough to need very large token budgets, or whose surfaces the site itself had truncated. A further three were dropped because our difficulty annotation failed on them — a limit of the annotation method, not a defect in the puzzles.
+**Where the puzzles come from.** A puzzle nobody has solved carries no evidence that its clues suffice, that its solution is unique, or that the intended leap is reachable — an agent scoring zero on one teaches us nothing. Our set is hand-picked from the classic repertoire of a Chinese Turtle Soup community: 22 puzzles people have played and solved, each keeping its source record. Every item was read and kept or rejected by hand; rejected were puzzles turning on deduction from stated evidence rather than a lateral reframing, and puzzles whose surfaces were incomplete at the source. Surfaces run 9–108 characters (median 34), solutions 13–200 (median 102).
 
-**One game, in full.** ⚠️ *Table to be regenerated from the re-run.* Four columns per round: the Questioner's question, the Oracle's 是/不是/与此无关, **the full story the Questioner is forced to commit that round, and that story's score**. The third and fourth columns are the point — E1 forces a checkpoint every round, and each point on the accuracy curve is one of them; a table of questions alone leaves the reader unable to see where the curve comes from. A pilot on `refsoup_008` showed the shape worth looking for: the first-round answer already named the balloon, the jettisoned luggage and the fall, and confirming the lottery four rounds later did not improve on it. If that holds in the re-run, the flatness of §5 is visible inside a single game — but the pilot's scores predate the current clue set and are not carried over.
+**How hard are they?** Each puzzle carries an **under-determination** score: give a model the surface alone, with no Oracle and no feedback, let it write twelve complete stories, and take the closest to the real solution. The index is one minus that best guess — large when the surface leaves you far from the answer. Over the set:
 
-**How difficulty is judged.** Under-determination, as in §3.2. Closeness is embedding similarity to the solution rather than clue recall, because a cold guess that reaches the right mechanism in its own words would otherwise score zero and the index would measure vocabulary. We first tried to separate *depth* (the solution sits far from the surface) from *breadth* (many stories fit it); measured separately both saturated, and they are not independent — a surface loose enough to admit many mechanisms is, for that reason, one whose true mechanism takes more reframing to reach. Over the set, under-determination is uncorrelated with surface length and correlates weakly with clue count (ρ = −0.46, p = 0.03, one of four tests at n = 22).
+| range | count |
+|---|---|
+| 0.15–0.25 | 5 |
+| 0.25–0.35 | 8 |
+| 0.35–0.45 | 4 |
+| 0.45–0.55 | 4 |
+| 0.55–0.65 | 1 |
 
-**How accuracy is measured.** Clue recall (70) plus causal-logic identity (30), the latter judged by a model told to ignore wording and sampled three times. Clue matching falls back to character-bigram recall when the literal string is absent, which imposes a floor on clue length: a clue too short for that fallback can only match verbatim, so two answers with the same content can score several times apart purely because one happened to use the annotated word. Requiring longer clues removes that gap. **This weakens the original case for the logic half** — much of what it compensated for was clue quality rather than a limit of lexical matching — and whether thirty points are earned is an open question we would rather state than paper over. ⚠️ *Settling it needs the re-run: compare clue-only and composite rankings across the set.*
+Median 0.347, quartiles 0.273 and 0.410, full range 0.173–0.577 — single-peaked with a thin hard tail. Easiest: the 海龟汤 story itself (0.17) and the desert matchstick (0.19). Hardest: a fourteen-character surface reading *our heights differ / a flowerpot broke / our heights are the same* (0.58).
 
-**A caveat we report either way.** The two lowest-scoring puzzles are the two most widely circulated ones. Their surfaces may be easy to complete not because the inference is short but because the story is in the training data, in which case the measure reads familiarity as much as difficulty. A memorisation probe — asking for the solution with no surface given — separates the two and belongs in any use of this measure.
+Two properties make this usable as a covariate. It describes the puzzle, not any agent's performance on it. And it is independent of rounds used — a difficulty defined as "how many rounds this takes" would make an accuracy-versus-rounds plot confirm itself. It is also not a proxy for surface length (r = −0.22, n.s.), so it carries information the obvious surrogate does not.
+
+**A caveat we report either way.** The two puzzles scoring easiest are the two most widely circulated ones. Their surfaces may be easy to complete not because the inference is short but because the story is in the training data, in which case the measure reads familiarity as much as difficulty. A memorisation probe — asking for the solution with no surface given — separates the two and belongs in any use of this measure.
+
+---
+
+## Appendix B — Measuring agent performance
+
+**What counts as a correct answer.** Judged outcome is **clue recall (70)** plus **causal-logic identity (30)**. Clue recall matches the answer against per-puzzle annotated key clues: objective and reproducible. The logic judge rates only whether cause → mechanism → outcome matches, is told explicitly to ignore wording, and is sampled three times and averaged, since single ratings are unstable on borderline answers. The gap between the two subscores is itself readable: right story, wrong vocabulary.
+
+Clue matching tolerates paraphrase through character-bigram recall, which sets a floor on how short an annotated clue may be — below it only a verbatim match counts, and the score reads vocabulary rather than content. Clues are annotated above that floor.
+
+⚠️ *How much the logic half adds over clue recall alone is measurable and not yet measured: compare the two rankings across the set in the re-run. If they agree, thirty points are buying nothing and clue recall alone is the cleaner scale.*
+
+**Where the accuracy curve comes from.** E1 does not score once at the end. Every round, after the Oracle answers, the Questioner is required to commit its best complete story, and *that* is scored — so each point on the accuracy curve is a full answer written with the evidence available at that round.
+
+⚠️ **GAP — one game, in full.** A four-column table per round: the Questioner's question, the Oracle's 是/不是/与此无关, the story it was forced to commit that round, and that story's score. Without the last two columns the reader cannot see where the curve comes from.
 
 ---
 

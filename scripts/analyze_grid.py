@@ -145,6 +145,11 @@ def e3_geometry(reports, out_json: Path, out_fig: Path):
             if geo is None:
                 continue
             s = geo.summary()
+            # Keep the per-round series, not just its summary: the paper's central
+            # figure is stride and anchor distance against round, and a run that
+            # stores only means cannot draw it without being repeated.
+            s["step_sizes"] = [round(x, 5) for x in geo.step_sizes]
+            s["anchor_dists"] = [round(x, 5) for x in geo.human_dists]
             accs = row.get("accuracy_by_round", {})
             s["best_acc"] = max(accs.values()) if accs else row.get("score", 0.0)
             s["seed"] = row.get("seed")
