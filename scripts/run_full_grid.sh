@@ -1,8 +1,12 @@
 #!/bin/bash
 # Full E1+E2 grid, one shard = (questioner model, seed).
 # Usage: run_full_grid.sh <model> <seed> <outdir>
-# E1: round curve over the verified set, 30 checkpoint rounds, clue-only composite.
-# E2: cap sweep {5..30}, composite with 397B logic rater (2 samples).
+# E1: round curve over the verified set, 30 checkpoint rounds.
+# E2: cap sweep {5..30}.
+# Both score with the same composite judge. Scoring E1 on clue recall alone would
+# cap it at 0.70 while E2 reaches 1.00, and the two curves get read side by side.
+# It also makes the clue-only-versus-composite comparison possible on E1, which is
+# how the question "does the logic half earn its thirty points" gets answered.
 set -u
 # Use the interpreter of the active environment; .venv is not guaranteed to exist.
 PY="${PY:-$(command -v python3 || command -v python)}"
@@ -35,7 +39,8 @@ export TINKER_THINK=0
   --puzzles $PUZZLES --max-rounds 30 --seeds "$SEED" \
   --questioner-provider "$QUESTIONER_PROVIDER" --questioner-model "$MODEL" \
   --oracle-provider "$ORACLE_PROVIDER" --oracle-model "$ORACLE" \
-  --judge composite \
+  --judge composite --judge-provider "$ORACLE_PROVIDER" --judge-model "$ORACLE" \
+  --logic-samples "${LOGIC_SAMPLES:-2}" \
   --output "$OUT/curve" > "$OUT/curve.log" 2>&1
 E1=$?
 if [ "$E1" -ne 0 ]; then
@@ -48,7 +53,7 @@ fi
   --puzzles $PUZZLES --round-caps 5 10 15 20 25 30 --seeds "$SEED" \
   --questioner-provider "$QUESTIONER_PROVIDER" --questioner-model "$MODEL" \
   --oracle-provider "$ORACLE_PROVIDER" --oracle-model "$ORACLE" \
-  --judge composite --judge-provider "$ORACLE_PROVIDER" --judge-model "$ORACLE" --logic-samples 2 \
+  --judge composite --judge-provider "$ORACLE_PROVIDER" --judge-model "$ORACLE" --logic-samples "${LOGIC_SAMPLES:-2}" \
   --output "$OUT/caps" > "$OUT/caps.log" 2>&1
 E2=$?
 

@@ -141,7 +141,18 @@ def e3_geometry(reports, out_json: Path, out_fig: Path):
                 continue
             pid = row["puzzle_id"]
             puzzles.setdefault(pid, load_puzzle(pid))
-            geo = trace_geometry(row["qa_rounds"], puzzles[pid], label=label)
+            # Both anchors, always. The default one is built from the solution,
+            # so distance to it is partly definitional against a clue-recall
+            # outcome; the surface-only anchor is the clean comparison. Computing
+            # one would mean running the grid again to get the other.
+            geo = trace_geometry(
+                row["qa_rounds"], puzzles[pid], label=label,
+                manifold_source="with_solution",
+            )
+            geo_surface = trace_geometry(
+                row["qa_rounds"], puzzles[pid], label=label,
+                manifold_source="surface_only",
+            )
             if geo is None:
                 continue
             s = geo.summary()
@@ -150,6 +161,11 @@ def e3_geometry(reports, out_json: Path, out_fig: Path):
             # stores only means cannot draw it without being repeated.
             s["step_sizes"] = [round(x, 5) for x in geo.step_sizes]
             s["anchor_dists"] = [round(x, 5) for x in geo.human_dists]
+            if geo_surface is not None:
+                sf = geo_surface.summary()
+                s["surface_anchor_dists"] = [round(x, 5) for x in geo_surface.human_dists]
+                s["surface_mean_human_dist"] = sf["mean_human_dist"]
+                s["surface_human_dist_slope"] = sf["human_dist_slope"]
             accs = row.get("accuracy_by_round", {})
             s["best_acc"] = max(accs.values()) if accs else row.get("score", 0.0)
             s["seed"] = row.get("seed")
