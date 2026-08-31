@@ -2,6 +2,12 @@
 
 **Target venue:** IAB — Interpreting Agent Behavior, Workshop @ NeurIPS 2026 (https://iab-agents.github.io/)
 **Draft:** v0.8 — 2026-08-30 — rewritten for readability on the v0.3 structure; dataset section added (22 human-played puzzles); appendix drafted. PDF at `docs/paper/iab2026.pdf`; structure spec at `docs/paper/paper-outline.md`.
+> ⚠️ **`iab2026.tex` 与 `iab2026.pdf` 尚未依据本文件重新生成。**
+> 它们是在单向流程确立之前直接编辑的，仍带着已作废网格的数字
+> （693 局、11 道题、stride 0.003 / 0.16、p = 0.28）。
+> **本文件才是内容真源** —— 实验章节已清空并标出 7 处缺口，可定稿的部分已写好。
+> 下一步是**由本文件重新生成 tex**，不要在旧 tex 上打补丁，也不要把那些数字带过去。
+
 **Status:** awaiting author feedback; see "Open questions for the authors" at the end.
 
 ---
