@@ -100,10 +100,14 @@ python scripts/review_ui.py     # http://127.0.0.1:8765/
 python scripts/crawl_reference.py --sort rating_desc --max-pages 3
 
 # 预览：短 + 经典
+# ⚠️ --replace 会删光现有题库（含两轮人工审核与关键词重抽）。
+# 增补题目请用 --external-ids <站点id...>
 python scripts/import_reference_puzzles.py --replace --require-classic \
   --max-surface-chars 120 --max-solution-chars 200 --limit 10 --dry-run
 
 # 导入 → data/puzzles/refsoup_001.json …
+# ⚠️ --replace 会删光现有题库（含两轮人工审核与关键词重抽）。
+# 增补题目请用 --external-ids <站点id...>
 python scripts/import_reference_puzzles.py --replace --require-classic \
   --max-surface-chars 120 --max-solution-chars 200 --limit 10
 ```

@@ -54,9 +54,11 @@
 ### 参考汤（R 支线）
 
 ```bash
+# ⚠️ --replace 会删光现有题库（含两轮人工审核与关键词重抽）。
+# 增补题目请用 --external-ids <站点id...>
 python scripts/import_reference_puzzles.py --replace --require-classic \
   --max-surface-chars 120 --max-solution-chars 200 --limit 10
-python scripts/refresh_reference_key_clues.py
+python scripts/refresh_key_clues_llm.py   # 旧的 refresh_reference_key_clues.py 会覆盖成劣质线索
 ```
 
 `key_clues`：`generator/reference/key_clues.py`（词典匹配 + 过滤汤面重复词）。
@@ -257,6 +259,9 @@ Ollama：`OLLAMA_TIMEOUT`（默认 600）。Z.AI Coding Plan：`ZAI_USE_CODING_E
   Ollama 侧已映射到 `options.num_predict`
 
 ## 常用命令
+
+> ⚠️ 下面带 `--mock` 或单题的命令是**离线自检**，不是实验。
+> 正式重跑走 `plan.md` →「下一阶段 → 怎么跑」的四条命令。
 
 ```bash
 python scripts/run_game.py --puzzle refsoup_008 --mock

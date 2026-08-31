@@ -37,6 +37,11 @@ def main() -> int:
     p.add_argument("--max-surface-chars", type=int, default=None, help="Max 汤面 character length")
     p.add_argument("--max-solution-chars", type=int, default=None, help="Max 汤底 character length")
     p.add_argument(
+        "--i-understand-replace-deletes-curation",
+        action="store_true",
+        help="Required alongside --replace; see the message it prints",
+    )
+    p.add_argument(
         "--replace",
         action="store_true",
         help="Delete existing refsoup_*.json and reset manifest before import",
@@ -58,6 +63,16 @@ def main() -> int:
     manifest = load_import_manifest(manifest_path)
     skip = imported_external_ids(manifest, puzzles_dir) if not args.replace else set()
 
+    if args.replace and not args.dry_run and not args.i_understand_replace_deletes_curation:
+        print(
+            "--replace deletes every refsoup_*.json and re-imports from scratch.\n"
+            "The current set is the result of two rounds of human review and a full\n"
+            "clue re-extraction; both would be lost. To add puzzles without that,\n"
+            "use --external-ids. To proceed anyway, pass\n"
+            "--i-understand-replace-deletes-curation.",
+            file=sys.stderr,
+        )
+        return 2
     if args.replace and not args.dry_run:
         n = clear_reference_puzzles(puzzles_dir, manifest_path=manifest_path)
         print(f"Removed {n} existing refsoup_* puzzle(s); manifest reset.")

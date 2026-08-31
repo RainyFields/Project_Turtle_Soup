@@ -67,6 +67,8 @@ Reports: `results/pilot/` or `results/real_timing/` (JSON + HTML).
 
 ```bash
 python scripts/crawl_reference.py --sort rating_desc --max-pages 3
+# ⚠️ --replace 会删光现有题库（含两轮人工审核与关键词重抽）。
+# 增补题目请用 --external-ids <站点id...>
 python scripts/import_reference_puzzles.py --replace --require-classic \
   --max-surface-chars 120 --max-solution-chars 200 --limit 10
 ```

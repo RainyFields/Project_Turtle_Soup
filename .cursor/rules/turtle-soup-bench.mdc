@@ -20,6 +20,9 @@ alwaysApply: true
 
 ## Entry points
 
+> ⚠️ 下面带 `--mock` 或单题的命令是**离线自检**，不是实验。
+> 正式重跑走 `plan.md` →「下一阶段 → 怎么跑」的四条命令。
+
 - `python scripts/run_game.py --puzzle refsoup_008 --mock`
 - `python scripts/run_pilot.py --puzzles refsoup_008 --mock`
 - `python scripts/run_benchmark.py --puzzles refsoup --mock`
