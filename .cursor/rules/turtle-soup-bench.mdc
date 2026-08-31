@@ -9,14 +9,17 @@ alwaysApply: true
 
 海龟汤双 Agent 评测：Oracle + Questioner。代号 `turtle-soup-bench`。
 
-## Status (2026-08-25)
+## Status (2026-08-31)
 
-- ✅ M0–M3、Generator A→E+R、round-study pilot（58 tests）
-- ✅ Provider 加固：重试 + 空回复处理；复合评分 `composite_judge`
-- 🔶 全量 Exp1/Exp2（11×3×3）未跑
-- 🔲 M4b benchmark CSV；M5 多 Questioner
-- 🔲 **下一阶段**：题库深度×广度（多解需改 schema）、Exp 3 联想轨迹（embedding）
-  → 见 `plan.md`「下一阶段」与 `AGENTS.md`
+- ✅ 题集重建完成：`real/` **22 题**，全部人工审核，欠定度标注 100%
+- ✅ 工具链就绪：Oracle 审计、可跑性预检、网格驱动、逐轮量记录
+- 🔶 **全量网格未跑** —— 这是当前的主线任务
+- 🔲 论文实验章节已清空待数据（`docs/paper/iab2026-draft.md` 是内容真源）
+
+## 接手后第一件事
+
+读 `plan.md` →「下一阶段」，然后按那四条命令跑。
+不要从下面的 Entry points 开始 —— 那些是离线自检。
 
 ## Entry points
 
@@ -51,9 +54,9 @@ alwaysApply: true
 
 ## 重跑 693 局 = 完全重跑
 
-题集（11→25，零重叠）、Oracle 家族、锚点三处同时变更，**论文 §5 每个数字都需重建，
+题集（11→22，零重叠）、Oracle 家族、锚点三处同时变更，**论文 §5 每个数字都需重建，
 新旧不可比**。重跑须：两个锚点都算、保存逐轮步长与距离、`qa_rounds` 入库
-（否则核心图画不出来且 E3 无法复核）。详见 AGENTS.md。
+（否则核心图画不出来且 E3 无法复核）。脚本已内置这些护栏，详见 `plan.md`。
 
 ## 题目难度（＝原「深度 × 广度」讨论的结论）
 
@@ -63,6 +66,15 @@ alwaysApply: true
 - **不要**用 puzzle JSON 的 `difficulty` 字段（来自站点评分＝好不好玩）
   或 `composite_judge.difficulty_band`（只按线索条数分档）——两者对同一批题给出相反分布
 - 难度必须与「所需轮数」独立，否则 accuracy-vs-rounds 的分组图会自证
+
+## 不要运行这两个（会破坏题库）
+
+- `scripts/refresh_reference_key_clues.py` —— 旧词典抽取器，会把现有线索
+  覆盖成碎片词。用 `scripts/refresh_key_clues_llm.py`
+- `scripts/import_reference_puzzles.py --replace` —— 删光题库重导，
+  两轮人工审核作废。增补题目用 `--external-ids <站点id...>`
+
+两者现在都会拒绝执行并提示替代方案。
 
 ## Conventions
 
