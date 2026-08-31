@@ -63,7 +63,7 @@ MUTATE~\cite{mutate} shows frontier agents find far fewer mechanism-distinct pat
 A \textbf{Questioner} sees only the 汤面 and asks one yes/no question per round. An \textbf{Oracle} holds the 汤底 and answers 是/不是/与此无关 (yes/no/irrelevant). The Questioner may commit a final story at any round, or is forced to at the budget. The harness has pluggable providers---local, gateway, and token-billed sampling including RL-trained checkpoints---with full per-round logging and per-game seeds.
 
 \subsection{Puzzles}
-A puzzle nobody has solved carries no evidence that its clues suffice or that its intended leap is findable, so an agent failing it teaches us nothing. Our benchmark takes puzzles with a public record of human play: 21 items from a Chinese Turtle Soup community site, each keeping its source URL. Surfaces run 9--108 characters (median 32), solutions 13--200 (median 94), with 99 annotated key clues. Provenance is enforced in code---a verified family and a quarantined generated family, with tests that fail if they mix.
+A puzzle nobody has solved carries no evidence that its clues suffice or that its intended leap is findable, so an agent failing it teaches us nothing. Our benchmark takes puzzles with a public record of human play: 22 items from a Chinese Turtle Soup community site, each keeping its source URL. Surfaces run 9--108 characters (median 34), solutions 13--200 (median 102), with 97 annotated key clues. Provenance is enforced in code---a verified family and a quarantined generated family, with tests that fail if they mix.
 
 \subsection{Outcome scoring: composite, not surface}
 String matching cannot tell a wrong answer from a right one worded differently. We watched a frontier model reconstruct a hidden causal chain completely and score $0.00$. Our composite score is \textbf{clue recall (70)} plus \textbf{causal-logic identity (30)}. Clue recall matches per-puzzle annotated clues: objective and reproducible. The logic judge rates only whether cause $\to$ mechanism $\to$ outcome matches, is told explicitly to ignore wording, and is sampled $k{=}3$ and averaged, since single ratings are unstable on borderline answers. The clue half also blocks ``far $=$ creative'' gaming: distance without validity scores zero.
@@ -124,7 +124,7 @@ Four findings from the harness, each showing the framework detects something rea
 \textbf{Linearly solvable puzzles are poor probes.} A strong model solved a classic puzzle in five straight-line rounds---no reframing, no dead ends. Puzzles like this cannot discriminate between agents, which is what motivates grading the item set by how much of the solution the surface leaves under-determined.
 
 \section{Limitations and Conclusion}
-\textbf{Limitations.} The grid predates the puzzle-set rebuild and must be re-run on the released 21 items; we say so rather than narrow the claims to fit the data in hand. The anchor is not yet human-derived. The coordinate that would settle stalling versus unbanked exploration most directly---whether the next question depends on the last answer---is definable but unmeasured. In the pilot grid the largest model was Questioner, Oracle, and judge: the answering role is mechanical, the judging role is not. Puzzles carry dark themes (content-flagged) and the source site is public, so memorization probes are required.
+\textbf{Limitations.} The grid predates the puzzle-set rebuild and must be re-run on the released 22 items; we say so rather than narrow the claims to fit the data in hand. The anchor is not yet human-derived. The coordinate that would settle stalling versus unbanked exploration most directly---whether the next question depends on the last answer---is definable but unmeasured. In the pilot grid the largest model was Questioner, Oracle, and judge: the answering role is mechanical, the judging role is not. Puzzles carry dark themes (content-flagged) and the source site is public, so memorization probes are required.
 
 \textbf{Conclusion.} Turtle Soup turns hypothesis-space search into observable text, and trajectory geometry turns that text into behavioral signatures. An endpoint score projects that search onto one number, destroying what you need to improve an interactive agent: one that stalls and one that explores without banking need opposite interventions. Reading the trajectory tells you which you have.
 
@@ -158,7 +158,7 @@ damaged (a long surface truncated to a placeholder with the real text buried in 
 solution field; a scrape artefact and an author's preamble prepended). Ten short puzzles
 replaced them and a further item was cut on a second pass. The site's 经典 tag is
 exhausted, so the ten replacements carry other tags; the boundary is stated rather than
-assumed. What remains is 21 items: surfaces of 9--108 characters (median 35), solutions
+assumed. What remains is 22 items: surfaces of 9--108 characters (median 35), solutions
 of 13--279 (median 102), and 115 annotated key clues (median 5 per puzzle).
 
 Provenance is enforced in code rather than by convention---a verified family and a
