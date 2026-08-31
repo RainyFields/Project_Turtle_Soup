@@ -18,7 +18,12 @@ class ModelConfig:
     provider: str
     model: str
     temperature: float = 0.2
-    max_tokens: int = 512
+    # Reasoning models spend this budget thinking before emitting anything, and a
+    # short, abstract surface needs more of it. At 512 the Questioner returned
+    # empty content on 10 of 21 puzzles — the turn is then discarded and a game
+    # can end with zero rounds played. 2048 cleared 19 of 21; see
+    # scripts/check_puzzle_runnability.py.
+    max_tokens: int = 2048
 
 
 class BaseProvider(Protocol):

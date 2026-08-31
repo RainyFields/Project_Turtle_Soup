@@ -35,7 +35,7 @@ def _model_cfg(section: Dict[str, Any]) -> ModelConfig:
         provider=str(section.get("provider", "mock")),
         model=str(section.get("model", "mock")),
         temperature=float(section.get("temperature", 0.2)),
-        max_tokens=int(section.get("max_tokens", 512)),
+        max_tokens=int(section.get("max_tokens", 2048)),
     )
 
 

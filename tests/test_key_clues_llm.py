@@ -29,9 +29,18 @@ def test_unparseable_reply_yields_nothing():
 
 
 def test_surface_words_are_rejected_as_free_points():
-    kept, rejected = validate_clues(["火柴", "热气球"], SURFACE, SOLUTION)
-    assert kept == ["热气球"]
+    # long enough to pass the length gate, so the surface check is what rejects it
+    kept, rejected = validate_clues(["紧紧攥着半根火柴", "抽签减重被扔下"], SURFACE, SOLUTION)
+    assert kept == ["抽签减重被扔下"]
     assert any("火柴" in r and "汤面" in r for r in rejected)
+
+
+def test_clues_too_short_for_the_paraphrase_fallback_are_rejected():
+    """An N-character clue has N-1 bigrams and the judge's fallback needs 4, so
+    anything under 5 characters can only ever match by exact substring."""
+    kept, rejected = validate_clues(["抽签", "热气球", "抽签减重被扔下"], SURFACE, SOLUTION)
+    assert kept == ["抽签减重被扔下"]
+    assert sum("只能逐字匹配" in r for r in rejected) == 2
 
 
 def test_invented_content_is_rejected():
@@ -42,13 +51,16 @@ def test_invented_content_is_rejected():
 
 def test_condensed_wording_from_the_solution_is_kept():
     # not a verbatim substring, but built from the solution's own vocabulary
-    kept, _ = validate_clues(["抽签减重"], SURFACE, SOLUTION)
-    assert kept == ["抽签减重"]
+    kept, _ = validate_clues(["抽签减重被扔下"], SURFACE, SOLUTION)
+    assert kept == ["抽签减重被扔下"]
 
 
 def test_duplicates_and_length_bounds():
-    kept, rejected = validate_clues(["抽签", "抽签", "人", "一行人乘热气球穿越沙漠超重"], SURFACE, SOLUTION)
-    assert kept == ["抽签"]
+    kept, rejected = validate_clues(
+        ["抽签减重被扔下", "抽签减重被扔下", "人", "一行人乘热气球穿越沙漠超重抽签"],
+        SURFACE, SOLUTION,
+    )
+    assert kept == ["抽签减重被扔下"]
     assert len(rejected) == 3
 
 
@@ -56,8 +68,7 @@ def test_end_to_end_keeps_only_valid_clues():
     out = extract_key_clues_llm(
         SURFACE,
         SOLUTION,
-        rater=_Rater('{"clues": ["热气球", "抽签", "火柴", "减重"]}'),
+        rater=_Rater('{"clues": ["乘热气球穿越沙漠", "抽签减重被扔下", "火柴", "抽签"]}'),
     )
-    assert out["clues"] == ["热气球", "抽签", "减重"]
-    assert out["proposed"] == ["热气球", "抽签", "火柴", "减重"]
-    assert len(out["rejected"]) == 1
+    assert out["clues"] == ["乘热气球穿越沙漠", "抽签减重被扔下"]
+    assert len(out["rejected"]) == 2  # 火柴 is in the surface; 抽签 is too short

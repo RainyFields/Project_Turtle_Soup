@@ -169,7 +169,6 @@ def count_dangling_details(
 def under_determination(
     surface: str,
     solution: str,
-    key_clues: List[str],
     *,
     rater: Any,
     n: int = 12,
@@ -180,6 +179,9 @@ def under_determination(
     guess that reaches the right mechanism in its own words ("抽火柴定谁跳下"
     against the clue "抽签") scores zero under string matching, which would make
     the index measure vocabulary rather than difficulty.
+
+    Only the surface and the solution are read, so re-extracting a puzzle's
+    key clues does not invalidate an annotation.
     """
     from evaluation.trajectory import embed
 

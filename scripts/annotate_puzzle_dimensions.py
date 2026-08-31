@@ -65,8 +65,7 @@ def main() -> int:
         surface, solution = puzzle["surface"], puzzle["solution"]
         try:
             ud = under_determination(
-                surface, solution, puzzle.get("key_clues", []),
-                rater=rater, n=args.candidates,
+                surface, solution, rater=rater, n=args.candidates
             )
             dangling = (
                 count_dangling_details(
@@ -77,6 +76,13 @@ def main() -> int:
             )
         except Exception as exc:  # keep going; a partial run is still useful
             print(f"FAIL {pid}: {type(exc).__name__}: {exc}", flush=True)
+            continue
+
+        # An empty candidate list means the generation failed (unparseable JSON,
+        # or retries exhausted). Recording index=None would look like a result
+        # and would be skipped by --skip-done on the next pass.
+        if ud.get("index") is None:
+            print(f"FAIL {pid}: no candidate stories generated", flush=True)
             continue
 
         row = {

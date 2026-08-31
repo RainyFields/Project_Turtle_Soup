@@ -8,8 +8,7 @@
   "key_clues": [
     "墙上有个洞",
     "洞里是红色的",
-    "隔壁住着人",
-    "红眼病患者"
+    "隔壁是个红眼病患者"
   ],
   "oracle_rules": {
     "answerable_topics": [

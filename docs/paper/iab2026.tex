@@ -63,7 +63,7 @@ MUTATE~\cite{mutate} shows frontier agents find far fewer mechanism-distinct pat
 A \textbf{Questioner} sees only the 汤面 and asks one yes/no question per round. An \textbf{Oracle} holds the 汤底 and answers 是/不是/与此无关 (yes/no/irrelevant). The Questioner may commit a final story at any round, or is forced to at the budget. The harness has pluggable providers---local, gateway, and token-billed sampling including RL-trained checkpoints---with full per-round logging and per-game seeds.
 
 \subsection{Puzzles}
-A puzzle nobody has solved carries no evidence that its clues suffice or that its intended leap is findable, so an agent failing it teaches us nothing. Our benchmark takes puzzles with a public record of human play: 25 items from a Chinese Turtle Soup community site, each keeping its source URL. Surfaces run 9--108 characters (median 35), solutions 13--279 (median 102), with 115 annotated key clues (median 5 per puzzle). Provenance is enforced in code---a verified family and a quarantined generated family, with tests that fail if they mix.
+A puzzle nobody has solved carries no evidence that its clues suffice or that its intended leap is findable, so an agent failing it teaches us nothing. Our benchmark takes puzzles with a public record of human play: 21 items from a Chinese Turtle Soup community site, each keeping its source URL. Surfaces run 9--108 characters (median 32), solutions 13--200 (median 94), with 99 annotated key clues. Provenance is enforced in code---a verified family and a quarantined generated family, with tests that fail if they mix.
 
 \subsection{Outcome scoring: composite, not surface}
 String matching cannot tell a wrong answer from a right one worded differently. We watched a frontier model reconstruct a hidden causal chain completely and score $0.00$. Our composite score is \textbf{clue recall (70)} plus \textbf{causal-logic identity (30)}. Clue recall matches per-puzzle annotated clues: objective and reproducible. The logic judge rates only whether cause $\to$ mechanism $\to$ outcome matches, is told explicitly to ignore wording, and is sampled $k{=}3$ and averaged, since single ratings are unstable on borderline answers. The clue half also blocks ``far $=$ creative'' gaming: distance without validity scores zero.
@@ -124,7 +124,7 @@ Four findings from the harness, each showing the framework detects something rea
 \textbf{Linearly solvable puzzles are poor probes.} A strong model solved a classic puzzle in five straight-line rounds---no reframing, no dead ends. Puzzles like this cannot discriminate between agents, which is what motivates grading the item set by how much of the solution the surface leaves under-determined.
 
 \section{Limitations and Conclusion}
-\textbf{Limitations.} The grid predates the puzzle-set rebuild and must be re-run on the released 25 items; we say so rather than narrow the claims to fit the data in hand. The anchor is not yet human-derived. The coordinate that would settle stalling versus unbanked exploration most directly---whether the next question depends on the last answer---is definable but unmeasured. In the pilot grid the largest model was Questioner, Oracle, and judge: the answering role is mechanical, the judging role is not. Puzzles carry dark themes (content-flagged) and the source site is public, so memorization probes are required.
+\textbf{Limitations.} The grid predates the puzzle-set rebuild and must be re-run on the released 21 items; we say so rather than narrow the claims to fit the data in hand. The anchor is not yet human-derived. The coordinate that would settle stalling versus unbanked exploration most directly---whether the next question depends on the last answer---is definable but unmeasured. In the pilot grid the largest model was Questioner, Oracle, and judge: the answering role is mechanical, the judging role is not. Puzzles carry dark themes (content-flagged) and the source site is public, so memorization probes are required.
 
 \textbf{Conclusion.} Turtle Soup turns hypothesis-space search into observable text, and trajectory geometry turns that text into behavioral signatures. An endpoint score projects that search onto one number, destroying what you need to improve an interactive agent: one that stalls and one that explores without banking need opposite interventions. Reading the trajectory tells you which you have.
 
@@ -139,5 +139,131 @@ Four findings from the harness, each showing the framework detects something rea
 \bibitem{dat} J.~A.~Olson \emph{et al.} Naming Unrelated Words Predicts Creativity. \emph{PNAS} 118(25), 2021.
 \bibitem{swow} S.~De~Deyne \emph{et al.} The ``Small World of Words'' English Word Association Norms. \emph{Behavior Research Methods} 51(3), 2019.
 \end{thebibliography}
+
+\appendix
+\newpage
+\section{The validation set}\label{app:set}
+
+\subsection*{Where the puzzles come from}
+A puzzle nobody has solved carries no evidence that its clues suffice, that its solution
+is unique, or that the intended leap is reachable at all. An agent scoring zero on such
+an item tells us nothing about the agent. We therefore take only puzzles with a public
+record of human play: items tagged 经典 (``classic'') on a Chinese Turtle Soup community
+site, each keeping its source URL.
+
+Two rounds of human review followed. The first cut eleven items---one was a deduction
+puzzle presenting suspect testimonies rather than a lateral one, several had solutions
+long enough to need 32k-token budgets, and three had surfaces the site itself had
+damaged (a long surface truncated to a placeholder with the real text buried in the
+solution field; a scrape artefact and an author's preamble prepended). Ten short puzzles
+replaced them and a further item was cut on a second pass. The site's 经典 tag is
+exhausted, so the ten replacements carry other tags; the boundary is stated rather than
+assumed. What remains is 21 items: surfaces of 9--108 characters (median 35), solutions
+of 13--279 (median 102), and 115 annotated key clues (median 5 per puzzle).
+
+Provenance is enforced in code rather than by convention---a verified family and a
+quarantined generated family, with tests that fail if the two ever mix. This matters
+because the grid in \S\ref{sec:results} ran on an earlier set in which only two of eleven
+puzzles were real: six were model-generated (one still carrying a development placeholder
+as its title, three near-duplicate variants of a single motif) and three were written by
+us and never tested on anyone.
+
+\subsection*{One game, in full}
+\textbf{Surface (汤面).} 沙漠里躺着一具男尸，手里紧紧攥着半根火柴，周围散落着一些行李箱、衣物。
+\emph{(A man's body lies in the desert, clutching half a matchstick; luggage and clothing are scattered around him.)}
+
+\textbf{Base (汤底), hidden from the Questioner.} A hot-air balloon crossing the desert
+began losing altitude. The passengers threw out their luggage and were still too heavy,
+so they drew lots with matchsticks; the man who drew the short half was thrown out and
+fell to his death.
+
+\begin{center}\small
+\begin{tabular}{@{}rp{0.62\linewidth}l@{}}
+\toprule
+& \textbf{Questioner} (sees only the surface) & \textbf{Oracle} \\
+\midrule
+1 & Did he die from falling from a height? & 是 \\
+2 & Before falling, was he airborne in some craft---a balloon or a plane? & 是 \\
+3 & Was it a hot-air balloon? & 是 \\
+4 & Were there passengers besides the victim? & 是 \\
+5 & Did they throw luggage and clothing out to lose weight? & 是 \\
+6 & Still too heavy after jettisoning everything, did they draw matchsticks to decide who would jump---and he drew the short half? & \textbf{与此无关} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Round 6 states the hidden story completely and is answered ``irrelevant.'' The Oracle
+is wrong: re-running that question returns 是 twice out of three samples. One example
+therefore carries three things at once---the protocol, a converging trajectory (five
+confirmations narrowing steadily), and a reminder that the environment is a model and
+makes mistakes at the moment they cost the most.
+
+\subsection*{How difficulty is judged}
+The mixed-effects result in \S\ref{sec:results} says puzzle identity dominates outcome
+without saying \emph{what} about a puzzle does the dominating. A difficulty measure that
+could supply the account needs two properties: it must describe the puzzle rather than
+an agent's performance on it, and it must be independent of rounds used---otherwise
+grouping an accuracy-versus-rounds plot by it would make the plot confirm itself.
+
+We measure \emph{under-determination}: how far the surface alone leaves you from the
+solution. Given only the 汤面, a model produces $N{=}12$ complete stories, each required
+to explain every detail of the surface and to differ from the others in mechanism rather
+than in names or setting. It never sees the 汤底, which would anchor it on the true
+answer. Each story is scored by embedding similarity to the real solution, and the index
+is $1-\max_i \mathrm{sim}(\mathrm{story}_i, \mathrm{solution})$: large when no cold guess
+comes close.
+
+\emph{Why similarity rather than clue matching.} Our first version scored cold guesses by
+key-clue recall and rated the balloon puzzle 0.33---although its very first candidate was
+the correct story. The candidate said ``drawing matchsticks to decide who jumps'' where
+the annotated clue reads ``drawing lots''; a two-character clue is too short for the
+bigram fallback, so the match failed. That version measured vocabulary, not difficulty.
+
+\emph{Why one dimension rather than two.} We first tried to separate \emph{depth} (the
+solution sits far from the surface, taking many confirmations to reach) from
+\emph{breadth} (the surface admits many stories, so progress comes by elimination).
+Measured separately both saturated---every puzzle scored 4 of 5 on a depth rubric, and
+distinct-candidate counts sat at their ceiling. They are not independent either: a
+surface loose enough to admit many mechanisms is, for that same reason, one whose single
+true mechanism takes more reframing to reach. Under-determination absorbs both.
+
+\emph{Approaches that failed}, recorded so they are not repeated: surface-to-solution
+embedding distance (uncorrelated with observed accuracy, and it rated the puzzle a strong
+model solved in five straight rounds the hardest in the set); adding annotated clues to
+the surface one at a time and watching the distance fall (it does not fall
+monotonically---several clues push it up); a 1--5 depth rubric (no calibrated scale, so
+everything lands mid-range); counting unexplained surface details (bounded at 1--3 by how
+few odd details a short surface can hold, though still useful for saying \emph{what}
+makes a particular puzzle hard).
+
+\subsection*{How accuracy is measured}
+String matching cannot tell a wrong answer from a right one worded differently: we watched
+a frontier model reconstruct a hidden causal chain completely and score $0.00$. The
+composite score separates what objective matching can verify from what it cannot.
+
+\textbf{Clue recall (70).} Annotated key clues matched against the final answer,
+with a character-bigram fallback so that sentence-form clues do not collapse the match to
+exact substring. Clues are model-extracted under three constraints that make them
+scorable: each must be a causal element of the solution, must \emph{not} already appear
+in the surface (or it is free points), and must be grounded in the solution's own
+vocabulary (or it is invented). The earlier lexicon-based extractor matched a word list
+written for the first ten puzzles, so on any other puzzle it emitted mid-sentence
+fragments and words that fit any story at all---seventy points scoring noise.
+
+\textbf{Causal-logic identity (30).} A judge rates only whether cause $\to$ mechanism
+$\to$ outcome matches, instructed explicitly to ignore wording, sampled $k{=}3$ and
+averaged because single ratings are unstable on borderline answers. The gap between the
+two subscores is itself readable: right story, wrong vocabulary.
+
+\subsection*{Difficulty across the set}
+\emph{[To be filled once all 25 puzzles are annotated: the distribution of
+under-determination, and its correlation with surface length, clue count, and observed
+accuracy.]}
+
+\textbf{A caveat we report either way.} The two puzzles scoring lowest are the two most
+widely circulated ones. Their surfaces may be easy to complete not because the inference
+is short but because the story is in the training data, in which case the measure is
+reading familiarity as much as difficulty. A memorisation probe---asking for the solution
+with no surface given---separates the two and belongs in any use of this measure.
 
 \end{document}

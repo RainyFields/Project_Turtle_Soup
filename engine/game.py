@@ -16,6 +16,18 @@ from .trajectory import GameTrajectory, RoundRecord, _utc_now_iso, new_game_id, 
 
 FINAL_ANSWER_PREFIX = "FINAL_ANSWER:"
 
+# A generation cut short can leave only its own scaffolding — "**提问：" and
+# nothing else. That is not empty, so a bare strip() check passes it through: the
+# turn spends a round, the Oracle answers a string containing no question, and
+# the checkpoint is scored as if a question had been asked.
+_SCAFFOLDING = re.compile(r"[\s*#>\-—:：。，,.、\d]+")
+MIN_QUESTION_CHARS = 4
+
+
+def has_question_content(text: str) -> bool:
+    """True when a turn carries something to answer, not just markup."""
+    return len(_SCAFFOLDING.sub("", text or "")) >= MIN_QUESTION_CHARS
+
 
 @dataclass
 class GameResult:
@@ -196,11 +208,14 @@ class TurtleSoupGame:
                 question = ""
             self._record_tokens(history, question)
 
-            # An empty turn carries no question, so it must not spend a round.
-            if not question.strip():
+            # A turn with no question in it must not spend a round.
+            if not has_question_content(question):
                 empty_turns += 1
                 if verbose:
-                    print(f"⚠️ Questioner 返回空回复（第 {empty_turns} 次），不计入轮次")
+                    print(
+                        f"⚠️ Questioner 未给出问题（第 {empty_turns} 次，"
+                        f"内容 {question.strip()[:20]!r}），不计入轮次"
+                    )
                 if empty_turns >= self.game_config.max_empty_turns:
                     terminated_by = "empty_response"
                     break

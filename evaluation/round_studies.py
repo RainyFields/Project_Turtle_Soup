@@ -11,6 +11,7 @@ from agents.questioner_agent import QuestionerInputs
 from engine.config import AppConfig, GameConfig
 from engine.game import (
     TurtleSoupGame,
+    has_question_content,
     format_qa_history,
     is_final_answer_turn,
     load_puzzle,
@@ -151,8 +152,9 @@ def run_round_curve(
         except EmptyResponseError:
             question = ""
 
-        # Exp 1 measures accuracy per *asked* round; a blank turn is not one.
-        if not question.strip():
+        # Exp 1 measures accuracy per *asked* round; a turn with no question
+        # in it — including one truncated down to its own markup — is not one.
+        if not has_question_content(question):
             empty_turns += 1
             if empty_turns >= cfg.max_empty_turns:
                 break

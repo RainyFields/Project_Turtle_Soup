@@ -150,3 +150,24 @@ def test_no_generated_puzzle_leaks_into_the_real_set():
     for pid in list_puzzle_ids(family="generated"):
         source = load_puzzle(pid)["metadata"]["source"]
         assert source in {"generated", "original"}, f"{pid} has source={source}"
+
+
+def test_a_turn_truncated_to_its_own_markup_is_not_a_question():
+    """Observed in a real E1 game: the generation stopped after "**提问：",
+    which strip() calls non-empty, so it spent a round and the Oracle answered
+    a string containing no question."""
+    from engine.game import has_question_content
+
+    assert not has_question_content("**提问：")
+    assert not has_question_content("**1.**")
+    assert not has_question_content("   \n")
+    assert not has_question_content("")
+    assert has_question_content("**提问：** 男子是从高处坠落死的吗？")
+    assert has_question_content("死者是自杀吗？")
+
+
+def test_markup_only_turns_do_not_consume_rounds():
+    turns = ["问题一？", "**提问：", "问题二？", "**", "问题三？"]
+    traj = _game(turns, max_rounds=3, max_empty_turns=5).run(verbose=False).trajectory
+    assert traj.total_rounds == 3
+    assert [r.question for r in traj.trajectory] == ["问题一？", "问题二？", "问题三？"]

@@ -29,7 +29,7 @@ alwaysApply: true
 
 - `engine/game.py` · `evaluation/round_studies.py` · `evaluation/judge.py`
 - Providers: `agents/model_providers/`（含 `openrouter_provider.py`）
-- Puzzles: `data/puzzles/real/` **25 题**（站点收录，经两轮人工审核）+ `generated/` 9 题（禁用）
+- Puzzles: `data/puzzles/real/` **21 题**（站点收录，经两轮人工审核）+ `generated/` 9 题（禁用）
 - 取题一律 `list_puzzle_ids(family="real")`；`"all"`/`"turtle"`/`"refsoup"` 会跨目录
 - Default test puzzle: **`refsoup_008`**（沙漠里的尸体，旧编号 refsoup_006）
 

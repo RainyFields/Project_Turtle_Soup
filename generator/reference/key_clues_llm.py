@@ -18,6 +18,13 @@ from typing import Any, Dict, List, Optional, Tuple
 # Some solutions are a single sentence ("弟弟想要更大的巧克力于是杀死小明") and
 # genuinely contain only two causal elements; forcing three would invent one.
 MIN_CLUES = 2
+# A clue shorter than this can only ever match by exact substring. The judge's
+# paraphrase fallback works on character bigrams and needs at least four of them,
+# and an N-character clue yields N-1 — so "抽签" (1 bigram) scores zero against an
+# answer that says the same thing as "用抽火柴的方式决定谁跳下". That is the game's
+# vocabulary leaking into a measurement meant to be about lateral thinking, so
+# clues are required to be long enough for the fallback to apply.
+MIN_CLUE_CHARS = 5
 MAX_CLUES = 6
 MAX_CLUE_CHARS = 12
 # A clue need not be a verbatim substring of the solution — condensing
@@ -38,7 +45,10 @@ EXTRACT_PROMPT = """你在为「海龟汤」推理评测标注关键要素。
 要求：
 1. 每个要素是**因果链上必不可少**的一环——起因、机制、或结果。缺了它，故事就不成立。
 2. 只写**汤底有、汤面没有**的信息。猜题者已经知道汤面，写汤面里的词等于白送分。
-3. 每个要素是 2–{max_chars} 字的名词或动词短语，不要整句，不要解释。
+3. 每个要素是 {min_chars}–{max_chars} 字的短语。**不足 {min_chars} 字的要素必须补足**——
+   把「抽签」写成「抽签决定谁跳下」，把「热气球」写成「乘坐热气球穿越沙漠」。
+   评分时短于 {min_chars} 字的要素只能逐字匹配，猜题者用别的说法表达同一件事就会判错。
+   但仍然不要写成整句，不要加解释。
 4. 用汤底原文的词，不要改写成同义词。
 5. 不要用「真相」「秘密」「过程」「意识到」这类任何故事都适用的空泛词。
 
@@ -87,8 +97,8 @@ def validate_clues(clues: List[str], surface: str, solution: str) -> Tuple[List[
         if c in seen:
             rejected.append(f"{c} (重复)")
             continue
-        if len(c) < 2:
-            rejected.append(f"{c} (过短)")
+        if len(c) < MIN_CLUE_CHARS:
+            rejected.append(f"{c} (不足 {MIN_CLUE_CHARS} 字，只能逐字匹配)")
             continue
         if len(c) > MAX_CLUE_CHARS:
             rejected.append(f"{c} (过长)")
@@ -119,6 +129,7 @@ def extract_key_clues_llm(
         solution=solution,
         min_clues=min_clues,
         max_clues=max_clues,
+        min_chars=MIN_CLUE_CHARS,
         max_chars=MAX_CLUE_CHARS,
     )
     raw = rater.complete(system="你是严谨的推理游戏标注员，只输出 JSON。", user=prompt)

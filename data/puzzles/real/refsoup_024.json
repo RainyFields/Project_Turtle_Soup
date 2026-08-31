@@ -6,9 +6,8 @@
   "surface": "我的同伴被吃掉了，我却在微笑跳舞",
   "solution": "我是植物大战僵尸里的向日葵",
   "key_clues": [
-    "向日葵",
     "植物大战僵尸",
-    "僵尸"
+    "我是向日葵"
   ],
   "oracle_rules": {
     "answerable_topics": [
