@@ -74,8 +74,11 @@ python scripts/refresh_key_clues_llm.py   # 旧的 refresh_reference_key_clues.p
 那是模型给自己的答案打分。
 
 > 已知问题：2026-08 的 693 局网格中，`Qwen3.5-397B-A17B` 同时担任 Questioner、
-> Oracle 和逻辑裁判。重跑时必须换掉。当前可用的异构 Oracle 是
-> `openrouter` / `z-ai/glm-5.3-flash`（ZAI 家族，实测 90%）。
+> Oracle 和逻辑裁判。重跑时必须换掉。当前可用的异构 Oracle：
+> `openrouter` / `z-ai/glm-5.3-flash`（ZAI 家族，实测 90%），或无 OpenRouter 余额时
+> `tinker` / `deepseek-ai/DeepSeek-V3.1`（DeepSeek 家族，2026-09-03 实测 95%，
+> 记得 `TINKER_THINK=0`）。`run_full_grid.sh` 的守卫按**模型家族**而非 provider 判定，
+> 同一 tinker 账号可同时采样 Qwen Questioner 与 DeepSeek Oracle。
 > 注意 `qwen-flash` 虽然准确率也是 90%，但**仍属 Qwen 家族，对 Qwen Questioner 不适用**。
 
 **规则 2：Oracle 先审计再跑，不合格不开始。**

@@ -18,11 +18,25 @@ mkdir -p "$OUT"
 QUESTIONER_PROVIDER="${QUESTIONER_PROVIDER:-tinker}"
 ORACLE_PROVIDER="${ORACLE_PROVIDER:-openrouter}"
 ORACLE="${ORACLE_MODEL:-z-ai/glm-5.3-flash}"
-if [ "$ORACLE_PROVIDER" = "$QUESTIONER_PROVIDER" ]; then
-  echo "refusing to run: Oracle and Questioner would share a provider" >&2
-  echo "  ($QUESTIONER_PROVIDER). A same-family Oracle reads same-family questions" >&2
-  echo "  more easily, which makes scale and resemblance inseparable." >&2
-  echo "  Set ORACLE_PROVIDER / ORACLE_MODEL to a different family." >&2
+# The scientific rule is about model FAMILY, not provider: a same-family Oracle
+# reads same-family questions more easily, which makes scale and resemblance
+# inseparable. Provider equality was only a proxy for that, and it wrongly ruled
+# out e.g. a DeepSeek Oracle sampled through the same tinker account as the Qwen
+# questioners. Family = leading letters of the model basename (qwen / deepseek /
+# glm / kimi / gpt…); a tinker:// checkpoint has no readable family, so declare
+# it with QUESTIONER_FAMILY / ORACLE_FAMILY.
+model_family() {
+  case "$1" in tinker://*) echo ""; return;; esac
+  basename=$(echo "${1##*/}" | tr '[:upper:]' '[:lower:]')
+  echo "${basename%%[^a-z]*}"
+}
+QF="${QUESTIONER_FAMILY:-$(model_family "$MODEL")}"
+OF="${ORACLE_FAMILY:-$(model_family "$ORACLE")}"
+if [ -z "$QF" ] || [ -z "$OF" ] || [ "$QF" = "$OF" ]; then
+  echo "refusing to run: Oracle family ('${OF:-unknown}') must differ from" >&2
+  echo "  Questioner family ('${QF:-unknown}'), and both must be determinable." >&2
+  echo "  Set ORACLE_MODEL to a different family, or declare families explicitly" >&2
+  echo "  via QUESTIONER_FAMILY / ORACLE_FAMILY (needed for tinker:// checkpoints)." >&2
   exit 2
 fi
 

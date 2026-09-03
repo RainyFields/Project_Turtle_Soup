@@ -94,6 +94,14 @@ python scripts/run_real_timing.py \
 | v0.2 | 2026-08-26 | **全量 693 局跑完**（E1 99 + E2 594，零错误）。核心结果：① E1 三模型 checkpoint 准确率 30 轮全程平坦（27B≈0.20 ≥ 397B≈0.18 > 4B≈0.14）；② E2 大模型对预算不敏感（0.32–0.36），4B 随预算**单调退化**（cap15 0.23 → cap30 0.10，29/198 局 token 超限）；③ E3 几何解释平坦性且**随规模反转**：drift 斜率预测失败（pooled r=−0.28，27B −0.43），步长 4B ρ=−0.46 vs 397B +0.21；④ 提交行为分化（4B 0/33 从不提交，27B 9/33 @8.7 轮）。Figure 1 用真实 30 轮轨迹重做（4B late-step 0.003 停摆 vs 397B 0.16→0.02 探索收敛）。**PDF 已产出**（`docs/paper/iab2026.pdf`，tectonic XeLaTeX，5 页=4 正文+参考文献，中文正常）。Artifact 已更新至 v0.2 | ✅ 反馈已消化 |
 | v0.3 | 2026-08-26 | 按作者反馈：① **摘要/引言改为平坦性结果先行**；② **混合效应分析已跑**（`scripts/mixed_effects_h3.py` → `h3_mixed_effects.json`）：puzzle 随机截距吸收 drift 信号（drift LRT p=0.28，stride×tier p=0.73，puzzle 方差 0.050）→ **H3 不成立**，论文改为主张"轨迹几何是解释性仪器而非结果预测器"（诚实呈报）；md/tex/PDF/artifact 四处同步 | ⏸ 等作者反馈 |
 
+## 作者反馈（2026-09-03）
+
+- ✅ **论文只保留最重要的结论与结果，不罗列测试/失败实验。**
+  已按此裁剪草稿 §6（四条 → 两条，被裁两条的实质已由 §3.2/§3.3/附录覆盖）。
+  重跑后回填 §5 时同样适用：报主结果与核心失败模式对比，
+  pilot 数字、评分 bug、被否决的度量等留在 plan/AGENTS，不进论文。
+- ✅ **Oracle/裁判可走 Tinker**（无 OpenRouter 余额时）：DeepSeek-V3.1 审计 95% 通过。
+
 ## 作者反馈（2026-08-26）
 
 - ✅ 决策 2：**跑满 E1–E3**（Tinker 预算已批）
@@ -144,7 +152,13 @@ python scripts/run_real_timing.py \
    经 tinker 采样，三个 seed。换模型或缩小范围：
    `MODELS="a b" SEEDS="0" bash scripts/run_all_shards.sh <outdir>`
 2. **预算。** 22 题 × 模型数 × seed 数，E1 每题 30 轮、每轮 3 次调用，
-   E2 六个 cap 各一局。Oracle 与裁判走 OpenRouter，需要余额。
+   E2 六个 cap 各一局。Oracle 与裁判默认走 OpenRouter（`z-ai/glm-5.3-flash`，$0），
+   需要 OpenRouter key；**没有 key 时可全走 Tinker**：
+   `ORACLE_PROVIDER=tinker ORACLE_MODEL=deepseek-ai/DeepSeek-V3.1`
+   （2026-09-03 审计通过：yes/no 20/21 = 95%，跨家族），费用记入 $2k Tinker 额度。
+   `run_full_grid.sh` 的守卫已从「不同 provider」改为「不同**模型家族**」，
+   同一 tinker 账号下 Qwen Questioner + DeepSeek Oracle 是合法组合；
+   `tinker://` checkpoint 无法从名字判家族，需显式 `QUESTIONER_FAMILY=...`。
 
 **默认锚点用哪个不需要决定** —— `analyze_grid.py` 已改为**两个锚点都算**，
 逐轮距离各存一份（`anchor_dists` 与 `surface_anchor_dists`）。
