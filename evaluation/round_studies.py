@@ -4,7 +4,7 @@ import json
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from agents.base_agent import EmptyResponseError, ModelConfig
 from agents.questioner_agent import QuestionerInputs
@@ -72,19 +72,41 @@ def _judge_score(
     judge: Optional[JudgeSpec] = None,
     rater: Optional[LLMJudge] = None,
 ) -> float:
+    return _judge_detail(puzzle, final_answer, judge=judge, rater=rater)[0]
+
+
+def _judge_detail(
+    puzzle: Dict[str, Any],
+    final_answer: Optional[str],
+    *,
+    judge: Optional[JudgeSpec] = None,
+    rater: Optional[LLMJudge] = None,
+) -> Tuple[float, Optional[Dict[str, Any]]]:
+    """Score, plus the breakdown behind it.
+
+    composite_judge already computes the two halves separately, which clue was
+    hit, and every logic sample; keeping only the blended number throws all of
+    that away at no saving. It cannot be recovered afterwards without paying for
+    the judge calls again, and the open question of whether the logic half earns
+    its thirty points is answered by comparing the halves.
+    """
     if judge is not None and judge.mode == "composite":
-        return composite_judge(
+        detail = composite_judge(
             solution=puzzle["solution"],
             final_answer=final_answer,
             key_clues=puzzle.get("key_clues", []),
             logic_rater=rater,
             logic_samples=judge.logic_samples if rater is not None else 0,
-        ).to_dict()["score"]
-    return heuristic_judge(
-        solution=puzzle["solution"],
-        final_answer=final_answer,
-        key_clues=puzzle.get("key_clues", []),
-    ).score
+        ).to_dict()
+        return detail["score"], detail
+    return (
+        heuristic_judge(
+            solution=puzzle["solution"],
+            final_answer=final_answer,
+            key_clues=puzzle.get("key_clues", []),
+        ).score,
+        None,
+    )
 
 
 def build_app_config(
@@ -140,6 +162,7 @@ def run_round_curve(
     traj_rounds: List[RoundRecord] = []
     accuracy_by_round: Dict[int, float] = {}
     checkpoints_by_round: Dict[int, str] = {}
+    score_detail_by_round: Dict[int, Dict[str, Any]] = {}
     natural_end_round: Optional[int] = None
     natural_final_answer: Optional[str] = None
 
@@ -182,9 +205,12 @@ def run_round_curve(
             checkpoint = ""  # no checkpoint answer this round → scores 0
         checkpoint_answer = parse_final_answer(checkpoint)
         checkpoints_by_round[round_idx] = checkpoint_answer or ""
-        accuracy_by_round[round_idx] = _judge_score(
+        score, detail = _judge_detail(
             puzzle, checkpoint_answer, judge=judge, rater=rater
         )
+        accuracy_by_round[round_idx] = score
+        if detail is not None:
+            score_detail_by_round[round_idx] = detail
 
     api_calls = len(traj_rounds) * 3  # question + oracle + checkpoint per round played
     return {
@@ -196,6 +222,9 @@ def run_round_curve(
         ],
         "checkpoints_by_round": checkpoints_by_round,
         "accuracy_by_round": accuracy_by_round,
+        # Per-round halves of the composite score. Free to keep, impossible to
+        # rebuild later without re-paying for the logic judge.
+        "score_detail_by_round": score_detail_by_round,
         "natural_end_round": natural_end_round,
         "natural_final_answer": natural_final_answer,
         "total_played_rounds": len(traj_rounds),
@@ -230,7 +259,9 @@ def run_round_cap(
 
     result = game.run(verbose=False)
     traj = result.trajectory
-    score = _judge_score(puzzle, traj.final_answer, judge=judge, rater=rater)
+    score, score_detail = _judge_detail(
+        puzzle, traj.final_answer, judge=judge, rater=rater
+    )
     api_calls = traj.total_rounds * 2 + (1 if traj.final_answer else 0)
     return {
         "puzzle_id": puzzle["id"],
@@ -240,6 +271,7 @@ def run_round_cap(
         ],
         "round_cap": round_cap,
         "score": score,
+        "score_detail": score_detail,
         "final_answer": traj.final_answer,
         "total_rounds": traj.total_rounds,
         "terminated_by": traj.terminated_by,
