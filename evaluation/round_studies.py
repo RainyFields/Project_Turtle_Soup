@@ -35,8 +35,10 @@ class JudgeSpec:
 
     mode "heuristic" keeps the substring-matching judge; "composite" uses
     composite_judge (clue recall 70 + logic 30). The logic 30 needs a rater
-    model; without provider/model the composite run scores clues only, so
-    checkpoint-heavy Exp 1 can stay cheap while Exp 2 rates logic.
+    model; without provider/model the composite run scores clues only and so
+    tops out at 0.70. The grid gives both experiments a rater for that reason -
+    scoring Exp 1 on clues alone put its curve on a different scale from Exp 2's
+    while the two get read side by side.
     """
 
     mode: str = "heuristic"
