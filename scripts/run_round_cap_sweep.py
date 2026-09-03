@@ -19,7 +19,12 @@ load_dotenv(ROOT / ".env")
 from engine.game import load_puzzle
 from evaluation.round_studies import ModelSpec, build_app_config, run_round_cap
 from evaluation.study_report_html import write_json_and_html
-from scripts.run_round_curve import add_common_study_args, build_judge_spec, resolve_models
+from scripts.run_round_curve import (
+    add_common_study_args,
+    build_judge_spec,
+    require_cross_family,
+    resolve_models,
+)
 
 
 def main() -> int:
@@ -35,12 +40,7 @@ def main() -> int:
             "--questioner-provider and --oracle-provider are required "
             "(or pass --mock for an offline pipeline check)"
         )
-    if not args.mock and args.questioner_provider == args.oracle_provider:
-        p.error(
-            f"Oracle and Questioner would share a provider ({args.oracle_provider}); "
-            "a same-family Oracle reads same-family questions more easily, which "
-            "makes scale and resemblance inseparable"
-        )
+    require_cross_family(p, args)
 
     questioner = resolve_models(args)
     judge = build_judge_spec(args)

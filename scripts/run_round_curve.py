@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import argparse
+import os
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -20,6 +22,34 @@ import time
 from evaluation.round_studies import JudgeSpec, ModelSpec, build_app_config, run_round_curve
 from evaluation.study_report_html import write_json_and_html
 from engine.game import load_puzzle
+
+
+def model_family(model: str) -> str:
+    """Leading letters of the model basename: Qwen/Qwen3.5-4B -> 'qwen',
+    deepseek-ai/DeepSeek-V3.1 -> 'deepseek', z-ai/glm-5.3-flash -> 'glm'.
+    A tinker:// checkpoint has no readable family -> ''."""
+    if model.startswith("tinker://"):
+        return ""
+    base = model.rsplit("/", 1)[-1].lower()
+    match = re.match(r"[a-z]+", base)
+    return match.group(0) if match else ""
+
+
+def require_cross_family(p: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    # The scientific rule is about model FAMILY, not provider: a same-family
+    # Oracle reads same-family questions more easily, which makes scale and
+    # resemblance inseparable. Sharing a provider is fine — a Qwen questioner
+    # and a DeepSeek oracle can both be sampled through the same tinker account.
+    if args.mock:
+        return
+    q_family = os.environ.get("QUESTIONER_FAMILY") or model_family(args.questioner_model)
+    o_family = os.environ.get("ORACLE_FAMILY") or model_family(args.oracle_model)
+    if not q_family or not o_family or q_family == o_family:
+        p.error(
+            f"Oracle family ({o_family or 'unknown'}) must differ from Questioner "
+            f"family ({q_family or 'unknown'}), and both must be determinable; "
+            "declare QUESTIONER_FAMILY / ORACLE_FAMILY for tinker:// checkpoints"
+        )
 
 
 def add_common_study_args(p: argparse.ArgumentParser) -> None:
@@ -70,12 +100,7 @@ def main() -> int:
             "--questioner-provider and --oracle-provider are required "
             "(or pass --mock for an offline pipeline check)"
         )
-    if not args.mock and args.questioner_provider == args.oracle_provider:
-        p.error(
-            f"Oracle and Questioner would share a provider ({args.oracle_provider}); "
-            "a same-family Oracle reads same-family questions more easily, which "
-            "makes scale and resemblance inseparable"
-        )
+    require_cross_family(p, args)
 
     questioner = resolve_models(args)
     judge = build_judge_spec(args)
