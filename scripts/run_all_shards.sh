@@ -43,4 +43,4 @@ if [ -n "$failed" ]; then
 fi
 echo ""
 echo "all shards complete → $OUT"
-echo "next: python scripts/analyze_grid.py $OUT"
+echo "next: python scripts/analyze_grid.py --run $OUT"

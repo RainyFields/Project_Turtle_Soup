@@ -172,8 +172,11 @@ python scripts/run_real_timing.py \
 ## 怎么跑
 
 ```bash
-# 1. 预检：确认 token 预算对全部 22 道够用
-python scripts/check_puzzle_runnability.py
+# 1. 预检：确认 token 预算对全部 22 道够用。
+#    ⚠️ 探的是 **Questioner**（预算不足时它返回空内容，整局零轮结束），
+#    所以要传实际要跑的 Questioner，不是 Oracle。默认值是 OpenRouter，没有 key 时必须改：
+python scripts/check_puzzle_runnability.py \
+  --provider tinker --model Qwen/Qwen3.5-4B
 
 # 2. 审计 Oracle：≥90%，且必须与 Questioner 不同家族
 python scripts/audit_oracle.py --provider openrouter --model z-ai/glm-5.3-flash
@@ -182,7 +185,7 @@ python scripts/audit_oracle.py --provider openrouter --model z-ai/glm-5.3-flash
 bash scripts/run_all_shards.sh results/grid_2026_09
 
 # 4. 分析
-python scripts/analyze_grid.py results/grid_2026_09
+python scripts/analyze_grid.py --run results/grid_2026_09
 ```
 
 `run_all_shards.sh` **跳过已完成的分片**，失败后重跑只补失败的那些；

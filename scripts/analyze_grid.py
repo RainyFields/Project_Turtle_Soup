@@ -87,8 +87,15 @@ def plot_e1(reports, out_path: Path, max_rounds: int = 30):
         ax.plot(xs, mean, lw=1.8, color=c, label=f"{label} (n={len(curves)})")
         ax.fill_between(xs, mean - sem, mean + sem, alpha=0.15, color=c)
     ax.set_xlabel("Round")
-    ax.set_ylabel("Checkpoint accuracy (clue recall)")
-    ax.set_title("E1 — checkpoint accuracy by round (11 puzzles × 3 seeds)")
+    ax.set_ylabel("Checkpoint accuracy")
+    # Full 0-1 range on purpose. Autoscaling a flat curve zooms into its noise
+    # band and draws it as a trend, which is the opposite of what E1 reports.
+    ax.set_ylim(-0.02, 1.02)
+    n_puz = len({row["puzzle_id"] for rep in reports for row in rep["results"]})
+    n_seed = len({row.get("seed") for rep in reports for row in rep["results"]})
+    ax.set_title(
+        f"E1 - checkpoint accuracy by round ({n_puz} puzzles x {n_seed} seeds)"
+    )
     ax.grid(alpha=0.25)
     ax.legend(fontsize=9)
     fig.tight_layout()
@@ -216,20 +223,36 @@ def e3_geometry(reports, out_json: Path, out_fig: Path):
 
 def main() -> int:
     p = argparse.ArgumentParser()
-    p.add_argument("--run", default="results/full_20260826")
+    p.add_argument("run_dir", nargs="?", default=None,
+                   help="grid output directory (same as --run)")
+    # No default run directory. It used to point at results/full_20260826 - the
+    # 693-game grid that the puzzle-set rebuild made incomparable - so a bare
+    # invocation would quietly analyse superseded data.
+    p.add_argument("--run", default=None)
     p.add_argument("--out", default="docs/paper/figures")
     p.add_argument("--skip-e3", action="store_true")
     args = p.parse_args()
-    run, out = Path(args.run), Path(args.out)
+    target = args.run_dir or args.run
+    if not target:
+        raise SystemExit("usage: analyze_grid.py <grid output dir>")
+    run, out = Path(target), Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 
     e1 = list(load_reports(run, "e1"))
     print(f"E1 reports: {len(e1)}")
-    plot_e1(e1, out / "fig_e1_curves.png")
-    print(f"Wrote {out/'fig_e1_curves.png'}")
-
     e2 = list(load_reports(run, "e2"))
     print(f"E2 reports: {len(e2)}")
+    if not e1 and not e2:
+        # Writing here would replace the committed figures with empty axes, and
+        # the paper would still compile - silently, with blank plots.
+        raise SystemExit(
+            f"no reports under {run}: expected <shard>/curve/round_curve.json "
+            "or <shard>/caps/round_cap_sweep.json. Refusing to overwrite the "
+            "existing figures with empty ones."
+        )
+
+    plot_e1(e1, out / "fig_e1_curves.png")
+    print(f"Wrote {out/'fig_e1_curves.png'}")
     if plot_e2(e2, out / "fig_e2_caps.png"):
         print(f"Wrote {out/'fig_e2_caps.png'}")
 
