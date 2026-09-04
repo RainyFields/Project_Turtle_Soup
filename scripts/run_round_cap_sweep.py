@@ -74,10 +74,13 @@ def main() -> int:
                 row["questioner"] = questioner.__dict__
                 row["elapsed_s"] = round(time.perf_counter() - t0, 3)
                 rows.append(row)
+                # flush: same reason as run_round_curve — redirected stdout is
+                # block-buffered and a running shard looks hung without it.
                 print(
                     f"[cap] {pid} seed={seed} cap={cap}: score={row['score']:.2f} "
                     f"rounds={row['total_rounds']} by={row['terminated_by']} "
-                    f"({row['elapsed_s']}s)"
+                    f"({row['elapsed_s']}s)",
+                    flush=True,
                 )
 
     report = {

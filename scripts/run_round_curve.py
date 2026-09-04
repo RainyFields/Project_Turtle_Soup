@@ -132,9 +132,13 @@ def main() -> int:
             row["questioner"] = questioner.__dict__
             row["elapsed_s"] = round(time.perf_counter() - t0, 3)
             rows.append(row)
+            # flush: the grid redirects stdout to a log, and block buffering
+            # holds these lines back for hours — a multi-hour shard then looks
+            # identical to a hung one from outside.
             print(
                 f"[curve] {pid} seed={seed}: rounds={row['total_played_rounds']} "
-                f"end={row['natural_end_round']} ({row['elapsed_s']}s)"
+                f"end={row['natural_end_round']} ({row['elapsed_s']}s)",
+                flush=True,
             )
 
     report = {

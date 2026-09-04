@@ -48,6 +48,9 @@ echo "puzzles: $PUZZLES"
 # inseparable: a same-family question is easier for the Oracle to read, and that
 # advantage does not reach the other models equally. Override per run.
 export TINKER_THINK=0
+# Stream per-game progress and tracebacks into the shard logs as they happen;
+# block-buffered stdout makes a running shard indistinguishable from a hung one.
+export PYTHONUNBUFFERED=1
 
 "$PY" scripts/run_round_curve.py \
   --puzzles $PUZZLES --max-rounds 30 --seeds "$SEED" \
