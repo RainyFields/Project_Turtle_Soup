@@ -52,27 +52,40 @@ export TINKER_THINK=0
 # block-buffered stdout makes a running shard indistinguishable from a hung one.
 export PYTHONUNBUFFERED=1
 
-"$PY" scripts/run_round_curve.py \
-  --puzzles $PUZZLES --max-rounds 30 --seeds "$SEED" \
-  --questioner-provider "$QUESTIONER_PROVIDER" --questioner-model "$MODEL" \
-  --oracle-provider "$ORACLE_PROVIDER" --oracle-model "$ORACLE" \
-  --judge composite --judge-provider "$ORACLE_PROVIDER" --judge-model "$ORACLE" \
-  --logic-samples "${LOGIC_SAMPLES:-2}" \
-  --output "$OUT/curve" > "$OUT/curve.log" 2>&1
-E1=$?
+# Skip halves that already produced their report, so a retry (or a restructured
+# launch) never re-buys completed games. run_all_shards.sh only skips when BOTH
+# halves are done; this makes the E1-done/E2-missing case cheap too.
+if [ -f "$OUT/curve/round_curve.json" ]; then
+  echo "skip E1 (round_curve.json exists)"
+  E1=0
+else
+  "$PY" scripts/run_round_curve.py \
+    --puzzles $PUZZLES --max-rounds 30 --seeds "$SEED" \
+    --questioner-provider "$QUESTIONER_PROVIDER" --questioner-model "$MODEL" \
+    --oracle-provider "$ORACLE_PROVIDER" --oracle-model "$ORACLE" \
+    --judge composite --judge-provider "$ORACLE_PROVIDER" --judge-model "$ORACLE" \
+    --logic-samples "${LOGIC_SAMPLES:-2}" \
+    --output "$OUT/curve" > "$OUT/curve.log" 2>&1
+  E1=$?
+fi
 if [ "$E1" -ne 0 ]; then
   echo "E1 failed for model=$MODEL seed=$SEED; skipping E2 for this shard" >&2
   echo "  see $OUT/curve.log" >&2
   exit "$E1"
 fi
 
-"$PY" scripts/run_round_cap_sweep.py \
-  --puzzles $PUZZLES --round-caps 5 10 15 20 25 30 --seeds "$SEED" \
-  --questioner-provider "$QUESTIONER_PROVIDER" --questioner-model "$MODEL" \
-  --oracle-provider "$ORACLE_PROVIDER" --oracle-model "$ORACLE" \
-  --judge composite --judge-provider "$ORACLE_PROVIDER" --judge-model "$ORACLE" --logic-samples "${LOGIC_SAMPLES:-2}" \
-  --output "$OUT/caps" > "$OUT/caps.log" 2>&1
-E2=$?
+if [ -f "$OUT/caps/round_cap_sweep.json" ]; then
+  echo "skip E2 (round_cap_sweep.json exists)"
+  E2=0
+else
+  "$PY" scripts/run_round_cap_sweep.py \
+    --puzzles $PUZZLES --round-caps 5 10 15 20 25 30 --seeds "$SEED" \
+    --questioner-provider "$QUESTIONER_PROVIDER" --questioner-model "$MODEL" \
+    --oracle-provider "$ORACLE_PROVIDER" --oracle-model "$ORACLE" \
+    --judge composite --judge-provider "$ORACLE_PROVIDER" --judge-model "$ORACLE" --logic-samples "${LOGIC_SAMPLES:-2}" \
+    --output "$OUT/caps" > "$OUT/caps.log" 2>&1
+  E2=$?
+fi
 
 echo "shard done model=$MODEL seed=$SEED e1=$E1 e2=$E2"
 exit $(( E1 + E2 ))
