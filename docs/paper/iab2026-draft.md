@@ -1,7 +1,7 @@
 # Thinking Sideways, Observed: Interpreting the Lateral-Thinking Search Behavior of LLM Agents with Turtle Soup Puzzles
 
 **Target venue:** IAB — Interpreting Agent Behavior, Workshop @ NeurIPS 2026 (https://iab-agents.github.io/)
-**Draft:** v0.9 — 2026-09-04 — §5 and abstract filled from the completed 22-puzzle grid (`results/grid_2026_09`, 9 shards, zero failures); flatness-first hook confirmed by the author; per the author's 2026-09-03 rule, §5 reports headline conclusions only. Appendix B worked example filled (refsoup_021). **Trim pass done: main text ends exactly at page 4** (7-page PDF = 4 main + refs + appendices); §2 condensed, intro/limitations/conclusion tightened, figures at 0.62/0.78 linewidth. 本文件是内容真源；tex 由本文件重新生成（不打补丁）。
+**Draft:** v0.10 — 2026-09-04 — **nature-polish pass** (nature-polishing skill + the author's NeurIPS 2024 paper as the voice exemplar): abstract restructured to enumerated findings; em dashes removed from prose; sentences split to one proposition each; terminology locked (stride / anchor distance / 4B–27B–397B / accuracy = composite÷100). Consistency-sweep fixes: abstract–§5 precision drift (0.124/0.200 everywhere), logic samples corrected to k=2 as actually run, H2's verdict now stated in §5.3 (drift slopes ≈ 0 at every scale; stalling dominates), stale §3.2/App-B claims repaired, figure numbering aligned (Fig 1 = E1 curves, Fig 2 = E3 scatter). Main text still ends exactly at page 4. Prior state (v0.9): §5/abstract filled from `results/grid_2026_09`, App B worked example, trim pass. 本文件是内容真源；tex 由本文件重新生成（不打补丁）。
 
 **Status:** awaiting author feedback on v0.9; see "Open questions for the authors" at the end.
 
@@ -9,7 +9,9 @@
 
 ## Abstract
 
-Give a language-model agent thirty rounds of yes/no questions to crack a lateral-thinking puzzle and it does not keep getting better: on 22 human-played Turtle Soup puzzles, checkpoint accuracy improves only in the first ten rounds and only at scale (Qwen3.5-397B 0.12 → 0.20, then flat; a 4B model stays at 0.05 throughout), and extending the round budget monotonically *hurts* the small model (0.050 → 0.004). Outcome scores cannot say why, so we read the process: each game's questions form a trajectory in association space, whose geometry separates two failure modes that share a score of zero. The small model stalls — its late-game stride shrinks to under half the mid-size model's (0.030 vs 0.082) and it volunteers a final story in 2 of 66 games — while larger models stride twice as far, bank their gains early, and then stop converting exploration into accuracy. We are equally plain about what the geometry does not do: within puzzles, mixed-effects models find no predictive power for stride or drift (LRT p ≥ 0.20), unchanged under a surface-only anchor — an interpretive instrument, not a score predictor. One pre-experiment lesson: an unaudited Oracle collapses questions to "irrelevant," making every game unwinnable, so agent claims begin with an information audit of the environment. We release the harness, the provenance-enforced puzzle set with an under-determination difficulty measure, and a two-part score whose halves demonstrably measure different competences.
+*(v0.10, nature-polish pass; enumerated-findings structure per the author's NeurIPS 2024 paper.)*
+
+Interactive agents are usually evaluated by endpoint scores, yet a score records where a search ended, not how it moved. We study this gap in Turtle Soup, a lateral-thinking game in which an agent must reconstruct a hidden story through yes/no questions. We ran three Qwen models (4B, 27B, 397B) on 22 human-played puzzles, scoring a forced checkpoint answer every round and embedding each round's question to form an association trajectory. We found that: (1) checkpoint accuracy improves only in the first ten of thirty rounds and only at scale (397B 0.124 → 0.200, then flat; 4B flat at 0.05–0.06 throughout), and extending the round budget monotonically *hurts* the small model (0.050 → 0.004); (2) trajectory geometry separates two failure modes that share a score of zero: the small model stalls, its late-game stride shrinking to under half the mid-size model's (0.030 vs 0.082) and committing a final story in only 2 of 66 games, whereas larger models gain early and then stop converting exploration into accuracy; (3) within puzzles, mixed-effects models find no predictive power for stride or drift (likelihood-ratio tests, p ≥ 0.20), a conclusion unchanged under a surface-only anchor, so the geometry is an interpretive instrument rather than a score predictor; and (4) an unaudited Oracle collapses questions to "irrelevant" and makes every game unwinnable, so agent claims must begin with an information audit of the environment. We release the harness, a provenance-enforced puzzle set with an under-determination difficulty measure, and a two-part score whose clue-recall and causal-logic halves demonstrably measure different competences.
 
 ## 1. Introduction
 
@@ -38,11 +40,11 @@ Existing turtle-soup benchmarks — TurtleBench [1], SPLAT [2] (whose interactiv
 
 Dual-agent protocol: a **Questioner** sees only the 汤面 and asks one yes/no question per round; an **Oracle** holds the 汤底 and answers 是/不是/与此无关 (yes/no/irrelevant); the Questioner may commit a final story at any round, or is forced to at the budget. Open-source harness with pluggable model providers (local, gateway, and token-billed large-model sampling — including checkpoints of RL-trained questioners), full trajectory logging, and seeds recorded per game.
 
-**Figures** (all regenerated from the 2026-09 grid, in `docs/paper/figures/`): Figure 2 = `fig_e1_curves.png`, checkpoint accuracy against round on the full 0–1 outcome range, so that flatness reads as flat rather than as noise; Figure 3 = `fig_e3_scatter.png`, stride and drift against best outcome per trace — the direct view of the failure-mode separation, with no 2-D projection that cannot preserve the very distances being claimed. (`fig_e2_caps.png` is available for §5.2 if the layout has room; its content is one sentence of text otherwise.)
+**Figures** (all regenerated from the 2026-09 grid, in `docs/paper/figures/`): Figure 1 = `fig_e1_curves.png`, checkpoint accuracy against round on the full 0–1 outcome range, so that flatness reads as flat rather than as noise; Figure 2 = `fig_e3_scatter.png`, stride and drift against best outcome per trace, the direct view of the failure-mode separation with no 2-D projection that cannot preserve the very distances being claimed. (`fig_e2_caps.png` is available for §5.2 if the layout has room; its content is one sentence of text otherwise.)
 
 ### 3.2 Puzzles
 
-A puzzle nobody has solved carries no evidence that its clues suffice, that its solution is unique, or that the intended leap is reachable — an agent scoring zero on one teaches us nothing. Our set is therefore hand-picked from the classic repertoire of a Chinese Turtle Soup community — 22 puzzles that people have actually played and solved, each keeping its source record. Surfaces run 9–108 characters (median 34), solutions 13–200 (median 102), with 97 annotated key clues. Provenance is enforced in code — a verified family and a quarantined generated family, with tests that fail if the two mix — because the grid in §5 ran on an earlier set in which only two of eleven puzzles were real.
+A puzzle nobody has solved carries no evidence that its clues suffice, that its solution is unique, or that the intended leap is reachable — an agent scoring zero on one teaches us nothing. Our set is therefore hand-picked from the classic repertoire of a Chinese Turtle Soup community — 22 puzzles that people have actually played and solved, each keeping its source record. Surfaces run 9–108 characters (median 34), solutions 13–200 (median 102), with 97 annotated key clues. Provenance is enforced in code, with a verified family, a quarantined generated family, and tests that fail if the two mix (an earlier pilot set had mixed the two, with only two of eleven puzzles real).
 
 Each puzzle carries an **under-determination** score: how far the surface alone leaves you from the solution, measured by sampling twelve cold guesses from the surface with no Oracle feedback and taking the closest. It ranges 0.173–0.577 (median 0.347) over the set and is *not* explained by surface length (r = −0.22, n.s.), so it is available as a puzzle-level covariate — the thing §5.3's mixed-effects model currently lacks.
 
@@ -50,7 +52,7 @@ Each puzzle carries an **under-determination** score: how far the surface alone 
 
 Judged outcome = **clue recall (70)** + **causal-logic identity (30)**:
 - Clue recall: matching against per-puzzle annotated key clues — objective, reproducible, difficulty-banded by clue count.
-- Causal logic: an LLM judge rates only whether the causal chain (cause → mechanism → outcome) matches, explicitly instructed to ignore wording; sampled k=3 and averaged, since single ratings are unstable on borderline answers.
+- Causal logic: an LLM judge rates only whether the causal chain (cause → mechanism → outcome) matches, explicitly instructed to ignore wording; sampled and averaged (k=2 in the reported grid), since single ratings are unstable on borderline answers.
 
 Motivation: string matching cannot tell a wrong answer from a right one worded differently — we watched a frontier model reconstruct a hidden causal chain completely and score **0.00**. Conversely the clue half stops "far = creative" gaming: distance without validity scores zero, per the novelty × appropriateness consensus [5, 6, 9, 10].
 
@@ -84,7 +86,7 @@ For every E1/E2 game: compute \(\{s_t\}, \{h_t\}\); test H1/H2 by clustering fai
 |---|---|
 | Keyword extraction | per-round, same extractor for all models (held fixed; audited on 50 rounds) |
 | Embedding | multilingual encoder ×2 (agreement reported) |
-| Human manifold | SWOW-EN + SWOW-zh cues seeded from 汤面 content words [11] |
+| Anchor | proxy from surface/solution/clues, both variants reported (§3.4); SWOW-based version [11] is the intended future form |
 | Baselines | lexical novelty (`question_novelty`), rounds-used, model size |
 | Predicted dissociation | H1 caught by both lexical & semantic; H2 caught **only** by semantic |
 
@@ -98,7 +100,7 @@ Before any agent claim: probe candidate Oracles on held-out (question, ground-tr
 
 ## 5. Results
 
-**Page budget: ~1.2 pages, including Figures 2–3.** All numbers from the 2026-09 grid: the 22-puzzle verified set × {Qwen3.5-4B, Qwen3.6-27B, Qwen3.5-397B-A17B} × 3 seeds, DeepSeek-V3.1 Oracle and logic judge (cross-family, audited 95%), zero failed games. E1 = 198 thirty-round games with a scored checkpoint every round; E2 = 1,188 games across caps {5,10,15,20,25,30}.
+**Page budget: ~1.2 pages, including Figures 1–2.** All numbers from the 2026-09 grid: the 22-puzzle verified set × {Qwen3.5-4B, Qwen3.6-27B, Qwen3.5-397B-A17B; hereafter 4B, 27B, 397B} × 3 seeds, DeepSeek-V3.1 Oracle and logic judge (cross-family, audited 95%; two logic samples per rating), zero failed games. Accuracy denotes the composite score rescaled to [0,1]. E1 = 198 thirty-round games with a scored checkpoint every round; E2 = 1,188 games across caps {5,10,15,20,25,30}.
 
 ### 5.1 More interaction stops helping after ten rounds (E1)
 
@@ -114,7 +116,7 @@ End accuracy is insensitive to the round cap for the larger models (397B 0.19–
 
 ### 5.3 Trajectory geometry explains the plateau but does not predict the score (E3, H3)
 
-The models occupy different geometric regimes: mean associative stride is 0.049 for 4B against 0.088 (397B) and 0.114 (27B), and in the late game 4B's stride falls to 0.030 — under half of 27B's 0.082 — while it almost never commits. That is the stalling signature of H1: the small model circles a hypothesis basin with shrinking steps. Pooled across models, stride correlates with best checkpoint score (Spearman ρ = 0.23, n = 198); but this is a between-model effect — **within** each model the correlation vanishes (|ρ| ≤ 0.16 for every model and every geometric feature; Figure 3).
+The models occupy different geometric regimes: mean associative stride is 0.049 for 4B against 0.088 (397B) and 0.114 (27B), and in the late game 4B's stride falls to 0.030 — under half of 27B's 0.082 — while it almost never commits. That is the stalling signature of H1: the small model circles a hypothesis basin with shrinking steps. H2's drifting signature, by contrast, barely appears: drift slopes cluster near zero at every scale (Figure 2, right); stalling, not drifting, is the dominant failure geometry we observe. Pooled across models, stride correlates with best checkpoint score (Spearman ρ = 0.23, n = 198), but this is a between-model effect; **within** each model the correlation vanishes (|ρ| ≤ 0.16 for every model and feature; Figure 2).
 
 The mixed-effects test makes that precise. With puzzle as a random intercept and model tier as a fixed effect, adding the drift slope does not improve fit (LRT p = 0.39), nor does stride × tier (p = 0.20); the puzzle intercept absorbs the variance the geometry seemed to carry. The new puzzle-level covariate sharpens the interpretation: under-determination points the expected way (harder surface → lower score, coef −0.031) but is not significant (p = 0.22) and removes only ~8% of the puzzle variance — the puzzle effect is not merely measured difficulty. **H3 is not supported within-puzzle**, and we accordingly claim trajectory geometry as an interpretive instrument — it says *how* an agent is failing — not as a score predictor.
 
@@ -190,7 +192,7 @@ Two properties make this usable as a covariate. It describes the puzzle, not any
 
 Clue matching tolerates paraphrase through character-bigram recall, which sets a floor on how short an annotated clue may be — below it only a verbatim match counts, and the score reads vocabulary rather than content. Clues are annotated above that floor.
 
-⚠️ *How much the logic half adds over clue recall alone is measurable and not yet measured: compare the two rankings across the set in the re-run. If they agree, thirty points are buying nothing and clue recall alone is the cleaner scale.*
+**Does the logic half earn its thirty points?** On the full grid, yes: the two halves dissociate for every model (§5.2), with each model earning a several-fold larger share of the logic half than of the clue half. If the two rankings had agreed, clue recall alone would have been the cleaner scale; they do not.
 
 **Where the accuracy curve comes from.** E1 does not score once at the end. Every round, after the Oracle answers, the Questioner is required to commit its best complete story, and *that* is scored — so each point on the accuracy curve is a full answer written with the evidence available at that round.
 
@@ -209,7 +211,7 @@ Three things the table shows that no mean curve can. **The checkpoint mechanism 
 
 ---
 
-## Open questions for the authors (feedback wanted before v0.4)
+## Open questions for the authors (feedback wanted before v1.0)
 
 *(Resolved: v0.1 decisions 2 & 5 — grid ran, Figure 1 real. v0.2 decisions 1 & 5 — abstract/intro now lead with flatness; mixed-effects ran: H3 not supported within-puzzle, so the paper claims geometry as interpretive, not predictive. v0.9: flatness-first hook confirmed by the author on the new grid; Q1 below answered empirically — under-determination is not significant (p = 0.22) and absorbs ~8% of the puzzle variance, so the softened H3 framing stays, now with the covariate test to cite.)*
 1. **H1 on the new grid:** stalling now shows as the small model's *low and shrinking* stride (0.049 mean, 0.030 late) rather than a sign inversion — H1 reads cleaner than on the old grid. Any objection to stating H1's confirmation in exactly those terms in the intro?
