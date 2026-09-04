@@ -198,7 +198,18 @@ Clue matching tolerates paraphrase through character-bigram recall, which sets a
 
 **Where the accuracy curve comes from.** E1 does not score once at the end. Every round, after the Oracle answers, the Questioner is required to commit its best complete story, and *that* is scored — so each point on the accuracy curve is a full answer written with the evidence available at that round.
 
-⚠️ **GAP — one game, in full.** A four-column table per round: the Questioner's question, the Oracle's 是/不是/与此无关, the story it was forced to commit that round, and that story's score. Without the last two columns the reader cannot see where the curve comes from.
+**One game, worked.** Puzzle `refsoup_021` (surface: a stormy night, a run-down temple, two photographs on the wall that seem to stare; by morning the narrator sees only two windows; solution: 墙上根本没有照片，是有人贴着窗户往里看), played by Qwen3.5-397B, seed 2. Six of thirty rounds; every cell verbatim from the log, stories abridged to the clause carrying the hypothesis.
+
+| 轮 | Question (abridged) | 答 | Committed story (abridged) | score (clue + logic) |
+|---|---|---|---|---|
+| 1 | 照片里的是人吗？ | 是 | 那两张"照片"…是两个被钉死或封在墙洞里的人 | 0.12 (0 + 12) |
+| 3 | 主角第二天醒来时，还在那座寺庙里吗？ | 是 | 所谓的"两张照片"其实是两扇窗户…昏暗光线下…误看成了照片 | 0.91 (70 + 21) |
+| 10 | "两扇窗户"是因为相框玻璃破碎脱落、变成通透的洞口吗？ | 不是 | 那根本不是照片，而是…躲在窗户后面（或贴在窗玻璃外侧）的人脸 | **1.00 (70 + 30)** |
+| 11 | 是因为照片被取走、露出了后面原本就存在的窗户吗？ | 不是 | 昨晚"盯着他的人像"，其实是**窗外的人** | **1.00 (70 + 30)** |
+| 19 | 照片里的人像实际上是躲在照片后面的真人吗？ | 不是 | 窗户洞口被画着人像的布帘封住…雷雨导致遮挡物脱落 | 0.12 (0 + 12) |
+| 30 | 是因为积水使主角身体位置升高吗？ | 不是 | 两个被纸糊住的窗户洞口…雷雨导致纸张脱落 | 0.12 (0 + 12) |
+
+Three things the table shows that no mean curve can. **The checkpoint mechanism surfaces knowledge the agent never acts on:** the round-10 committed story *is* the solution — synthesized from earlier answers, on a round whose own question was answered 不是 — yet the model never volunteers a final answer in all thirty rounds (it is one of the 57/66 non-committing 397B games), and by round 19 it has abandoned the correct reading for a falling-coverings mechanism it never escapes. **Stalling in fresh words happens at the largest scale too:** rounds 22–30 are eight lexically distinct re-asks of the same flooding hypothesis, exactly the pattern lexical novelty misses (§6). **And the curve's round-to-round jitter is a scoring fact, not a knowledge fact:** the same understanding re-worded (rounds 3 → 4) swings the clue half 70 → 0; the mean curves of §5.1 average this out, which is why single-game curves are not the unit of analysis.
 
 ---
 
