@@ -46,14 +46,18 @@ Turtle Soup, a lateral-thinking game in which an agent must reconstruct a hidden
 story through yes/no questions. We ran three Qwen models (4B, 27B, 397B) on 22
 human-played puzzles, scoring a forced checkpoint answer every round and
 embedding each round's question to form an association trajectory. We found
-that: (1)~checkpoint accuracy improves only in the first ten of thirty rounds
-and only at scale (397B $0.124 \to 0.200$, then flat; 4B flat at
-$0.05$--$0.06$ throughout), and extending the round budget monotonically
-\emph{hurts} the small model ($0.050 \to 0.004$); (2)~trajectory geometry
-separates two failure modes that share a score of zero: the small model stalls,
-its late-game stride shrinking to under half the mid-size model's ($0.030$ vs
-$0.082$) and committing a final story in only 2 of 66 games, whereas larger
-models gain early and then stop converting exploration into accuracy;
+that: (1)~the flat accuracy curve is not a resource limit: gains stop after
+round ten at every scale (397B $0.124 \to 0.200$, then flat; 4B flat at
+$0.05$--$0.06$), longer budgets monotonically \emph{hurt} the smallest model
+($0.050 \to 0.004$), and the plateau is an equilibrium of finding and losing:
+models keep only 0.69--0.76 of the understanding they had held across two
+consecutive checkpoints, a retention scale leaves unchanged even as it raises
+the peaks 3.5-fold;
+(2)~two behavioral patterns underlie this, read jointly from geometry and
+language: the small model \emph{circles} (late-game stride $0.030$ vs the
+mid-size model's $0.082$; 2 of 66 games committed), whereas larger models
+\emph{abandon}, reaching the solution mid-game and then failing to keep or
+commit it;
 (3)~within puzzles, mixed-effects models find no predictive
 power for stride or drift (likelihood-ratio tests, $p \geq 0.20$), a conclusion
 unchanged under a surface-only anchor, so the geometry is an interpretive
@@ -76,40 +80,42 @@ this story by asking yes/no questions, one per round.
 Outcome metrics can say whether an agent got there. On our verified set, that
 story is flat: accuracy rises only in the first ten of thirty rounds, only for
 the larger models, and twenty further rounds buy nothing at any scale we tested
-(\S\ref{sec:results}). What outcome metrics cannot say is how the agent
-searched. Two agents scoring $0.0$ on the same puzzle may be failing in opposite
-ways: one never leaves its first hypothesis, while the other leaves the
-plausible region entirely. Telling them apart requires instruments that read
-the process; providing them is this paper's contribution.
+(\S\ref{sec:results}). The failure is not a budget limit, and scaling does not
+remove it: scale raises the peaks a model reaches mid-game, but not the
+fraction it keeps. What outcome metrics cannot say is how the agent searched.
+Two agents scoring $0.0$ on the same puzzle may be failing in opposite ways:
+one never leaves its first hypothesis, while the other finds the answer and
+lets it go. Telling them apart requires instruments that read the process;
+providing them is this paper's contribution.
 
-\textbf{Why Turtle Soup.} The questioning protocol is a naturally verbalized
-search trace: no probing or activation access is needed, because the behavior
-\emph{is} text. Puzzles are deliberately under-determined, so the direction of
-each associative jump is diagnostic. Games are short, language-only, and cheap
-to run at scale.
+\textbf{Why Turtle Soup.} The behavior \emph{is} text, so no probing or
+activation access is needed; puzzles are deliberately under-determined, so each
+associative jump's direction is diagnostic; and games are short, language-only,
+and cheap at scale.
 
-\textbf{Central hypothesis.} An agent's per-round questions, embedded in a semantic
-space, form a trajectory whose geometry explains success and failure.
-\begin{itemize}
-\item \textbf{H1 (stalling).} An agent stuck in a hypothesis basin shows its
-stride (per-round semantic step size) shrinking toward zero; lexical novelty
-heuristics catch only the verbatim extreme of this mode.
-\item \textbf{H2 (drifting).} An agent exploring where no human path goes shows
-normal stride but growing anchor distance. Lexical novelty misses this mode
-entirely: synonym-shuffled re-asks look new.
-\item \textbf{H3 (predictivity).} Trajectory features predict final solve quality
-beyond outcome-adjacent covariates.
-\end{itemize}
+\textbf{Central hypothesis.} An agent's per-round questions, embedded in a
+semantic space, form a trajectory whose geometry explains success and failure.
+\textbf{H1 (stalling)}: an agent stuck in a hypothesis basin shows its stride
+(per-round semantic step size) shrinking toward zero, of which lexical novelty
+heuristics catch only the verbatim extreme. \textbf{H2 (drifting)}: an agent
+exploring where no human path goes shows normal stride but growing anchor
+distance, which lexical novelty misses entirely. \textbf{H3 (predictivity)}:
+trajectory features predict final solve quality beyond outcome-adjacent
+covariates. The results confirm H1 (as circling), reject H2's drift, reveal a
+second, unhypothesized pattern (abandoning), and do not support H3
+(\S\ref{sec:results}).
 
-\textbf{Contributions.} (1)~The flatness result: interaction length buys accuracy
-only in the first ${\sim}10$ rounds and only at scale, and budget extension
-actively harms the smallest model. (2)~A behavioral-interpretation framework
-that separates stalling from unbanked exploration, with an honest account of
-what it does and does not predict. (3)~An open-source harness, a \textbf{22-puzzle
-set restricted to puzzles humans have played and solved}, and a composite score
-decoupling clue recall from judged causal logic. (4)~A puzzle-level difficulty
-measure, \textbf{under-determination}, independent of rounds used, so it can
-group an accuracy-versus-rounds analysis without circularity.
+\textbf{Contributions.} (1)~An explanation of the flat curve: task failure is
+driven neither by round budget nor by model capability alone, but by
+ineffective exploration; scale raises what a model momentarily finds, not what
+it keeps. (2)~Two behavioral patterns, \emph{circling} and \emph{abandoning},
+identified jointly in geometry space and in language space, with an honest
+account of what the geometry does and does not predict. (3)~An open-source
+harness, a \textbf{22-puzzle set restricted to puzzles humans have played and
+solved}, and a composite score decoupling clue recall from judged causal
+logic. (4)~A puzzle-level difficulty measure, \textbf{under-determination},
+independent of rounds used, so it can group an accuracy-versus-rounds analysis
+without circularity.
 
 \section{Related Work}\label{sec:rw}
 Existing turtle-soup benchmarks, TurtleBench~\cite{turtlebench},
@@ -130,9 +136,9 @@ to the one subscore that objective matching cannot reach.
 \subsection{Task and harness}
 A \textbf{Questioner} sees only the 汤面 and asks one yes/no question per round. An
 \textbf{Oracle} holds the 汤底 and answers 是/不是/与此无关. The Questioner may
-commit a final story at any round, or is forced to at the budget. The harness has
-pluggable providers (local, gateway, and token-billed sampling, including
-RL-trained checkpoints), with full per-round logging and per-game seeds.
+commit a final story at any round, or is forced to at the budget. The
+open-source harness has pluggable model providers and logs every round, with
+per-game seeds.
 
 \subsection{Puzzles}
 A puzzle nobody has solved carries no evidence that its clues suffice, that its
@@ -176,28 +182,33 @@ on a minority of traces (quantified in \S\ref{sec:results}). We therefore
 report both anchors and treat a SWOW-based version~\cite{swow} as the correct
 future form.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.78\linewidth]{figures/fig1_flatness.pdf}
+\caption{\textbf{(a)}~Mean checkpoint accuracy by round (66 games per model;
+bands, 95\% CI), full 0--1 range. \textbf{(b)}~Final score against sustained
+peak (best held two rounds), one point per game; points under the red line
+ended below half their peak (18--20 of 66 per model).}
+\label{fig:e1}
+\end{figure}
+
 \section{Experiment Designs}
 \textbf{E1, round curve.} Play to 30 rounds, forcing and scoring a checkpoint
-answer after each round. Does interaction help, and where does behavior degrade?
+answer after each round.
 
 \textbf{E2, round budget.} Hard caps $\{5,10,15,20,25,30\}$ with a forced final
-answer, asking how behavior changes under pressure.
+answer.
 
 \textbf{E3, association trajectory.} For every E1 game, compute $\{s_t\}$ and
-$\{h_t\}$ and test H1--H3. The keyword extractor is held fixed across models, so
-no model is scored through its own vocabulary.
-
-\textbf{E4 (exploratory).} Which trajectory feature does diverge-then-narrow
-prompting~\cite{mutate} move, and do signatures shift on puzzles admitting many
-distinct stories versus one?
+$\{h_t\}$ and test H1--H3, with the keyword extractor held fixed across models
+so no model is scored through its own vocabulary.
 
 \textbf{Prerequisite: the Oracle audit.} The Oracle is the sole information
-channel. A weak one collapses answers to ``irrelevant'', the reply carrying no
-information, after which no Questioner can succeed and every score measures the
-environment. Candidates are therefore probed on held-out pairs before any agent
-claim, and \textbf{must come from a different model family than the
-Questioners}; otherwise a same-family Questioner's advantage cannot be
-separated from its scale.
+channel: a weak one collapses answers to ``irrelevant'', after which no
+Questioner can succeed and every score measures the environment. Candidates
+are probed on held-out pairs before any agent claim, and \textbf{must come
+from a different model family than the Questioners}, or a Questioner's
+resemblance to the Oracle cannot be separated from its scale.
 
 \section{Results}\label{sec:results}
 All numbers come from one grid on the verified set: 22 puzzles $\times$
@@ -213,20 +224,30 @@ Checkpoint accuracy rises only in the first ${\sim}10$ rounds, and only for the
 larger models: 397B climbs from $0.124$ (round 1) to $0.200$ (round 10) and then
 stays between $0.18$ and $0.21$ through round 30, while 27B rises
 $0.117 \to 0.162$ and plateaus near $0.16$. The 4B model is flat for the entire
-game, $0.05$--$0.06$ at every checkpoint (Figure~\ref{fig:e1}, drawn on the full
-0--1 range). Twenty further rounds of yes/no evidence, two thirds of the
-interaction budget, buy no accuracy at any scale.
+game, $0.05$--$0.06$ at every checkpoint (Figure~\ref{fig:e1}a). Twenty
+further rounds of evidence buy no accuracy at any scale.
 
-\textbf{Commitment separates the models more than accuracy does.} 27B volunteers
-a final story in 11/66 games (mean round 11.1) and 397B in 9/66 (round 14.2).
-The 4B model commits in 2/66 (round 23.5); it neither improves nor concludes.
+\textbf{Commitment separates the models more than accuracy does.} 27B
+volunteers a final story in 11/66 games (mean round 11.1), 397B in 9/66
+(14.2), and 4B in 2/66 (23.5); the smallest neither improves nor concludes.
+
+\textbf{The plateau is an equilibrium of finding and losing, not stagnation.}
+Each game's best checkpoint sits far above its last (Figure~\ref{fig:e1}b).
+Because rewording alone can swing one checkpoint's score, we measure a
+\emph{sustained} peak, the best value held over two consecutive checkpoints;
+even so, models end with only 0.69--0.76 of what they had demonstrably
+reached. Scale raises the sustained peak 3.5-fold ($0.084 \to 0.296$) but
+leaves retention unchanged: capability buys higher finds, not better keeping.
+
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.49\linewidth]{figures/fig_e1_curves.png}
-\caption{E1: mean checkpoint accuracy by round (22 puzzles $\times$ 3 seeds per
-model), on the full 0--1 outcome range so that flatness reads as flat.}
-\label{fig:e1}
+\includegraphics[width=0.72\linewidth]{figures/fig2_geometry.pdf}
+\caption{Per-trace geometry against best outcome ($n = 198$). \textbf{(a)}~The
+models separate into stride regimes, but within a model stride does not predict
+outcome. \textbf{(b)}~Drift slopes cluster near zero at every scale: H3's
+negative result and H2's absent signature in one view.}
+\label{fig:e3}
 \end{figure}
 
 \subsection{Budget pressure is asymmetric (E2)}
@@ -243,79 +264,74 @@ more of the judged causal-logic half than the clue-recall half: 397B averages
 12.6/30 logic against 7.2/70 clues, 27B 10.1 against 6.8, and 4B 2.9 against
 0.2. Models reach the right causal shape well before, and often without,
 landing the annotated clue content. The two subscores therefore measure
-different competences, and the composite's logic half is not redundant with
-string-level recall.
+different competences; the logic half is not redundant with string-level
+recall.
 
-\subsection{Geometry explains the plateau but does not predict the score (E3, H3)}
+\subsection{Two patterns: circling and abandoning (E3)}
 The models occupy different geometric regimes: mean stride is $0.049$ for 4B
-against $0.088$ (397B) and $0.114$ (27B), and in the late game 4B's stride falls
-to $0.030$, under half of 27B's $0.082$, while it almost never commits. That is
-H1's stalling signature: the small model circles a hypothesis basin with
-shrinking steps. H2's drifting signature, by contrast, barely appears: drift
-slopes cluster near zero at every scale (Figure~\ref{fig:e3}, right); stalling,
-not drifting, is the dominant failure geometry we observe. Pooled across
-models, stride correlates with best checkpoint score (Spearman $\rho = 0.23$,
-$n = 198$), but this is a between-model effect; \textbf{within} each model the
-correlation vanishes ($|\rho| \leq 0.16$ for every model and feature;
-Figure~\ref{fig:e3}).
+against $0.088$ (397B) and $0.114$ (27B), and in the late game 4B's stride
+falls to $0.030$, under half of 27B's $0.082$, while it almost never commits.
+That is H1's signature, which we name \emph{circling}: shrinking orbits of one
+hypothesis basin, with a sustained peak (0.084) showing the model never finds
+a solution to lose. The larger models fail in the
+opposite way, by \emph{abandoning}: they find (sustained peak $\geq 0.5$ in
+4--6 of 66 games each) and then fail to keep or commit (\S5.1). H2's drifting
+signature, by contrast, barely appears: drift slopes cluster near zero at
+every scale (Figure~\ref{fig:e3}, right). The second real pattern is
+abandonment, which the hypothesized drift did not anticipate.
 
-The mixed-effects test makes that precise. With puzzle as a random intercept and
-model tier as a fixed effect, adding the drift slope does not improve fit (LRT
-$p = 0.39$), nor does stride $\times$ tier ($p = 0.20$); the puzzle intercept
-absorbs the variance the geometry seemed to carry. The puzzle-level covariate
-sharpens the interpretation: under-determination points the expected way
-(harder surface, lower score; coefficient $-0.031$) but is not significant
-($p = 0.22$) and removes only ${\sim}8\%$ of the puzzle variance, so the puzzle
-effect is not merely measured difficulty. \textbf{H3 is not supported within-puzzle}. We
-accordingly claim trajectory geometry as an interpretive instrument, one that
-says \emph{how} an agent is failing, not as a score predictor.
+\textbf{The same two patterns read differently in language space.} Circling is
+only half-visible to lexical novelty: verbatim re-asks in late rounds are
+caught, but the same games earlier re-ask one hypothesis in fresh words, which
+lexical metrics score as new and only the geometry detects. Abandoning is invisible to lexical
+measures altogether; it shows in commitment behavior and checkpoint dynamics
+(\S5.1), and Appendix~\ref{app:metrics} walks one game whose round-10
+checkpoint story \emph{is} the solution, later abandoned.
+
+Pooled across models, stride correlates with best checkpoint score (Spearman
+$\rho = 0.23$, $n = 198$), but this is a between-model effect; \textbf{within}
+each model the correlation vanishes ($|\rho| \leq 0.16$ for every model and
+feature; Figure~\ref{fig:e3}).
+
+The mixed-effects test makes that precise. With puzzle as a random intercept
+and model tier as a fixed effect, adding the drift slope does not improve fit
+(LRT $p = 0.39$), nor does stride $\times$ tier ($p = 0.20$).
+Under-determination, the puzzle-level covariate, points the expected way
+(coefficient $-0.031$) but is not significant ($p = 0.22$) and removes only
+${\sim}8\%$ of the puzzle variance, so the puzzle effect is not merely
+measured difficulty. \textbf{H3 is not supported within-puzzle}; trajectory
+geometry is an interpretive instrument, one that says \emph{how} an agent
+fails, not a score predictor.
 
 \textbf{Both anchors, as promised (\S\ref{sec:framework}).} Drift slopes from
-the solution-aware and the surface-only anchor agree in rank ($\rho = 0.80$)
-yet flip sign on 38/198 traces; the mixed-effects conclusion is the same under
-both (surface-only drift LRT $p = 0.10$). The anchor choice changes individual
-traces, not the finding.
+the solution-aware and surface-only anchors agree in rank ($\rho = 0.80$) yet
+flip sign on 38/198 traces, and the mixed-effects conclusion holds under both
+(surface-only LRT $p = 0.10$): the anchor changes traces, not the finding.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.60\linewidth]{figures/fig_e3_scatter.png}
-\caption{E3: per-trace geometry against best outcome ($n = 198$). Left: mean
-stride $\bar{s}$; the models separate into regimes, but within a model stride
-does not predict outcome. Right: drift slope $dh/dt$, clustered near zero,
-visualizing both H3's negative result and H2's largely absent signature.}
-\label{fig:e3}
-\end{figure}
-
-\section{Harness Observations}
-\textbf{Stalling is real, and lexical metrics only half-see it.} A small model
-re-asks earlier questions verbatim in later rounds, which a lexical novelty
-metric catches only because it is verbatim. Earlier in the same games, it
-re-asks one hypothesis in fresh words, which that metric scores as new and the
-geometry does not.
-
-\textbf{Truncated thinking masquerades as behavior.} Under too small a token
-budget, a reasoning model's logged ``questions'' are fragments of
-chain-of-thought, and every Oracle reply to them is ``irrelevant.'' From the
-transcript this is indistinguishable from an agent that cannot form a question;
-decoding configuration is part of the environment.
 
 \section{Limitations and Conclusion}
+\textbf{A harness trap worth naming.} Under too small a token budget, a
+reasoning model's logged ``questions'' are truncated chain-of-thought fragments
+to which every Oracle reply is ``irrelevant''; from the transcript this is
+indistinguishable from an agent that cannot form a question, so decoding
+configuration is part of the environment.
+
+
 \textbf{Limitations.} The anchor is not yet human-derived
 (\S\ref{sec:framework}), so H2's framing is descriptive until SWOW norms or
 collected human traces are in place; we do not equate human-unlike with wrong.
-Keyword extraction and encoders are themselves models, and feedback
-incorporation, the coordinate that would most directly separate stalling from
-unbanked exploration, is definable but unmeasured. The source site is public,
-so memorisation probes are required rather than optional: the two puzzles our
-difficulty measure rates easiest are the two most widely circulated.
-Puzzles involve death and dark themes; content-flagged.
+Keyword extraction and encoders are themselves models; feedback incorporation,
+the most direct coordinate for separating circling from abandoning, is
+definable but unmeasured. The source site is public,
+so memorisation probes are required: the two puzzles rated easiest are also
+the two most widely circulated. Puzzles involve death and dark themes;
+content-flagged.
 
 \textbf{Conclusion.} Turtle Soup turns hypothesis-space search into observable
 text, and trajectory geometry turns that text into behavioral signatures. An
 endpoint score projects the whole search onto one number, discarding exactly
-what improving an interactive agent requires: a stalling agent and one that
-explores without banking need opposite interventions, and reading the
-trajectory is how you tell which one you have.
+what improving an interactive agent requires: circling and abandoning agents
+need opposite interventions, and only the trajectory tells you which you have.
 
 \begin{thebibliography}{9}\small
 \bibitem{turtlebench} Q.~Yu \emph{et al.} TurtleBench: Evaluating Top Language Models via Real-World Yes/No Puzzles. arXiv:2410.05262.
