@@ -14,30 +14,23 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{titlesec}
 \usepackage{xcolor}
-\usepackage{mdframed}
-\titlespacing*{\section}{0pt}{8pt}{3pt}
-\titlespacing*{\subsection}{0pt}{6pt}{2pt}
+\titlespacing*{\section}{0pt}{6pt}{2pt}
+\titlespacing*{\subsection}{0pt}{5pt}{2pt}
 \titleformat*{\section}{\large\bfseries}
 \titleformat*{\subsection}{\normalsize\bfseries}
-\captionsetup{font=small,labelfont=bf}
-\setlength{\parskip}{2pt}
+\captionsetup{font=small,labelfont=bf,skip=4pt}
+\setlength{\parskip}{1pt}
 \usepackage{enumitem}
 \setlist{nosep,leftmargin=1.3em}
 
-\definecolor{gapbg}{HTML}{FFF6E5}
-\definecolor{gaprule}{HTML}{C08A2E}
-\newmdenv[backgroundcolor=gapbg,linecolor=gaprule,linewidth=0.8pt,
-          innertopmargin=5pt,innerbottommargin=5pt,skipabove=5pt,skipbelow=5pt]{gap}
-
 \title{\bfseries Thinking Sideways, Observed:\\ Interpreting the Lateral-Thinking Search Behavior of LLM Agents}
 \author{Xiaoxuan Lei \and (co-authors TBD)\\
-\small Draft v0.10 --- IAB: Interpreting Agent Behavior, Workshop @ NeurIPS 2026\\
-\small Complete draft; no open gaps.}
+\small Draft v0.12 --- IAB: Interpreting Agent Behavior, Workshop @ NeurIPS 2026}
 \date{}
 
 \begin{document}
 \maketitle
-\vspace{-1.4em}
+\vspace{-1.8em}
 
 \begin{abstract}
 \small\noindent Interactive agents are usually evaluated by endpoint scores, yet
@@ -46,27 +39,27 @@ Turtle Soup, a lateral-thinking game in which an agent must reconstruct a hidden
 story through yes/no questions. We ran three Qwen models (4B, 27B, 397B) on 22
 human-played puzzles, scoring a forced checkpoint answer every round and
 embedding each round's question to form an association trajectory. We found
-that: (1)~the flat accuracy curve is not a resource limit: gains stop after
-round ten at every scale (397B $0.124 \to 0.200$, then flat; 4B flat at
-$0.05$--$0.06$), longer budgets monotonically \emph{hurt} the smallest model
-($0.050 \to 0.004$), and the plateau is an equilibrium of finding and losing:
-models keep only 0.69--0.76 of the understanding they had held across two
-consecutive checkpoints, a retention scale leaves unchanged even as it raises
-the peaks 3.5-fold;
-(2)~two behavioral patterns underlie this, read jointly from geometry and
-language: the small model \emph{circles} (late-game stride $0.030$ vs the
-mid-size model's $0.082$; 2 of 66 games committed), whereas larger models
-\emph{abandon}, reaching the solution mid-game and then failing to keep or
-commit it;
-(3)~within puzzles, mixed-effects models find no predictive
-power for stride or drift (likelihood-ratio tests, $p \geq 0.20$), a conclusion
-unchanged under a surface-only anchor, so the geometry is an interpretive
-instrument rather than a score predictor; and (4)~an unaudited Oracle collapses
-questions to ``irrelevant'' and makes every game unwinnable, so agent claims
-must begin with an information audit of the environment. We release the
+that: (1)~gains stop after round ten at every model tier (397B
+$0.124 \to 0.200$, then flat; 4B flat at $0.05$--$0.06$), and the round budget
+is not the constraint; the larger tiers are flat across caps 5--30, and the
+smallest model's apparent decline under longer caps ($0.050 \to 0.004$) is a
+token-exhaustion harness artifact absent from non-exhausted games; (2)~two
+behavioral patterns emerge, one from trajectory geometry
+and one from score dynamics and commitment: the small model \emph{circles}
+(late-game stride $0.030$ vs $0.082$, robust to excluding malformed rounds;
+2/66 games committed), whereas larger models
+\emph{abandon}, reaching solution-grade checkpoint stories mid-game yet
+committing a final story in at most 11 of 66 games; (3)~within puzzles,
+mixed-effects models detect no predictive power for stride or drift
+(coefficients bounded near zero, all likelihood-ratio $p > 0.09$, under both
+anchors), so the geometry is an interpretive instrument rather than a score
+predictor; and (4)~in a pre-experiment pilot, raising a failing Oracle's
+accuracy from 30\% to 100\% left the smallest Questioner's score unchanged;
+the environment, not the agent, had been the bottleneck, so agent claims must
+begin with an information audit of the environment. We release the
 harness, a provenance-enforced puzzle set with an under-determination
-difficulty measure, and a two-part score whose clue-recall and causal-logic
-halves demonstrably measure different competences.
+difficulty measure, and a two-part score whose halves correlate only weakly
+per game ($\rho \leq 0.35$).
 \end{abstract}
 
 \section{Introduction}
@@ -77,16 +70,14 @@ passengers threw out their luggage, still could not stay up, and drew lots with
 matchsticks; the man who drew the short one was thrown out. The solver recovers
 this story by asking yes/no questions, one per round.
 
-Outcome metrics can say whether an agent got there. On our verified set, that
+Outcome metrics can say whether an agent got there. On our verified set that
 story is flat: accuracy rises only in the first ten of thirty rounds, only for
-the larger models, and twenty further rounds buy nothing at any scale we tested
-(\S\ref{sec:results}). The failure is not a budget limit, and scaling does not
-remove it: scale raises the peaks a model reaches mid-game, but not the
-fraction it keeps. What outcome metrics cannot say is how the agent searched.
-Two agents scoring $0.0$ on the same puzzle may be failing in opposite ways:
-one never leaves its first hypothesis, while the other finds the answer and
-lets it go. Telling them apart requires instruments that read the process;
-providing them is this paper's contribution.
+the larger tiers, and the round budget is not the constraint
+(\S\ref{sec:results}). What outcome metrics cannot say is how the agent
+searched. Two agents scoring $0.0$ on the same puzzle may be failing in
+opposite ways: one never leaves its first hypothesis, while the other finds
+the answer and lets it go. Telling them apart requires instruments that read
+the process; providing them is this paper's contribution.
 
 \textbf{Why Turtle Soup.} The behavior \emph{is} text, so no probing or
 activation access is needed; puzzles are deliberately under-determined, so each
@@ -99,18 +90,19 @@ semantic space, form a trajectory whose geometry explains success and failure.
 (per-round semantic step size) shrinking toward zero, of which lexical novelty
 heuristics catch only the verbatim extreme. \textbf{H2 (drifting)}: an agent
 exploring where no human path goes shows normal stride but growing anchor
-distance, which lexical novelty misses entirely. \textbf{H3 (predictivity)}:
+distance. \textbf{H3 (predictivity)}:
 trajectory features predict final solve quality beyond outcome-adjacent
 covariates. The results confirm H1 (as circling), reject H2's drift, reveal a
 second, unhypothesized pattern (abandoning), and do not support H3
 (\S\ref{sec:results}).
 
-\textbf{Contributions.} (1)~An explanation of the flat curve: task failure is
-driven neither by round budget nor by model capability alone, but by
-ineffective exploration; scale raises what a model momentarily finds, not what
-it keeps. (2)~Two behavioral patterns, \emph{circling} and \emph{abandoning},
-identified jointly in geometry space and in language space, with an honest
-account of what the geometry does and does not predict. (3)~An open-source
+\textbf{Contributions.} (1)~A dissection of the flat curve: the round budget
+is not the constraint, the smallest model's apparent budget harm is an
+environment artifact, and model tier raises mid-game peaks without producing
+further gains after round ten. (2)~Two behavioral patterns, \emph{circling}
+(from trajectory geometry) and \emph{abandoning} (from score dynamics and
+commitment behavior), with an honest account of what the geometry does and
+does not predict. (3)~An open-source
 harness, a \textbf{22-puzzle set restricted to puzzles humans have played and
 solved}, and a composite score decoupling clue recall from judged causal
 logic. (4)~A puzzle-level difficulty measure, \textbf{under-determination},
@@ -121,21 +113,27 @@ without circularity.
 Existing turtle-soup benchmarks, TurtleBench~\cite{turtlebench},
 SPLAT~\cite{splat} (whose interactive player--judge protocol we adopt), and
 TurtleSoup-Bench~\cite{tsbench}, score verification accuracy, solve efficiency,
-or faithfulness to the intended story. They score the destination; we score the
-trajectory. MUTATE~\cite{mutate} shows that frontier agents find far fewer
+or faithfulness to the intended story. TurtleSoup-Bench probes what agents ask
+next but grades it against the intended story; none of the three measures the
+search's geometry, which is our delta. Circling and abandoning echo folk-known
+multi-turn failure modes (repetitive questioning; failing to commit or retain
+a correct answer); our contribution is to measure them, not to claim their
+novelty. MUTATE~\cite{mutate} shows that frontier agents find far fewer
 mechanism-distinct paths than humans, and its diverge-then-narrow agent is a
 natural intervention to test against our metrics. The instrument itself adapts
 forward flow~\cite{forwardflow} and the Divergent Association
-Task~\cite{dat} from human psychometrics, which treat semantic travel as a
-measure. The Small World of Words norms~\cite{swow} provide
-the human anchor that ours is not yet (\S\ref{sec:framework}). Judge-bias
+Task~\cite{dat} from human psychometrics. The Small World of Words
+norms~\cite{swow} provide the human anchor that ours is not yet
+(\S\ref{sec:framework}). Judge-bias
 catalogues~\cite{calm,posbias} shape the scoring: the model judge is confined
 to the one subscore that objective matching cannot reach.
 
 \section{Framework}\label{sec:framework}
 \subsection{Task and harness}
-A \textbf{Questioner} sees only the 汤面 and asks one yes/no question per round. An
-\textbf{Oracle} holds the 汤底 and answers 是/不是/与此无关. The Questioner may
+A \textbf{Questioner} sees only the 汤面 (the ``surface'', the puzzle's visible
+scenario) and asks one yes/no question per round. An \textbf{Oracle} holds the
+汤底 (the hidden story) and answers 是/不是/与此无关 (yes, no, or
+irrelevant). The Questioner may
 commit a final story at any round, or is forced to at the budget. The
 open-source harness has pluggable model providers and logs every round, with
 per-game seeds.
@@ -151,8 +149,8 @@ code, with a verified family, a quarantined generated family, and tests that
 fail if the two mix.
 
 Each puzzle carries an \textbf{under-determination} score: how far the surface
-alone leaves a solver from the solution, measured by sampling twelve cold
-guesses from the surface with no Oracle feedback and taking the closest. It
+alone leaves a solver from the solution, measured by taking the closest of
+twelve cold guesses written from the surface with no Oracle feedback. It
 ranges 0.173--0.577 (median 0.347) over the set and is \emph{not} explained by
 surface length ($r=-0.22$, n.s.). It therefore enters the mixed-effects
 analysis in \S\ref{sec:results} as a puzzle-level covariate.
@@ -166,8 +164,11 @@ the clue half blocks ``far $=$ creative'' gaming, because distance without
 validity scores zero.
 
 \subsection{Association-trajectory instrumentation}
-Each round, we extract the question's keywords, embed them, and aggregate them
-to a unit vector $q_t$. Two signals follow: the \textbf{stride}
+Each round, we extract the question's keywords (jieba), embed them
+(bge-small-zh-v1.5), and average them to a unit round vector $q_t$; distances
+are cosine, and anchors embed the puzzle's surface, solution, and clue terms
+(specification in Appendix~\ref{app:metrics}). Two signals follow: the
+\textbf{stride}
 $s_t = d(q_t,q_{t-1})$ and the \textbf{anchor distance}
 $h_t = d(q_t,\mathcal{A})$. The hypothesized signatures are stalling
 ($\bar{s}\to 0$ with $h$ flat) and drifting (normal $\bar{s}$ with $h_t$
@@ -184,7 +185,7 @@ future form.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.78\linewidth]{figures/fig1_flatness.pdf}
+\includegraphics[width=0.62\linewidth]{figures/fig1_flatness.pdf}
 \caption{\textbf{(a)}~Mean checkpoint accuracy by round (66 games per model;
 bands, 95\% CI), full 0--1 range. \textbf{(b)}~Final score against sustained
 peak (best held two rounds), one point per game; points under the red line
@@ -193,56 +194,65 @@ ended below half their peak (18--20 of 66 per model).}
 \end{figure}
 
 \section{Experiment Designs}
-\textbf{E1, round curve.} Play to 30 rounds, forcing and scoring a checkpoint
-answer after each round.
-
-\textbf{E2, round budget.} Hard caps $\{5,10,15,20,25,30\}$ with a forced final
-answer.
-
-\textbf{E3, association trajectory.} For every E1 game, compute $\{s_t\}$ and
-$\{h_t\}$ and test H1--H3, with the keyword extractor held fixed across models
-so no model is scored through its own vocabulary.
+\textbf{Designs.} E1 (round curve) plays to 30 rounds, forcing and scoring a
+checkpoint answer after each round. E2 (round budget) imposes hard caps
+$\{5,10,15,20,25,30\}$ with a forced final answer. E3 (association trajectory)
+computes $\{s_t\}$ and $\{h_t\}$ for every E1 game and tests H1--H3, with the
+keyword extractor held fixed across models so no model is scored through its
+own vocabulary.
 
 \textbf{Prerequisite: the Oracle audit.} The Oracle is the sole information
 channel: a weak one collapses answers to ``irrelevant'', after which no
-Questioner can succeed and every score measures the environment. Candidates
-are probed on held-out pairs before any agent claim, and \textbf{must come
-from a different model family than the Questioners}, or a Questioner's
-resemblance to the Oracle cannot be separated from its scale.
+Questioner can succeed and every score measures the environment. In a pilot, a
+4B Oracle (thinking disabled) answered 30\% of probes correctly; raising its
+accuracy to 100\% left the 4B Questioner's score unchanged. Candidates are
+therefore probed on held-out (question, answer) pairs before any agent claim
+(protocol and per-candidate numbers in Appendix~\ref{app:metrics}), and
+\textbf{must come from a different model family than the Questioners}, or a
+Questioner's resemblance to the Oracle cannot be separated from its tier.
 
 \section{Results}\label{sec:results}
 All numbers come from one grid on the verified set: 22 puzzles $\times$
 \{Qwen3.5-4B, Qwen3.6-27B, Qwen3.5-397B-A17B; hereafter 4B, 27B, 397B\}
-$\times$ 3 seeds, with a DeepSeek-V3.1 Oracle and logic judge (cross-family,
-audited at 95\%; two logic samples per rating), and zero failed games. Accuracy
-denotes the composite score rescaled to $[0,1]$. E1 comprises 198 thirty-round
-games with a scored checkpoint every round; E2, 1{,}188 games across caps
-$\{5,10,15,20,25,30\}$.
+$\times$ 3 seeds, with a DeepSeek-V3.1 Oracle and logic judge (cross-family
+with the Questioners; audit and settings in Appendix~\ref{app:metrics}). The
+three models differ in generation and architecture (the 397B is a
+mixture-of-experts with 17B active parameters), so we speak of model tiers,
+not scale; harness failures were zero, and token exhaustion is a game outcome
+reported below. Accuracy denotes the composite score rescaled to $[0,1]$. E1
+comprises 198 thirty-round games with a scored checkpoint every round; E2,
+1{,}188 games across caps $\{5,10,15,20,25,30\}$.
 
 \subsection{More interaction stops helping after ten rounds (E1)}
-Checkpoint accuracy rises only in the first ${\sim}10$ rounds, and only for the
-larger models: 397B climbs from $0.124$ (round 1) to $0.200$ (round 10) and then
-stays between $0.18$ and $0.21$ through round 30, while 27B rises
-$0.117 \to 0.162$ and plateaus near $0.16$. The 4B model is flat for the entire
-game, $0.05$--$0.06$ at every checkpoint (Figure~\ref{fig:e1}a). Twenty
-further rounds of evidence buy no accuracy at any scale.
+Checkpoint accuracy rises only in the first ${\sim}10$ rounds, and only for
+the larger tiers: 397B climbs from $0.124$ (round 1) to $0.200$ (round 10),
+then stays between $0.18$ and $0.21$; 27B rises $0.117 \to 0.162$ and plateaus
+near $0.16$; 4B is flat at $0.05$--$0.06$ throughout (Figure~\ref{fig:e1}a).
+Twenty further rounds of evidence buy no accuracy at any tier.
 
 \textbf{Commitment separates the models more than accuracy does.} 27B
 volunteers a final story in 11/66 games (mean round 11.1), 397B in 9/66
 (14.2), and 4B in 2/66 (23.5); the smallest neither improves nor concludes.
 
-\textbf{The plateau is an equilibrium of finding and losing, not stagnation.}
-Each game's best checkpoint sits far above its last (Figure~\ref{fig:e1}b).
-Because rewording alone can swing one checkpoint's score, we measure a
-\emph{sustained} peak, the best value held over two consecutive checkpoints;
-even so, models end with only 0.69--0.76 of what they had demonstrably
-reached. Scale raises the sustained peak 3.5-fold ($0.084 \to 0.296$) but
-leaves retention unchanged: capability buys higher finds, not better keeping.
+\textbf{Peaks, finals, and an honest null.} Model tier raises what is found
+mid-game: the \emph{sustained} peak (best score held over two consecutive
+checkpoints, robust to single-round rewording swings) averages 0.084 / 0.240 /
+0.296 across tiers, while finals sit lower (Figure~\ref{fig:e1}b).
+Retention, the mean per-game final-to-sustained-peak ratio over games with a
+nonzero peak (final = last played checkpoint; excluding early-committing games
+changes it by $\leq 0.03$), is 0.69--0.76 at every tier (bootstrap 95\% CIs
+$\pm{\approx}0.08$). We do not read that gap as evidence of systematic loss:
+under a within-game permutation null (knowledge constant, only
+checkpoint-scoring jitter), expected retention is 0.79--0.84 and the observed
+values are not significantly below it ($p \geq 0.09$). The quantitative case
+for ``finding and losing'' is therefore inconclusive at this sample size; the
+evidence for abandonment is the commitment record and the transcripts (\S5.3,
+Appendix~\ref{app:metrics}).
 
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.72\linewidth]{figures/fig2_geometry.pdf}
+\includegraphics[width=0.62\linewidth]{figures/fig2_geometry.pdf}
 \caption{Per-trace geometry against best outcome ($n = 198$). \textbf{(a)}~The
 models separate into stride regimes, but within a model stride does not predict
 outcome. \textbf{(b)}~Drift slopes cluster near zero at every scale: H3's
@@ -250,88 +260,91 @@ negative result and H2's absent signature in one view.}
 \label{fig:e3}
 \end{figure}
 
-\subsection{Budget pressure is asymmetric (E2)}
-End accuracy is insensitive to the round cap for the larger models (397B
-$0.19$--$0.21$ and 27B $0.14$--$0.18$ across all six caps), but
-\textbf{monotonically harmful for the smallest}: 4B falls from $0.050$ at
-cap~5 to $0.004$ at cap~30, with 175 of its 396 games ending by token-budget
-exhaustion rather than by answer (versus 2/396 for 27B and 0/396 for 397B).
-Longer games do not help a small model; they give it more rounds in which to
-fail.
+\subsection{Budget pressure and a harness artifact (E2)}
+End accuracy is insensitive to the round cap for the larger tiers (397B
+$0.19$--$0.21$ and 27B $0.14$--$0.18$ across all six caps). The smallest
+model's raw curve declines monotonically ($0.050$ at cap~5 to $0.004$ at
+cap~30), but this is an environment effect, not a behavioral one: games ending
+by token-budget exhaustion rise from 0/66 at cap~5 to 63/66 at cap~30 (175 of
+396 overall, versus 2/396 for 27B and 0/396 for 397B), and conditioned on
+non-exhausted games 4B's end accuracy does not decline (0.05--0.09 across
+caps). By our own audit principle, the raw decline measures the harness. It
+also resolves an internal check: 4B's E1 round-30 mean (0.05) and E2 cap-30
+final (0.004) disagree exactly because of exhaustion; on non-exhausted games
+the protocols agree (0.05 vs 0.09), as they do at the larger tiers.
 
 \textbf{The two score halves dissociate.} Every model earns proportionally far
 more of the judged causal-logic half than the clue-recall half: 397B averages
 12.6/30 logic against 7.2/70 clues, 27B 10.1 against 6.8, and 4B 2.9 against
-0.2. Models reach the right causal shape well before, and often without,
-landing the annotated clue content. The two subscores therefore measure
-different competences; the logic half is not redundant with string-level
-recall.
+0.2, and the halves correlate only weakly per game (Spearman $\rho = 0.30$ /
+$0.35$ / $0.06$ for 397B / 27B / 4B). Models reach the right causal shape
+well before, and often without, landing the annotated clue content; the logic
+half is not redundant with string-level recall.
 
 \subsection{Two patterns: circling and abandoning (E3)}
-The models occupy different geometric regimes: mean stride is $0.049$ for 4B
-against $0.088$ (397B) and $0.114$ (27B), and in the late game 4B's stride
-falls to $0.030$, under half of 27B's $0.082$, while it almost never commits.
-That is H1's signature, which we name \emph{circling}: shrinking orbits of one
-hypothesis basin, with a sustained peak (0.084) showing the model never finds
-a solution to lose. The larger models fail in the
-opposite way, by \emph{abandoning}: they find (sustained peak $\geq 0.5$ in
-4--6 of 66 games each) and then fail to keep or commit (\S5.1). H2's drifting
+Mean stride separates the tiers: $0.049$ (4B) against $0.088$ (397B) and
+$0.114$ (27B), with 4B's late-game stride at $0.030$, under half of 27B's
+$0.082$. That is H1's signature, which we name \emph{circling}. It is not a
+malformed-question artifact: 17\% of 4B's logged questions are truncated or
+non-interrogative (${\sim}1\%$ at the larger tiers), yet excluding them moves
+4B's mean stride only from 0.049 to 0.056, still under half of 27B's. Its
+sustained peak (0.084) shows it rarely finds a solution-grade story at all.
+The larger models fail in the opposite
+way, by \emph{abandoning}: sustained peaks reach $\geq 0.5$ in 4--6 of 66
+games each, yet a final story is volunteered in at most 11 of 66 (\S5.1).
+Below-half-peak endings alone do not separate the tiers (18--20 of 66
+everywhere; the jitter null explains much of that); the separators are whether
+a solution-grade peak existed and whether it was committed. H2's drifting
 signature, by contrast, barely appears: drift slopes cluster near zero at
-every scale (Figure~\ref{fig:e3}, right). The second real pattern is
-abandonment, which the hypothesized drift did not anticipate.
+every tier (Figure~\ref{fig:e3}, right); the second real pattern, abandonment,
+is detected in score dynamics and commitment rather than geometry.
 
-\textbf{The same two patterns read differently in language space.} Circling is
-only half-visible to lexical novelty: verbatim re-asks in late rounds are
-caught, but the same games earlier re-ask one hypothesis in fresh words, which
-lexical metrics score as new and only the geometry detects. Abandoning is invisible to lexical
-measures altogether; it shows in commitment behavior and checkpoint dynamics
-(\S5.1), and Appendix~\ref{app:metrics} walks one game whose round-10
+\textbf{The patterns in language space.} Circling is only half-visible to
+lexical novelty: 4B re-asks earlier questions verbatim in late rounds (caught
+lexically), but fresh-worded re-asks of one hypothesis read as new, and only
+the geometry detects them. Abandoning is invisible to lexical
+measures altogether; Appendix~\ref{app:metrics} walks one game whose round-10
 checkpoint story \emph{is} the solution, later abandoned.
 
 Pooled across models, stride correlates with best checkpoint score (Spearman
-$\rho = 0.23$, $n = 198$), but this is a between-model effect; \textbf{within}
-each model the correlation vanishes ($|\rho| \leq 0.16$ for every model and
-feature; Figure~\ref{fig:e3}).
-
-The mixed-effects test makes that precise. With puzzle as a random intercept
-and model tier as a fixed effect, adding the drift slope does not improve fit
-(LRT $p = 0.39$), nor does stride $\times$ tier ($p = 0.20$).
+$\rho = 0.23$, $n = 198$), a between-model effect; within each model no
+correlation is detected ($|\rho| \leq 0.16$ for every model and feature;
+Figure~\ref{fig:e3}). The mixed-effects test makes that precise (best
+checkpoint accuracy; Gaussian LMM, puzzle random intercept, tier fixed, ML).
+Stride adds nothing over the covariates ($\beta = -0.010$ per SD, 95\% CI
+$[-0.035, 0.014]$, LRT $p = 0.42$), nor does drift ($\beta = -0.011$,
+$[-0.035, 0.014]$, $p = 0.39$) or stride $\times$ tier ($p = 0.20$).
 Under-determination, the puzzle-level covariate, points the expected way
 (coefficient $-0.031$) but is not significant ($p = 0.22$) and removes only
 ${\sim}8\%$ of the puzzle variance, so the puzzle effect is not merely
-measured difficulty. \textbf{H3 is not supported within-puzzle}; trajectory
-geometry is an interpretive instrument, one that says \emph{how} an agent
-fails, not a score predictor.
+measured difficulty. \textbf{H3 is not supported within-puzzle}; effects are
+bounded small but not excluded, and trajectory geometry is an interpretive
+instrument, one that says \emph{how} an agent fails, not a score predictor.
 
-\textbf{Both anchors, as promised (\S\ref{sec:framework}).} Drift slopes from
+\textbf{Both anchors.} Drift slopes from
 the solution-aware and surface-only anchors agree in rank ($\rho = 0.80$) yet
-flip sign on 38/198 traces, and the mixed-effects conclusion holds under both
-(surface-only LRT $p = 0.10$): the anchor changes traces, not the finding.
+flip sign on 38/198 traces. The conclusion is unchanged though weaker under
+the surface-only anchor (drift $\beta = -0.020$ $[-0.044, 0.003]$,
+$p = 0.097$): the anchor changes traces, not the finding.
 
 
 \section{Limitations and Conclusion}
-\textbf{A harness trap worth naming.} Under too small a token budget, a
-reasoning model's logged ``questions'' are truncated chain-of-thought fragments
-to which every Oracle reply is ``irrelevant''; from the transcript this is
-indistinguishable from an agent that cannot form a question, so decoding
-configuration is part of the environment.
-
-
-\textbf{Limitations.} The anchor is not yet human-derived
+\textbf{Limitations.} Truncated chain-of-thought under a tight token budget
+masquerades as an agent that cannot form a question (\S5.2, \S5.3); decoding
+configuration is part of the environment. The anchor is not yet human-derived
 (\S\ref{sec:framework}), so H2's framing is descriptive until SWOW norms or
-collected human traces are in place; we do not equate human-unlike with wrong.
-Keyword extraction and encoders are themselves models; feedback incorporation,
-the most direct coordinate for separating circling from abandoning, is
-definable but unmeasured. The source site is public,
-so memorisation probes are required: the two puzzles rated easiest are also
-the two most widely circulated. Puzzles involve death and dark themes;
-content-flagged.
+human traces are in place. Keyword extraction and encoders are
+themselves models, and feedback incorporation, the most direct separator of
+circling from abandoning, is unmeasured. One DeepSeek model serves as both
+Oracle and logic judge (a cross-family judge check is pending), and the tiers
+confound generation and architecture, so tier effects are model comparisons,
+not scaling laws. The source site is public and memorisation probes are pending (the
+easiest-rated puzzles are the most circulated; nothing rests on the n.s.\
+covariate). Puzzles involve death and dark themes; content-flagged.
 
-\textbf{Conclusion.} Turtle Soup turns hypothesis-space search into observable
-text, and trajectory geometry turns that text into behavioral signatures. An
-endpoint score projects the whole search onto one number, discarding exactly
-what improving an interactive agent requires: circling and abandoning agents
-need opposite interventions, and only the trajectory tells you which you have.
+\textbf{Conclusion.} An endpoint score projects a whole search onto one
+number; circling and abandoning need opposite interventions, and the
+trajectory tells them apart.
 
 \begin{thebibliography}{9}\small
 \bibitem{turtlebench} Q.~Yu \emph{et al.} TurtleBench: Evaluating Top Language Models via Real-World Yes/No Puzzles. arXiv:2410.05262.
@@ -417,11 +430,48 @@ floor on how short an annotated clue may be. Below that floor only a verbatim
 match counts, and the score reads vocabulary rather than content. Clues are
 annotated above the floor.
 
-\textbf{Does the logic half earn its thirty points?} On the full grid, yes: the
-two halves dissociate for every model (\S\ref{sec:results}), with each model
-earning a several-fold larger share of the logic half than of the clue half. If
-the two rankings had agreed, clue recall alone would have been the cleaner scale;
-they do not.
+\textbf{Does the logic half earn its thirty points?} On the full grid, yes:
+each model earns a several-fold larger share of the logic half than of the
+clue half, and the halves correlate only weakly per game (Spearman
+$\rho = 0.30 / 0.35 / 0.06$ for 397B / 27B / 4B over 396 E2 games each). The
+70/30 weighting itself is a design choice; every conclusion in
+\S\ref{sec:results} is readable from the two halves separately, though the
+absolute plateau level (${\sim}0.2$) does depend on the weights. The logic
+judge is sampled twice per rating at temperature 0.2; the two samples agree
+exactly in 86\% of ratings.
+
+\textbf{Environment settings and Oracle audit.} Every model call uses
+max\_tokens 2048 (thinking disabled, temperature 0.2) with a per-game budget
+of 50{,}000 tokens; exhausting the game budget forces a final answer and is
+recorded as the game outcome \texttt{token\_budget}. The Oracle audit probes a
+candidate with 25 hand-crafted (question, expected-answer) pairs over three
+puzzles, 21 with a definite yes/no answer and 4 expecting ``irrelevant''; the
+pass bar is 90\% on the yes/no items. The deployed DeepSeek-V3.1 scored 20/21
+(95\%) on yes/no and 3/4 exact on ``irrelevant''. Candidates measured in the
+pilot phase: a 4B Oracle with thinking disabled, 30\% (rejected; this is the
+configuration behind abstract finding 4, where raising Oracle accuracy from
+30\% to 100\% left the 4B Questioner's score unchanged); the same model with
+thinking enabled, 70\% (rejected); a same-family flash model, 90\% (excluded
+for sharing the Questioners' family); GLM-5.3-flash, 100\% (used in earlier
+tooling).
+
+\textbf{Trajectory and difficulty pipeline.} Keywords are extracted with
+jieba after stripping Latin characters and digits; each keyword is embedded
+with bge-small-zh-v1.5 (normalized), and the round vector is the re-normalized
+mean of its keyword embeddings. All distances are cosine. The solution-aware
+anchor embeds the puzzle's surface, solution, and clue terms; the surface-only
+anchor embeds surface terms alone. The under-determination measure prompts
+GLM-5.3-flash (cross-family with all Questioners) for twelve cold guesses from
+the surface and scores closeness as embedding similarity between guess and
+solution under the same encoder, not with the composite score, so the
+covariate is not coupled to the outcome apparatus.
+
+\textbf{Artifacts.} Harness, puzzle set with per-item source records, per-game
+logs (including every checkpoint story), and the analysis scripts behind each
+reported number are released at
+\texttt{github.com/RainyFields/Project\_Turtle\_Soup}. Puzzle surfaces and
+solutions originate from a public community repertoire and are redistributed
+with source attribution and a content flag.
 
 \textbf{Where the accuracy curve comes from.} E1 does not score once at the end.
 Every round, after the Oracle answers, the Questioner is required to commit its
@@ -429,30 +479,37 @@ best complete story, and \emph{that} is scored. Each point on the accuracy
 curve is therefore a full answer written with the evidence available at that
 round.
 
-\textbf{One game, worked.} Puzzle \texttt{refsoup\_021} (surface: a stormy night, a
-run-down temple, two photographs on the wall that seem to stare; by morning the
-narrator sees only two windows; solution:
-墙上根本没有照片，是有人贴着窗户往里看), played by Qwen3.5-397B, seed~2.
-Table~\ref{tab:game} shows six of thirty rounds; every cell is verbatim from the
-log, stories abridged to the clause carrying the hypothesis.
+\textbf{One game, worked.} Puzzle \texttt{refsoup\_021} (surface: a stormy
+night, a run-down temple, two photographs on the wall that seem to stare; by
+morning the narrator sees only two windows; solution:
+墙上根本没有照片，是有人贴着窗户往里看, ``there were never photos on the
+wall; people were pressing against the windows, looking in''), played by
+Qwen3.5-397B, seed~2. Table~\ref{tab:game} shows seven of thirty rounds;
+Chinese cells are verbatim from the log with our translations, stories
+abridged to the clause carrying the hypothesis. Rounds 22--30, eight
+lexically distinct re-asks of the same flooding hypothesis (e.g.\ round 25,
+whether the narrator woke floating upside down; round 28, whether rising
+water reached eye level), are in the released logs.
 
 \begin{table}[h]
-\centering\small
-\begin{tabular}{@{}c p{4.2cm} c p{5.2cm} c@{}}
+\centering\footnotesize
+\begin{tabular}{@{}c p{4.6cm} c p{5.6cm} c@{}}
 \toprule
-轮 & Question (abridged) & 答 & Committed story (abridged) & score (clue$+$logic) \\
+Rd & Question (abridged) & Ans. & Committed story (abridged) & score (clue$+$logic) \\
 \midrule
-1 & 照片里的是人吗？ & 是 & 那两张“照片”……是两个被钉死或封在墙洞里的人 & 0.12 (0$+$12) \\
-3 & 主角第二天醒来时，还在那座寺庙里吗？ & 是 & 所谓的“两张照片”其实是两扇窗户……昏暗光线下……误看成了照片 & 0.91 (70$+$21) \\
-10 & “两扇窗户”是因为相框玻璃破碎脱落、变成通透的洞口吗？ & 不是 & 那根本不是照片，而是……躲在窗户后面（或贴在窗玻璃外侧）的人脸 & \textbf{1.00} (70$+$30) \\
-11 & 是因为照片被取走、露出了后面原本就存在的窗户吗？ & 不是 & 昨晚“盯着他的人像”，其实是\textbf{窗外的人} & \textbf{1.00} (70$+$30) \\
-19 & 照片里的人像实际上是躲在照片后面的真人吗？ & 不是 & 窗户洞口被画着人像的布帘封住……雷雨导致遮挡物脱落 & 0.12 (0$+$12) \\
-30 & 是因为积水使主角身体位置升高吗？ & 不是 & 两个被纸糊住的窗户洞口……雷雨导致纸张脱落 & 0.12 (0$+$12) \\
+1 & 照片里的是人吗？ \emph{Are the ones in the photos people?} & 是 \emph{yes} & 那两张“照片”……是两个被钉死或封在墙洞里的人 \emph{The two ``photos'' are two people nailed or sealed into wall niches.} & 0.12 (0$+$12) \\
+3 & 主角第二天醒来时，还在那座寺庙里吗？ \emph{On waking the next day, is he still in the temple?} & 是 \emph{yes} & 所谓的“两张照片”其实是两扇窗户……误看成了照片 \emph{The ``two photos'' are really two windows, mistaken for photos in the dim light.} & 0.91 (70$+$21) \\
+4 & 醒来看到的“两扇窗户”就是昨晚的“两张照片”吗？ \emph{Are the ``two windows'' the same objects as last night's ``photos''?} & 是 \emph{yes} & “照片”实际上是两个被挖空的人形窗口……恐惧感源于黑夜和错觉 \emph{The ``photos'' were hollowed-out window openings; the fear came from darkness and illusion.} & 0.12 (0$+$12) \\
+10 & “两扇窗户”是因为相框玻璃破碎脱落吗？ \emph{Did frame glass break and fall, leaving open holes?} & 不是 \emph{no} & 那根本不是照片，而是……贴在窗玻璃外侧的人脸 \emph{They were never photos, but faces pressed against the outside of the windows.} & \textbf{1.00} (70$+$30) \\
+11 & 是因为照片被取走、露出了后面的窗户吗？ \emph{Were the photos removed, revealing windows behind?} & 不是 \emph{no} & 昨晚“盯着他的人像”，其实是\textbf{窗外的人} \emph{The staring figures were people outside the windows.} & \textbf{1.00} (70$+$30) \\
+19 & 人像是躲在照片后面的真人吗？ \emph{Were real people hiding behind the photos?} & 不是 \emph{no} & 窗户洞口被画着人像的布帘封住……雷雨导致脱落 \emph{Window openings sealed by painted cloth covers; the storm tore them off.} & 0.12 (0$+$12) \\
+30 & 是因为积水使主角身体位置升高吗？ \emph{Did rising water lift the narrator higher?} & 不是 \emph{no} & 两个被纸糊住的窗户洞口……雷雨导致纸张脱落 \emph{Papered-over window openings; the storm stripped the paper away.} & 0.12 (0$+$12) \\
 \bottomrule
 \end{tabular}
-\caption{Six rounds of one E1 game (\texttt{refsoup\_021}, Qwen3.5-397B, seed 2):
-the Questioner's question, the Oracle's answer, the story the agent was forced to
-commit that round, and its composite score.}
+\caption{Seven rounds of one E1 game (\texttt{refsoup\_021}, Qwen3.5-397B,
+seed 2): the Questioner's question, the Oracle's answer, the story the agent
+was forced to commit that round, and its composite score. Italics are our
+translations.}
 \label{tab:game}
 \end{table}
 

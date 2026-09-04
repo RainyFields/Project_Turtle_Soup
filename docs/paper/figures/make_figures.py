@@ -90,7 +90,7 @@ def save(fig, stem):
 
 def fig1():
     curves, retention = load_e1()
-    fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(5.6, 2.25))
+    fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(5.2, 1.7))
 
     for m in MODELS:
         rounds = sorted(curves[m])
@@ -102,7 +102,7 @@ def fig1():
                           color=COLORS[m], alpha=0.18, lw=0)
         ax_a.plot(rounds, mean, color=COLORS[m], lw=1.4)
         # Dodge the 27B/397B end labels: their final means sit 0.026 apart.
-        dodge = {"Qwen3.5-4B": 0, "Qwen3.6-27B": -4, "Qwen3.5-397B": 8}[m]
+        dodge = {"Qwen3.5-4B": 0, "Qwen3.6-27B": 0, "Qwen3.5-397B": 8}[m]
         ax_a.annotate(LABELS[m], xy=(rounds[-1], mean[-1]),
                       xytext=(3, dodge), textcoords="offset points",
                       va="center", color=COLORS[m], fontsize=7)
@@ -128,12 +128,12 @@ def fig1():
     ax_b.set_ylim(0, lim)
     ax_b.set_xlabel("Sustained peak (best held 2 rounds)")
     ax_b.set_ylabel("Final-round score")
-    ax_b.set_title("Models keep ~0.7 of what they find", pad=3)
+    ax_b.set_title("Final score vs sustained peak", pad=3)
     ax_b.legend(loc="upper left", handletextpad=0.1, borderaxespad=0.2,
                 labelspacing=0.2)
 
     for ax, lab in ((ax_a, "a"), (ax_b, "b")):
-        ax.text(-0.18, 1.06, lab, transform=ax.transAxes,
+        ax.text(-0.24, 1.06, lab, transform=ax.transAxes,
                 fontsize=9, fontweight="bold", va="bottom")
     fig.tight_layout(w_pad=2.2)
     save(fig, "fig1_flatness")
@@ -145,25 +145,27 @@ def fig2():
     for t in traces:
         by[t["label"]].append(t)
 
-    fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(5.6, 2.25))
+    fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(5.2, 1.7))
     for m in MODELS:
         ts = by[m]
         ax_a.scatter([t["mean_step"] for t in ts], [t["best_acc"] for t in ts],
-                     s=9, color=COLORS[m], alpha=0.75, lw=0, label=LABELS[m])
+                     s=7, color=COLORS[m], alpha=0.75, lw=0, label=LABELS[m])
         ax_b.scatter([t["human_dist_slope"] for t in ts], [t["best_acc"] for t in ts],
-                     s=9, color=COLORS[m], alpha=0.75, lw=0)
+                     s=7, color=COLORS[m], alpha=0.75, lw=0)
     ax_a.set_xlabel(r"Mean stride $\bar{s}$")
-    ax_a.set_ylabel("Best checkpoint accuracy")
-    ax_a.set_title("Circling: small model, small strides", pad=3)
+    ax_a.set_ylabel("Best accuracy")
+    ax_a.set_title("Stride regimes separate models", pad=3)
     ax_a.legend(loc="upper right", handletextpad=0.1, borderaxespad=0.2,
                 labelspacing=0.2)
     ax_b.axvline(0.0, color="0.55", lw=0.8, ls=(0, (4, 2)))
-    ax_b.set_xlabel(r"Drift slope $dh/dt$")
-    ax_b.set_ylabel("Best checkpoint accuracy")
-    ax_b.set_title("Drift barely appears at any scale", pad=3)
+    lim_b = 0.055
+    ax_b.set_xlim(-lim_b, lim_b)
+    ax_b.set_xlabel(r"Drift slope $dh/dt$ (solution-aware anchor)")
+    ax_b.set_ylabel("Best accuracy")
+    ax_b.set_title("Drift slopes cluster near zero", pad=3)
     for ax, lab in ((ax_a, "a"), (ax_b, "b")):
         ax.set_ylim(0, 1.05)
-        ax.text(-0.18, 1.06, lab, transform=ax.transAxes,
+        ax.text(-0.24, 1.06, lab, transform=ax.transAxes,
                 fontsize=9, fontweight="bold", va="bottom")
     fig.tight_layout(w_pad=2.2)
     save(fig, "fig2_geometry")

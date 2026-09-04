@@ -1,0 +1,350 @@
+{
+ "retention": {
+  "Qwen3.5-397B": {
+   "n": 66,
+   "n_nonzero_peak": 66,
+   "retention_mean_of_ratios": 0.734,
+   "retention_ci95": [
+    0.647,
+    0.819
+   ],
+   "retention_ratio_of_means": 0.643,
+   "null_mean_retention": 0.796,
+   "null_ci95": [
+    0.672,
+    0.979
+   ],
+   "p_observed_at_or_below_null": 0.2345,
+   "retention_excl_committed": 0.703
+  },
+  "Qwen3.5-4B": {
+   "n": 66,
+   "n_nonzero_peak": 66,
+   "retention_mean_of_ratios": 0.761,
+   "retention_ci95": [
+    0.643,
+    0.897
+   ],
+   "retention_ratio_of_means": 0.598,
+   "null_mean_retention": 0.844,
+   "null_ci95": [
+    0.699,
+    1.046
+   ],
+   "p_observed_at_or_below_null": 0.1715,
+   "retention_excl_committed": 0.765
+  },
+  "Qwen3.6-27B": {
+   "n": 66,
+   "n_nonzero_peak": 66,
+   "retention_mean_of_ratios": 0.687,
+   "retention_ci95": [
+    0.608,
+    0.762
+   ],
+   "retention_ratio_of_means": 0.686,
+   "null_mean_retention": 0.787,
+   "null_ci95": [
+    0.658,
+    0.988
+   ],
+   "p_observed_at_or_below_null": 0.088,
+   "retention_excl_committed": 0.666
+  }
+ },
+ "wellformed": {
+  "Qwen3.5-397B": {
+   "rounds": 1838,
+   "wellformed": 1827,
+   "frac": 0.994
+  },
+  "Qwen3.5-4B": {
+   "rounds": 1967,
+   "wellformed": 1632,
+   "frac": 0.8297
+  },
+  "Qwen3.6-27B": {
+   "rounds": 1772,
+   "wellformed": 1753,
+   "frac": 0.9893
+  }
+ },
+ "e2_conditional": {
+  "Qwen3.5-397B": {
+   "5": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.186,
+    "mean_nonexhausted": 0.186
+   },
+   "10": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.185,
+    "mean_nonexhausted": 0.185
+   },
+   "15": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.206,
+    "mean_nonexhausted": 0.206
+   },
+   "20": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.209,
+    "mean_nonexhausted": 0.209
+   },
+   "25": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.197,
+    "mean_nonexhausted": 0.197
+   },
+   "30": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.201,
+    "mean_nonexhausted": 0.201
+   }
+  },
+  "Qwen3.5-4B": {
+   "5": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.05,
+    "mean_nonexhausted": 0.05
+   },
+   "10": {
+    "n": 66,
+    "exhausted": 4,
+    "mean_all": 0.05,
+    "mean_nonexhausted": 0.053
+   },
+   "15": {
+    "n": 66,
+    "exhausted": 13,
+    "mean_all": 0.041,
+    "mean_nonexhausted": 0.051
+   },
+   "20": {
+    "n": 66,
+    "exhausted": 44,
+    "mean_all": 0.02,
+    "mean_nonexhausted": 0.06
+   },
+   "25": {
+    "n": 66,
+    "exhausted": 51,
+    "mean_all": 0.02,
+    "mean_nonexhausted": 0.089
+   },
+   "30": {
+    "n": 66,
+    "exhausted": 63,
+    "mean_all": 0.004,
+    "mean_nonexhausted": 0.09
+   }
+  },
+  "Qwen3.6-27B": {
+   "5": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.167,
+    "mean_nonexhausted": 0.167
+   },
+   "10": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.184,
+    "mean_nonexhausted": 0.184
+   },
+   "15": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.14,
+    "mean_nonexhausted": 0.14
+   },
+   "20": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.172,
+    "mean_nonexhausted": 0.172
+   },
+   "25": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.176,
+    "mean_nonexhausted": 0.176
+   },
+   "30": {
+    "n": 66,
+    "exhausted": 2,
+    "mean_all": 0.176,
+    "mean_nonexhausted": 0.181
+   }
+  }
+ },
+ "e1_vs_e2": {
+  "Qwen3.5-397B": {
+   "5": {
+    "e1_checkpoint_mean": 0.189,
+    "e2_cap_final_mean": 0.186,
+    "e2_cap_final_nonexhausted": 0.186
+   },
+   "10": {
+    "e1_checkpoint_mean": 0.2,
+    "e2_cap_final_mean": 0.185,
+    "e2_cap_final_nonexhausted": 0.185
+   },
+   "15": {
+    "e1_checkpoint_mean": 0.201,
+    "e2_cap_final_mean": 0.206,
+    "e2_cap_final_nonexhausted": 0.206
+   },
+   "20": {
+    "e1_checkpoint_mean": 0.178,
+    "e2_cap_final_mean": 0.209,
+    "e2_cap_final_nonexhausted": 0.209
+   },
+   "25": {
+    "e1_checkpoint_mean": 0.19,
+    "e2_cap_final_mean": 0.197,
+    "e2_cap_final_nonexhausted": 0.197
+   },
+   "30": {
+    "e1_checkpoint_mean": 0.191,
+    "e2_cap_final_mean": 0.201,
+    "e2_cap_final_nonexhausted": 0.201
+   }
+  },
+  "Qwen3.5-4B": {
+   "5": {
+    "e1_checkpoint_mean": 0.053,
+    "e2_cap_final_mean": 0.05,
+    "e2_cap_final_nonexhausted": 0.05
+   },
+   "10": {
+    "e1_checkpoint_mean": 0.063,
+    "e2_cap_final_mean": 0.05,
+    "e2_cap_final_nonexhausted": 0.053
+   },
+   "15": {
+    "e1_checkpoint_mean": 0.053,
+    "e2_cap_final_mean": 0.041,
+    "e2_cap_final_nonexhausted": 0.051
+   },
+   "20": {
+    "e1_checkpoint_mean": 0.064,
+    "e2_cap_final_mean": 0.02,
+    "e2_cap_final_nonexhausted": 0.06
+   },
+   "25": {
+    "e1_checkpoint_mean": 0.053,
+    "e2_cap_final_mean": 0.02,
+    "e2_cap_final_nonexhausted": 0.089
+   },
+   "30": {
+    "e1_checkpoint_mean": 0.05,
+    "e2_cap_final_mean": 0.004,
+    "e2_cap_final_nonexhausted": 0.09
+   }
+  },
+  "Qwen3.6-27B": {
+   "5": {
+    "e1_checkpoint_mean": 0.18,
+    "e2_cap_final_mean": 0.167,
+    "e2_cap_final_nonexhausted": 0.167
+   },
+   "10": {
+    "e1_checkpoint_mean": 0.162,
+    "e2_cap_final_mean": 0.184,
+    "e2_cap_final_nonexhausted": 0.184
+   },
+   "15": {
+    "e1_checkpoint_mean": 0.167,
+    "e2_cap_final_mean": 0.14,
+    "e2_cap_final_nonexhausted": 0.14
+   },
+   "20": {
+    "e1_checkpoint_mean": 0.159,
+    "e2_cap_final_mean": 0.172,
+    "e2_cap_final_nonexhausted": 0.172
+   },
+   "25": {
+    "e1_checkpoint_mean": 0.177,
+    "e2_cap_final_mean": 0.176,
+    "e2_cap_final_nonexhausted": 0.176
+   },
+   "30": {
+    "e1_checkpoint_mean": 0.165,
+    "e2_cap_final_mean": 0.176,
+    "e2_cap_final_nonexhausted": 0.181
+   }
+  }
+ },
+ "mixed_model": {
+  "stride_main": {
+   "coef": -0.0102,
+   "ci95": [
+    -0.0349,
+    0.0145
+   ],
+   "lrt_p": 0.4197
+  },
+  "drift_main": {
+   "coef": -0.0107,
+   "ci95": [
+    -0.035,
+    0.0137
+   ],
+   "lrt_p": 0.3913
+  },
+  "surface_drift_main": {
+   "coef": -0.0202,
+   "ci95": [
+    -0.044,
+    0.0035
+   ],
+   "lrt_p": 0.0965
+  },
+  "spec": "response = best checkpoint accuracy per game; Gaussian LMM, puzzle random intercept, tier fixed effect, ML fits, LRTs"
+ },
+ "subscores": {
+  "Qwen3.5-397B": {
+   "n": 396,
+   "spearman": 0.3,
+   "p": 0.0
+  },
+  "Qwen3.5-4B": {
+   "n": 396,
+   "spearman": 0.062,
+   "p": 0.21808
+  },
+  "Qwen3.6-27B": {
+   "n": 396,
+   "spearman": 0.354,
+   "p": 0.0
+  },
+  "judge_intersample_mean_absdiff_of30": 0.03,
+  "judge_intersample_exact_agreement": 0.863
+ },
+ "stride_artifact_check": {
+  "method": "exact trace_geometry pipeline (jieba keywords -> bge-small-zh-v1.5 -> normalized mean round vector -> cosine stride); rounds filtered to well-formed questions (ends with question mark or interrogative pattern in last 25 chars)",
+  "Qwen3.5-4B": {
+   "mean_stride_unfiltered": 0.0493,
+   "mean_stride_wellformed_only": 0.0555,
+   "late_third_unfiltered": 0.0276,
+   "late_third_wellformed_only": 0.0287,
+   "malformed_frac": 0.17
+  },
+  "Qwen3.6-27B": {
+   "mean_stride_unfiltered": 0.1135,
+   "mean_stride_wellformed_only": 0.1184,
+   "late_third_unfiltered": 0.071,
+   "late_third_wellformed_only": 0.0812,
+   "malformed_frac": 0.011
+  },
+  "verdict": "circling signature survives exclusion of malformed rounds"
+ }
+}
