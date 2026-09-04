@@ -75,7 +75,7 @@ python scripts/run_real_timing.py \
   - `round_studies.py` 走 `JudgeSpec(mode="composite", provider=..., model=...)`；
     不给 provider 则只算关键词 70 分（满分 0.70）。
     ⚠️ **网格里 E1 和 E2 现已统一都开逻辑分** —— 否则两条曲线标度不同却被并排讨论
-- [ ] 全量网格 —— 见「下一阶段 → 怎么跑」（22 道 × 模型 × seed）
+- [x] 全量网格 —— **2026-09-04 完成**，见「执行状态（2026-09-04）」
 - [ ] 可选：Exp 1 每 5 轮 checkpoint（降低 checkpoint 调用量）
 
 ---
@@ -108,6 +108,25 @@ python scripts/run_real_timing.py \
 - ✅ 决策 5：**Figure 1 用 pilot 数据先做**
 - ✅ 新要求：**最终交付 PDF**（本机已有 tectonic，走 LaTeX；官方 pdf skill 已装）
 - ⏳ 决策 1（故事侧重）、3（中文联想 norms）、4（标题）仍待反馈
+
+## 执行状态（2026-09-04）—— 新题集全量网格已完成
+
+- **9/9 shard 零失败**：22 题 × {Qwen3.5-4B, Qwen3.6-27B, Qwen3.5-397B-A17B} × 3 seeds，
+  E1（30 轮 checkpoint）+ E2（6 cap），全走 Tinker（Oracle/裁判 = DeepSeek-V3.1，跨家族）。
+  并行 9 shard，总墙钟 ~8h；输出 `results/grid_2026_09/`（gitignored，45MB，逐轮
+  qa_rounds/step/anchor 距离齐备，score_detail 含 key_clue/logic 两半）。
+- **E1**：增益只在前 ~10 轮且只属大模型（397B 0.124→0.200，27B 0.117→0.162，之后平坦）；
+  4B 全程平坦 ~0.05–0.06。
+- **E2**：397B/27B 对预算不敏感（~0.14–0.21）；4B 单调退化 0.050→0.004
+  （175/396 局 token_budget 终止）。
+- **子分**：所有模型逻辑分占比远高于线索分（397B 12.6/30 vs 7.2/70；4B 2.9/30 vs 0.2/70）
+  —— 两半明显测不同东西，单题 ρ=1.000 的 pilot 结论不成立，逻辑分应保留。
+- **E3/H3（`h3_mixed_effects.json`，n=198）**：负结果复现 —— drift LRT p=0.39，
+  stride×tier p=0.20；**欠定度协变量不显著**（coef −0.031，p=0.22，只吸收 ~8% puzzle 方差）
+  → puzzle 随机效应不只是难度，保持「解释性仪器而非预测器」框架（回答开放问题 1）。
+- 图已重生成：`fig_e1_curves.png` / `fig_e2_caps.png` / `fig_e3_scatter.png`（英文标注，全量程纵轴）。
+- **下一步**：按 2026-09-03 作者要求（只报最重要结论）由 `iab2026-draft.md` 回填 §5，
+  再由 md 重生成 tex/PDF。
 
 ## 执行状态（2026-08-26）
 

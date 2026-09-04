@@ -47,10 +47,17 @@ def main() -> int:
     ].std()
     print(f"n={len(df)} traces, {df['puzzle_id'].nunique()} puzzles, tiers: {sorted(df['tier'].unique())}")
 
+    # Puzzle-level covariate: does under-determination explain what the puzzle
+    # random intercept was standing in for? (plan.md: §5.3 的缺口)
+    dims = json.loads((ROOT / "data/puzzles/dimensions.json").read_text())
+    df["underdet"] = df["puzzle_id"].map(lambda p: dims[p]["under_determination"])
+    df["z_underdet"] = (df["underdet"] - df["underdet"].mean()) / df["underdet"].std()
+
     kw = dict(groups=df["puzzle_id"], data=df)
     m0 = smf.mixedlm("best_acc ~ C(tier)", **kw).fit(reml=False)
     m1 = smf.mixedlm("best_acc ~ C(tier) + z_hslope", **kw).fit(reml=False)
     m2 = smf.mixedlm("best_acc ~ C(tier) + z_hslope + z_step:C(tier)", **kw).fit(reml=False)
+    m3 = smf.mixedlm("best_acc ~ C(tier) + z_underdet", **kw).fit(reml=False)
 
     out = {
         "n": len(df),
@@ -61,6 +68,13 @@ def main() -> int:
         },
         "lrt_M0_vs_M1_drift": lrt(m0, m1),
         "lrt_M1_vs_M2_stride_x_tier": lrt(m1, m2),
+        "lrt_M0_vs_M3_underdet": lrt(m0, m3),
+        "m3_underdet": {
+            "coef": round(float(m3.params["z_underdet"]), 4),
+            "p": round(float(m3.pvalues["z_underdet"]), 5),
+            "puzzle_var_M0": round(float(m0.cov_re.iloc[0, 0]), 5),
+            "puzzle_var_M3": round(float(m3.cov_re.iloc[0, 0]), 5),
+        },
         "m2_fixed_effects": {
             k: {"coef": round(float(v), 4), "p": round(float(m2.pvalues[k]), 5)}
             for k, v in m2.params.items()
