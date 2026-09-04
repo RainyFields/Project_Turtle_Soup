@@ -40,7 +40,7 @@
 \vspace{-1.4em}
 
 \begin{abstract}
-\noindent Give a language-model agent thirty rounds of yes/no questions to crack a
+\small\noindent Give a language-model agent thirty rounds of yes/no questions to crack a
 lateral-thinking puzzle and it does not keep getting better: on 22 human-played
 Turtle Soup puzzles, checkpoint accuracy improves only in the first ten rounds and
 only at scale (Qwen3.5-397B $0.12 \to 0.20$, then flat; a 4B model stays at $0.05$
@@ -53,14 +53,12 @@ $0.082$) and it volunteers a final story in 2 of 66 games --- while larger model
 stride twice as far, bank their gains early, and then stop converting exploration
 into accuracy. We are equally plain about what the geometry does not do: within
 puzzles, mixed-effects models find no predictive power for stride or drift (LRT
-$p \geq 0.20$), a conclusion unchanged under a surface-only anchor, so we claim
-trajectory geometry as an interpretive instrument, not a score predictor. A
-pre-experiment lesson rounds out the method: an unaudited Oracle collapses
-questions to ``irrelevant'' and makes every game unwinnable, so agent claims begin
-with an information audit of the environment. We release the harness, the
-provenance-enforced puzzle set with an under-determination difficulty measure, and
-a composite score whose clue-recall and causal-logic halves demonstrably measure
-different competences.
+$p \geq 0.20$), unchanged under a surface-only anchor---an interpretive
+instrument, not a score predictor. One pre-experiment lesson: an unaudited Oracle
+collapses questions to ``irrelevant,'' making every game unwinnable, so agent
+claims begin with an information audit of the environment. We release the harness,
+the provenance-enforced puzzle set with an under-determination difficulty measure,
+and a two-part score whose halves demonstrably measure different competences.
 \end{abstract}
 
 \section{Introduction}
@@ -71,39 +69,31 @@ passengers threw out their luggage and still could not stay up, so they drew lot
 with matchsticks---and the man who drew the short one was thrown out. The solver
 recovers this by asking yes/no questions, one per round.
 
-Outcome metrics can say whether an agent got there. They cannot say how it
-searched. Two agents scoring $0.0$ on the same puzzle may be failing in opposite
-ways: one never leaves its first hypothesis, the other leaves the plausible region
-entirely. Telling them apart requires instruments that read the process, and that
-is this paper's contribution.
+Outcome metrics can say whether an agent got there---and on our verified set that
+story is flat: accuracy rises only in the first ten of thirty rounds, only for the
+larger models, and twenty further rounds buy nothing at any scale we tested
+(\S\ref{sec:results}). What outcome metrics cannot say is how the agent searched.
+Two agents scoring $0.0$ on the same puzzle may be failing in opposite ways: one
+never leaves its first hypothesis, the other leaves the plausible region entirely.
+Telling them apart requires instruments that read the process, and that is this
+paper's contribution.
 
-On the verified set this flatness is now established (\S\ref{sec:results}):
-checkpoint accuracy rises only in the first ten of thirty rounds and only for the
-larger models, the smallest model never improves at all, and twenty further rounds
-of evidence buy nothing at any scale we tested.
-
-\textbf{Why Turtle Soup.} Three properties make it a good behavioral microscope.
-The questioning protocol is a naturally verbalized search trace---no probing or
-activation access needed, the behavior \emph{is} text. Puzzles are deliberately
-under-determined, so the direction of each associative jump is diagnostic. And
-games are short, language-only, and cheap to run at scale.
-
-\textbf{The gap.} Prior turtle-soup benchmarks score verification correctness,
-solve efficiency, or consistency with the single intended story~\cite{turtlebench,splat,tsbench}.
-None interprets the search behavior itself.
+\textbf{Why Turtle Soup.} The questioning protocol is a naturally verbalized
+search trace---no probing or activation access needed, the behavior \emph{is}
+text; puzzles are deliberately under-determined, so the direction of each
+associative jump is diagnostic; and games are short, language-only, and cheap to
+run at scale.
 
 \textbf{Central hypothesis.} An agent's per-round questions, embedded in a semantic
 space, form a trajectory whose geometry explains success and failure.
 \begin{itemize}
-\item \textbf{H1 (stalling).} An agent that cannot leave a hypothesis basin shows
-step size going to zero: successive questions are semantically near-identical.
-Lexical novelty heuristics catch only the verbatim extreme of this.
-\item \textbf{H2 (drifting).} An agent that explores in directions no human path
-takes shows normal step size but growing distance from the anchor. Lexical novelty
-misses this entirely, because synonym-shuffled re-asks look new.
+\item \textbf{H1 (stalling).} An agent stuck in a hypothesis basin shows step size
+going to zero; lexical novelty heuristics catch only the verbatim extreme of this.
+\item \textbf{H2 (drifting).} An agent exploring where no human path goes shows
+normal step size but growing anchor distance---invisible to lexical novelty,
+because synonym-shuffled re-asks look new.
 \item \textbf{H3 (predictivity).} Trajectory features predict final solve quality
-beyond outcome-adjacent covariates, and the two failure modes have distinct
-signatures.
+beyond outcome-adjacent covariates.
 \end{itemize}
 
 \textbf{Contributions.} (1)~The flatness result---interaction length buys accuracy
@@ -113,26 +103,21 @@ framework separating stalling from unbanked exploration, with an honest account 
 what it does and does not predict. (3)~An open-source harness, a \textbf{22-puzzle
 set restricted to puzzles humans have played and solved}, and a composite score
 decoupling clue recall from judged causal logic. (4)~A puzzle-level difficulty
-measure, \textbf{under-determination}, independent of rounds used---so it can group
-an accuracy-versus-rounds analysis without the grouping variable and the axis being
-the same quantity.
+measure, \textbf{under-determination}, independent of rounds used---so it can
+group an accuracy-versus-rounds analysis without circularity.
 
 \section{Related Work}\label{sec:rw}
-TurtleBench~\cite{turtlebench} collects 1{,}532 real user guesses and evaluates
-models as yes/no judges---verification, not exploration. SPLAT~\cite{splat}
-introduces 975 graded puzzles and the interactive player--judge protocol we adopt.
-TurtleSoup-Bench~\cite{tsbench} frames 800 bilingual puzzles with multi-dimensional
-scoring, still rewarding faithfulness to the single intended story. All three score
-the destination; we score the trajectory.
-
-MUTATE~\cite{mutate} shows frontier agents find far fewer mechanism-distinct paths
-than humans; its diverge-then-narrow agent is a natural intervention to test against
-our metrics. Our instrument adapts two ideas from human psychometrics: forward
-flow~\cite{forwardflow}, which measures how far free-association chains travel and
-predicts creativity, and the Divergent Association Task~\cite{dat}, where semantic
-distance among generated words is itself the measure. The Small World of Words
-norms~\cite{swow} would supply an empirical human anchor---\S\ref{sec:framework}
-says why ours is not yet that. Judge-bias catalogues~\cite{calm,posbias} shape our
+Existing turtle-soup benchmarks---TurtleBench~\cite{turtlebench},
+SPLAT~\cite{splat} (whose interactive player--judge protocol we adopt), and
+TurtleSoup-Bench~\cite{tsbench}---score verification accuracy, solve efficiency,
+or faithfulness to the intended story: the destination, where we score the
+trajectory. MUTATE~\cite{mutate} shows frontier agents find far fewer
+mechanism-distinct paths than humans; its diverge-then-narrow agent is a natural
+intervention to test against our metrics. The instrument itself adapts forward
+flow~\cite{forwardflow} and the Divergent Association Task~\cite{dat} from human
+psychometrics---semantic travel as a measure---with the Small World of Words
+norms~\cite{swow} as the human anchor ours is not yet
+(\S\ref{sec:framework}). Judge-bias catalogues~\cite{calm,posbias} shape the
 scoring: the model judge is confined to the one subscore objective matching cannot
 reach.
 
@@ -176,13 +161,11 @@ $\bar{s}$ with $h_t$ rising. The lexical \texttt{question\_novelty} metric is ke
 the ablation baseline H2 predicts will miss synonym-drift.
 
 \textbf{On the anchor, stated plainly.} Ours is built from the puzzle's surface,
-solution and clues. It is \textbf{not} a human association manifold and we no longer
-describe it as one. Two consequences we measured rather than papered over: a large
-share of its terms come only from the solution and clues, and clue recall is the
-outcome, so the two are partly definitionally linked; and rebuilding the anchor from
-the surface alone flips the sign of the drift slope on a substantial minority of
-traces. We report both anchors and treat a SWOW-based version~\cite{swow} as the
-correct future form.
+solution and clues---\textbf{not} a human association manifold, and we no longer
+describe it as one. Its terms overlap the clue set that defines the outcome, and
+rebuilding it from the surface alone flips the drift slope's sign on a minority of
+traces (quantified in \S\ref{sec:results}); we therefore report both anchors, and
+treat a SWOW-based version~\cite{swow} as the correct future form.
 
 \section{Experiment Designs}
 \textbf{E1 --- Round curve.} Play to 30 rounds; after each round force a checkpoint
@@ -200,12 +183,11 @@ trajectory feature does it move? And do signatures shift on puzzles admitting ma
 distinct stories versus one?
 
 \textbf{Prerequisite --- the Oracle audit.} The Oracle is the sole information
-channel, so its competence caps what any Questioner can learn. A weak one collapses
-answers to ``irrelevant''---the one reply carrying no information---after which no
-Questioner can succeed and every score measures the environment. Candidates are
-probed on held-out pairs before any agent claim, and \textbf{must come from a
-different model family than the Questioners}: otherwise a same-family Questioner's
-advantage cannot be separated from its scale.
+channel: a weak one collapses answers to ``irrelevant''---the reply carrying no
+information---after which no Questioner can succeed and every score measures the
+environment. Candidates are probed on held-out pairs before any agent claim, and
+\textbf{must come from a different model family than the Questioners}, or a
+same-family Questioner's advantage cannot be separated from its scale.
 
 \section{Results}\label{sec:results}
 All numbers come from one grid on the verified set: 22 puzzles $\times$
@@ -229,7 +211,7 @@ commits in 2/66 (round 23.5)---it neither improves nor concludes.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.9\linewidth]{figures/fig_e1_curves.png}
+\includegraphics[width=0.62\linewidth]{figures/fig_e1_curves.png}
 \caption{E1: mean checkpoint accuracy by round (22 puzzles $\times$ 3 seeds per
 model), on the full 0--1 outcome range so that flatness reads as flat. Gains exist
 only before round ${\sim}10$ and only at scale; the 4B curve never moves.}
@@ -280,7 +262,7 @@ traces, not the finding.
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=\linewidth]{figures/fig_e3_scatter.png}
+\includegraphics[width=0.78\linewidth]{figures/fig_e3_scatter.png}
 \caption{E3: per-trace geometry against best outcome ($n = 198$). Left: mean
 stride $\bar{s}$; the models separate into regimes (4B small strides and low
 scores), but within a model stride does not predict outcome. Right: drift slope
@@ -305,23 +287,21 @@ from an agent that cannot form a question. Decoding configuration is part of the
 environment.
 
 \section{Limitations and Conclusion}
-\textbf{Limitations.} The anchor is not yet human-derived (\S\ref{sec:framework}), so
-H2's framing is descriptive until SWOW norms or collected human traces are in place;
-we do not equate human-unlike with wrong. Keyword extraction and encoders are
-themselves models, audited and reported under two encoders. Feedback incorporation ---
-the coordinate that would separate stalling from unbanked exploration most directly ---
-is definable but unmeasured. Judge biases are mitigated per~\cite{calm,posbias}. The
-source site is public, so memorisation probes are required rather than optional: the
-two puzzles our difficulty measure rates easiest are the two most widely circulated,
-and the probe would separate familiarity from ease. Puzzles involve death and dark
-themes; content-flagged.
+\textbf{Limitations.} The anchor is not yet human-derived (\S\ref{sec:framework}),
+so H2's framing is descriptive until SWOW norms or collected human traces are in
+place; we do not equate human-unlike with wrong. Keyword extraction and encoders
+are themselves models; feedback incorporation---the coordinate that would separate
+stalling from unbanked exploration most directly---is definable but unmeasured.
+The source site is public, so memorisation probes are required rather than
+optional: the two puzzles our difficulty measure rates easiest are the two most
+widely circulated. Puzzles involve death and dark themes; content-flagged.
 
-\textbf{Conclusion.} Turtle Soup turns hypothesis-space search into observable text,
-and trajectory geometry turns that text into behavioral signatures. An endpoint score
-projects that whole search onto one number, and for interactive agents the projection
-destroys exactly what you need to improve them: an agent that stalls and an agent that
-explores without banking need opposite interventions. Reading the trajectory is how
-you tell which one you have.
+\textbf{Conclusion.} Turtle Soup turns hypothesis-space search into observable
+text, and trajectory geometry turns that text into behavioral signatures. An
+endpoint score projects the whole search onto one number, destroying exactly what
+improving an interactive agent requires: a stalling agent and one that explores
+without banking need opposite interventions, and reading the trajectory is how you
+tell which one you have.
 
 \begin{thebibliography}{9}\small
 \bibitem{turtlebench} Q.~Yu \emph{et al.} TurtleBench: Evaluating Top Language Models via Real-World Yes/No Puzzles. arXiv:2410.05262.
