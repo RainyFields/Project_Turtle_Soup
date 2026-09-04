@@ -32,26 +32,36 @@
 \title{\bfseries Thinking Sideways, Observed:\\ Interpreting the Lateral-Thinking Search Behavior of LLM Agents}
 \author{Xiaoxuan Lei \and (co-authors TBD)\\
 \small Draft v0.9 --- IAB: Interpreting Agent Behavior, Workshop @ NeurIPS 2026\\
-\small\color{gaprule}\textbf{Incomplete draft: shaded blocks await the re-run.}}
+\small\color{gaprule}\textbf{One shaded block remains: the worked-example game in Appendix B.}}
 \date{}
 
 \begin{document}
 \maketitle
 \vspace{-1.4em}
 
-\begin{gap}
-\small\textbf{GAP --- Abstract.} Every number in the previous abstract came from a
-puzzle set that has since been retired, and is removed rather than carried over.
-Refill after the re-run, in this order: \textbf{(1)}~the headline --- does more
-interaction buy accuracy, at any scale? \textbf{(2)}~the two failure modes, which
-is this paper's core: agents scoring the same but behaving oppositely, one
-circling a single hypothesis and never committing, the other covering real ground
-without converting it into a better story. Two concrete numbers carry this
-contrast. \textbf{(3)}~the honest negative: does the geometry predict outcome
-\emph{within} a puzzle? \textbf{(4)}~the anchor caveat: results under both
-anchors. \textbf{(5)}~one methodological line: a weak Oracle makes the task
-information-theoretically unsolvable.
-\end{gap}
+\begin{abstract}
+\noindent Give a language-model agent thirty rounds of yes/no questions to crack a
+lateral-thinking puzzle and it does not keep getting better: on 22 human-played
+Turtle Soup puzzles, checkpoint accuracy improves only in the first ten rounds and
+only at scale (Qwen3.5-397B $0.12 \to 0.20$, then flat; a 4B model stays at $0.05$
+throughout), and extending the round budget monotonically \emph{hurts} the small
+model ($0.050 \to 0.004$). Outcome scores cannot say why, so we read the process:
+each game's questions form a trajectory in association space whose geometry
+separates two failure modes that share a score of zero. The small model stalls ---
+its late-game stride shrinks to under half the mid-size model's ($0.030$ vs
+$0.082$) and it volunteers a final story in 2 of 66 games --- while larger models
+stride twice as far, bank their gains early, and then stop converting exploration
+into accuracy. We are equally plain about what the geometry does not do: within
+puzzles, mixed-effects models find no predictive power for stride or drift (LRT
+$p \geq 0.20$), a conclusion unchanged under a surface-only anchor, so we claim
+trajectory geometry as an interpretive instrument, not a score predictor. A
+pre-experiment lesson rounds out the method: an unaudited Oracle collapses
+questions to ``irrelevant'' and makes every game unwinnable, so agent claims begin
+with an information audit of the environment. We release the harness, the
+provenance-enforced puzzle set with an under-determination difficulty measure, and
+a composite score whose clue-recall and causal-logic halves demonstrably measure
+different competences.
+\end{abstract}
 
 \section{Introduction}
 Here is a Turtle Soup puzzle. \emph{A man's body lies in the desert, clutching half
@@ -67,14 +77,10 @@ ways: one never leaves its first hypothesis, the other leaves the plausible regi
 entirely. Telling them apart requires instruments that read the process, and that
 is this paper's contribution.
 
-\begin{gap}
-\small\textbf{GAP --- the hook, and possibly the framing.} The paper was built
-around a flatness result: thirty rounds of questioning buying no accuracy at any
-scale. That came from the retired grid. If the re-run reproduces it, the opening
-stands as written. \textbf{If it does not, the hook becomes the failure-mode
-separation itself} and the framing shifts with it --- this is a change of thesis,
-not of a number.
-\end{gap}
+On the verified set this flatness is now established (\S\ref{sec:results}):
+checkpoint accuracy rises only in the first ten of thirty rounds and only for the
+larger models, the smallest model never improves at all, and twenty further rounds
+of evidence buy nothing at any scale we tested.
 
 \textbf{Why Turtle Soup.} Three properties make it a good behavioral microscope.
 The questioning protocol is a naturally verbalized search trace---no probing or
@@ -100,8 +106,9 @@ beyond outcome-adjacent covariates, and the two failure modes have distinct
 signatures.
 \end{itemize}
 
-\textbf{Contributions.} (1)~The flatness result---whether interaction length buys
-accuracy at any scale \emph{(pending re-run)}. (2)~A behavioral-interpretation
+\textbf{Contributions.} (1)~The flatness result---interaction length buys accuracy
+only in the first ${\sim}10$ rounds and only at scale, and budget extension
+actively harms the smallest model. (2)~A behavioral-interpretation
 framework separating stalling from unbanked exploration, with an honest account of
 what it does and does not predict. (3)~An open-source harness, a \textbf{22-puzzle
 set restricted to puzzles humans have played and solved}, and a composite score
@@ -201,68 +208,101 @@ different model family than the Questioners}: otherwise a same-family Questioner
 advantage cannot be separated from its scale.
 
 \section{Results}\label{sec:results}
-\begin{gap}
-\small\textbf{GAP --- this section is empty by choice.} The previous grid ran on a
-puzzle set that has since been rebuilt, with no overlap; its Oracle shared a model
-family with the Questioners it judged; its anchor was built from the solution; and a
-token budget too small for reasoning models left some turns empty and scored them
-anyway. Four compounding problems, any one of which breaks comparability---so the
-numbers are removed rather than kept under a ``preliminary'' label that would invite
-exactly the side-by-side comparison that cannot be made.
+All numbers come from one grid on the verified set: 22 puzzles $\times$
+\{Qwen3.5-4B, Qwen3.6-27B, Qwen3.5-397B-A17B\} $\times$ 3 seeds, with a
+DeepSeek-V3.1 Oracle and logic judge (cross-family, audited at 95\%), and zero
+failed games. E1 is 198 thirty-round games with a scored checkpoint every round;
+E2 is 1{,}188 games across caps $\{5,10,15,20,25,30\}$.
 
-\smallskip
-\textbf{What has to be produced.} \emph{E1:} per-round checkpoint accuracy for each
-model, and commitment behaviour (how often, and how late, each model volunteers a
-final answer). \emph{E2:} end accuracy against round cap. \emph{E3:} per-round stride
-and per-round anchor distance, \textbf{under both anchors}. \emph{H3:} a mixed-effects
-model with puzzle as random intercept and \textbf{under-determination as the
-puzzle-level covariate} the earlier analysis lacked --- the question is whether
-difficulty is what the puzzle random effect was standing in for.
+\subsection{More interaction stops helping after ten rounds (E1)}
+Checkpoint accuracy rises only in the first ${\sim}10$ rounds, and only for the
+larger models: Qwen3.5-397B climbs from $0.124$ (round 1) to $0.200$ (round 10)
+and then stays between $0.18$ and $0.21$ through round 30; Qwen3.6-27B rises
+$0.117 \to 0.162$ and plateaus near $0.16$. Qwen3.5-4B is flat for the entire
+game, $0.05$--$0.06$ at every checkpoint (Figure~\ref{fig:e1}, drawn on the full
+0--1 range). Twenty further rounds of yes/no evidence---two thirds of the
+interaction budget---buy no accuracy at any scale.
 
-\smallskip
-\textbf{Before starting, or the run yields the wrong data.} Oracle audited at
-$\geq$90\% and from a different family than the Questioners. Per-round stride and
-distance saved, not just their summaries --- their absence is why the central figure
-cannot currently be drawn. Both anchors computed in one pass. Token budget verified
-sufficient for all 22 puzzles. Full question--answer rounds retained, or E3 cannot be
-rechecked by anyone.
-\end{gap}
+\textbf{Commitment separates the models more than accuracy does.} 27B volunteers a
+final story in 11/66 games (mean round 11.1) and 397B in 9/66 (round 14.2); 4B
+commits in 2/66 (round 23.5)---it neither improves nor concludes.
 
-\begin{gap}
-\small\textbf{GAP --- figures.} All three previous figures came from the retired grid
-and are removed. Two are needed. \textbf{(1)}~Accuracy against round, drawn on the
-full 0--1 outcome range: the earlier version used a narrow axis that magnified noise
-into what looked like movement, so the figure argued against the text it
-accompanied. \textbf{(2)}~Step size against round beside anchor distance against
-round --- the pair that separates the failure modes directly. The earlier trajectory
-figure projected a high-dimensional space into two dimensions, which cannot preserve
-the very distances being claimed, and showed the smallest model ranging widest while
-the text called it stalled.
-\end{gap}
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.9\linewidth]{figures/fig_e1_curves.png}
+\caption{E1: mean checkpoint accuracy by round (22 puzzles $\times$ 3 seeds per
+model), on the full 0--1 outcome range so that flatness reads as flat. Gains exist
+only before round ${\sim}10$ and only at scale; the 4B curve never moves.}
+\label{fig:e1}
+\end{figure}
+
+\subsection{Budget pressure is asymmetric (E2)}
+End accuracy is insensitive to the round cap for the larger models (397B
+$0.19$--$0.21$ and 27B $0.14$--$0.18$ across all six caps), but
+\textbf{monotonically harmful for the smallest}: 4B falls from $0.050$ at cap~5 to
+$0.004$ at cap~30, with 175 of its 396 games ending by token-budget exhaustion
+rather than by answer (versus 2/396 for 27B and 0/396 for 397B). Longer games do
+not help a small model; they give it more rounds in which to fail.
+
+\textbf{The two score halves dissociate.} Every model earns proportionally far
+more of the judged causal-logic half than the clue-recall half: 397B averages
+12.6/30 logic against 7.2/70 clues, 27B 10.1 against 6.8, 4B 2.9 against 0.2.
+Models reach the right causal shape well before---and often without---landing the
+annotated clue content, so the two subscores measure different competences and the
+composite's logic half is not redundant with string-level recall.
+
+\subsection{Geometry explains the plateau but does not predict the score (E3, H3)}
+The models occupy different geometric regimes: mean associative stride is $0.049$
+for 4B against $0.088$ (397B) and $0.114$ (27B), and in the late game 4B's stride
+falls to $0.030$---under half of 27B's $0.082$---while it almost never commits.
+That is H1's stalling signature: the small model circles a hypothesis basin with
+shrinking steps. Pooled across models, stride correlates with best checkpoint
+score (Spearman $\rho = 0.23$, $n = 198$); but this is a between-model
+effect---\textbf{within} each model the correlation vanishes ($|\rho| \leq 0.16$
+for every model and every geometric feature; Figure~\ref{fig:e3}).
+
+The mixed-effects test makes that precise. With puzzle as a random intercept and
+model tier as a fixed effect, adding the drift slope does not improve fit (LRT
+$p = 0.39$), nor does stride $\times$ tier ($p = 0.20$); the puzzle intercept
+absorbs the variance the geometry seemed to carry. The new puzzle-level covariate
+sharpens the interpretation: under-determination points the expected way (harder
+surface $\to$ lower score, coefficient $-0.031$) but is not significant
+($p = 0.22$) and removes only ${\sim}8\%$ of the puzzle variance---the puzzle
+effect is not merely measured difficulty. \textbf{H3 is not supported
+within-puzzle}, and we accordingly claim trajectory geometry as an interpretive
+instrument---it says \emph{how} an agent is failing---not as a score predictor.
+
+\textbf{Both anchors, as promised (\S\ref{sec:framework}).} Drift slopes computed
+from the solution-aware and the surface-only anchor agree in rank ($\rho = 0.80$)
+yet flip sign on 38/198 traces; the mixed-effects conclusion is the same under
+both (surface-only drift LRT $p = 0.10$). The anchor choice changes individual
+traces, not the finding.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_e3_scatter.png}
+\caption{E3: per-trace geometry against best outcome ($n = 198$). Left: mean
+stride $\bar{s}$; the models separate into regimes (4B small strides and low
+scores), but within a model stride does not predict outcome. Right: drift slope
+$dh/dt$, clustered near zero with no within-model relationship---the visual form
+of H3's negative result.}
+\label{fig:e3}
+\end{figure}
 
 \section{Harness Observations}
-Four observations that do not depend on the retired grid, each a trap for benchmarks
-of this shape rather than a claim of ours.
+Two observations, each a trap for benchmarks of this shape rather than a claim of
+ours.
 
 \textbf{Stalling is real, and lexical metrics only half-see it.} A small model
 re-asks earlier questions \emph{verbatim} in later rounds. A lexical novelty metric
 catches that---but only because it is verbatim. Earlier the same model re-asks one
 hypothesis in fresh words, which that metric scores as new and the geometry does not.
 
-\textbf{Surface scoring misleads.} Two answers with the same content can score
-several times apart purely because one happened to use an annotated word; requiring
-clues long enough to survive paraphrase removes the gap. This also weakens the
-original case for the composite score's logic half.
-
 \textbf{Truncated thinking masquerades as behavior.} Under too small a token budget,
 a reasoning model's logged ``questions'' are fragments of chain-of-thought, and every
 Oracle reply to them is ``irrelevant.'' From the transcript this is indistinguishable
 from an agent that cannot form a question. Decoding configuration is part of the
 environment.
-
-\textbf{Linearly solvable puzzles are poor probes.} A strong model solving a puzzle in
-a straight line cannot discriminate between agents---which is what motivates grading
-the set by under-determination.
 
 \section{Limitations and Conclusion}
 \textbf{Limitations.} The anchor is not yet human-derived (\S\ref{sec:framework}), so
@@ -362,11 +402,11 @@ Clue matching tolerates paraphrase through character-bigram recall, which sets a
 on how short an annotated clue may be --- below it only a verbatim match counts, and the
 score reads vocabulary rather than content. Clues are annotated above that floor.
 
-\begin{gap}
-\small\textbf{GAP --- does the logic half earn its thirty points?} Measurable and not
-yet measured. Compare clue-only and composite rankings across the set in the re-run: if
-they agree, thirty points are buying nothing and clue recall alone is the cleaner scale.
-\end{gap}
+\textbf{Does the logic half earn its thirty points?} On the full grid, yes: the
+two halves dissociate for every model (\S\ref{sec:results}), with each model
+earning a several-fold larger share of the logic half than of the clue half. If
+the two rankings had agreed, clue recall alone would have been the cleaner scale;
+they do not.
 
 \textbf{Where the accuracy curve comes from.} E1 does not score once at the end. Every
 round, after the Oracle answers, the Questioner is required to commit its best complete
