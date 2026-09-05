@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Three candidate Figure 1 designs. Panel (a) is shared; (b) differs.
+"""Figure 1. Panel (a) is the round curve; (b) is what the paper asks about.
+
+Two other panel-(b) designs were tried and are kept as functions rather than
+outputs: plateau height against slope (redundant with panel a) and reached
+against volunteered (too few counts to carry half a figure). Pass --all to
+render them.
 
 The rejected first attempt put a large question mark and a bulleted box in (b).
 That reads as a slide: the argument was carried by prose, not by the marks. In
@@ -79,7 +84,7 @@ def panel_a(ax, by, rng):
         ax.text(30.7, mean[-1] + nudge, LAB[tier], color=c, fontsize=6.2, va="center")
     ax.axvline(10, color="0.6", lw=0.7, ls=(0, (2, 2)))
     ax.set_xlim(1, 34); ax.set_ylim(0, 1.0)
-    ax.set_xlabel("Round"); ax.set_ylabel("Accuracy of the answer\nthe agent would give now")
+    ax.set_xlabel("Round"); ax.set_ylabel("Checkpoint accuracy")
     ax.set_title("Gains stop after round ten", pad=3, loc="left")
 
     ins = ax.inset_axes([0.36, 0.55, 0.60, 0.40])
@@ -91,7 +96,7 @@ def panel_a(ax, by, rng):
     ins.set_xlim(1, 14); ins.set_ylim(0, 0.26)
     ins.set_xticks([1, 10]); ins.set_yticks([0, 0.2])
     ins.tick_params(labelsize=5.2, length=2, pad=1)
-    ins.set_title("rounds 1–14, magnified", fontsize=5.4, pad=1.5)
+    ins.set_title("rounds 1–14", fontsize=5.4, pad=1.5)
 
 
 def opt1(ax, by, games):
@@ -111,8 +116,7 @@ def opt1(ax, by, games):
     ax.annotate("", xy=(0.203, 2.32), xytext=(0.056, 2.32),
                 arrowprops=dict(arrowstyle="<->", color=ACCENT, lw=0.8))
     ax.text(0.13, 2.42, "3.6×", fontsize=6.4, color=ACCENT, ha="center")
-    ax.set_title("Scale lifts the plateau. It never bends it.\nSo what does the extra capability buy?",
-                 pad=3, loc="left", fontsize=7.2)
+    ax.set_title("Plateau height and slope", pad=3, loc="left")
 
 
 def opt2(ax, by, games):
@@ -126,10 +130,9 @@ def opt2(ax, by, games):
         ax.text(1.05, fi, f"−{(pk-fi)/pk:.0%}", color=c, fontsize=5.8, va="center")
     ax.set_xlim(-0.30, 1.30); ax.set_ylim(0, 0.36)
     ax.set_xticks([0, 1])
-    ax.set_xticklabels(["best answer\nit reached", "answer it\nended with"], fontsize=6.2)
+    ax.set_xticklabels(["best reached", "final"], fontsize=6.4)
     ax.set_ylabel("Accuracy")
-    ax.set_title("Scale raises what is found, not what survives.\nSo what is the extra capability failing to do?",
-                 pad=3, loc="left", fontsize=7.2)
+    ax.set_title("Best reached vs. final", pad=3, loc="left")
 
 
 def opt3(ax, by, games):
@@ -146,10 +149,7 @@ def opt3(ax, by, games):
         ax.text(i + w / 2, com + 0.4, str(com), ha="center", fontsize=6.2, color=c)
     ax.set_xticks(range(3)); ax.set_xticklabels([LAB[m] for m in MODELS])
     ax.set_ylim(0, 15); ax.set_ylabel("Games out of 66")
-    ax.text(0.02, 0.96, "solid: reached a solution-grade answer\nhatched: also volunteered it",
-            transform=ax.transAxes, fontsize=5.8, color="0.4", va="top")
-    ax.set_title("Scale buys reaching the answer, not saying it.\nSo what does the extra capability buy?",
-                 pad=3, loc="left", fontsize=7.2)
+    ax.set_title("Reached vs. volunteered", pad=3, loc="left")
 
 
 def build(name, fn, by, games):
@@ -169,7 +169,9 @@ def build(name, fn, by, games):
 
 
 if __name__ == "__main__":
+    import sys
     by, games = load()
-    build("fig1_optA", opt1, by, games)
-    build("fig1_optB", opt2, by, games)
-    build("fig1_optC", opt3, by, games)
+    build("fig1_plateau", opt2, by, games)
+    if "--all" in sys.argv:
+        build("fig1_alt_height", opt1, by, games)
+        build("fig1_alt_counts", opt3, by, games)

@@ -143,19 +143,18 @@ def panel_a(ax, rng):
     my_top = st.mean([st.mean(v["yes"]) - st.mean(v["yes"] + v["no"]) + grand for v in usable.values()])
     # Short labels: the title and the axis already say what "no" and "yes" mean,
     # and the full phrases were wide enough to run into each other.
-    ax.annotate("after \u201cno\u201d", xy=(mn_top, top - 0.14), xytext=(mn_top - 0.016, top - 0.52),
-                fontsize=6, color="0.3", ha="center",
-                arrowprops=dict(arrowstyle="-", color="0.6", lw=0.6))
-    ax.annotate("after \u201cyes\u201d", xy=(my_top, top - 0.14), xytext=(my_top + 0.016, top - 0.52),
-                fontsize=6, color="0.3", ha="center",
-                arrowprops=dict(arrowstyle="-", color="0.6", lw=0.6))
+    ax.annotate("no", xy=(mn_top, top - 0.14), xytext=(mn_top - 0.010, top - 0.46),
+                fontsize=6, color="0.35", ha="center",
+                arrowprops=dict(arrowstyle="-", color="0.65", lw=0.6))
+    ax.annotate("yes", xy=(my_top, top - 0.14), xytext=(my_top + 0.010, top - 0.46),
+                fontsize=6, color="0.35", ha="center",
+                arrowprops=dict(arrowstyle="-", color="0.65", lw=0.6))
     ax.set_yticks(range(len(MODELS)))
     ax.set_yticklabels([LABELS[m] for m in MODELS])
     ax.set_ylim(-0.5, len(MODELS) + 0.15)
     ax.set_xlim(0.030, 0.200)
-    ax.set_xlabel("How far the next question moves in meaning\n(round-position adjusted; * CI excludes 0)")
-    ax.set_title("A refutation should push the search further away.\nInstead it moves less than a confirmation does.",
-                 pad=4, fontsize=6.8, loc="left")
+    ax.set_xlabel("Mean stride, round-adjusted")
+    ax.set_title("Stride by answer received", pad=4, loc="left")
 
 
 def panel_b(ax):
@@ -199,11 +198,7 @@ def panel_b(ax):
     # along, and so the labels can be written as full questions rather than as
     # terms the reader would have to have learnt from Section 5.
     data = [cross, within, abandon]
-    names = [
-        "two unrelated puzzles\n(a far-apart baseline)",
-        "any two moments\nof the same game",
-        "the story that scored 1.00\n\u2192 the story it ended with",
-    ]
+    names = ["different puzzles", "same game,\nany two rounds", "peak $\\to$ final,\nabandoning games"]
     colors = ["#9DB8D9", "#4C7BB8", ACCENT]
     parts = ax.violinplot(data, positions=range(3), widths=0.75, vert=False,
                           showextrema=False, showmedians=False)
@@ -219,28 +214,61 @@ def panel_b(ax):
         ax.text(st.median(vals), i + off, f"{st.median(vals):.2f}", ha="center",
                 va=va, fontsize=6, color=c)
     ax.set_yticks(range(3))
-    ax.set_yticklabels(names, fontsize=5.8)
-    ax.set_xlabel("Similarity of the two stories (cosine)")
+    ax.set_yticklabels(names, fontsize=6.0)
+    ax.set_xlabel("Cosine similarity")
     ax.set_xlim(0.18, 1.06)
     ax.set_ylim(-0.8, 3.0)
-    ax.set_title("The wrong ending sits as close to the right story\nas any ordinary step of the same game.",
-                 pad=4, fontsize=6.8, loc="left")
-    ax.annotate("the same distance apart \u2014\nyet the score fell 0.45 \u2192 0.10",
-                xy=(0.79, 2.18), xytext=(0.215, 2.52),
-                fontsize=5.8, color="0.25", ha="left", va="center",
-                arrowprops=dict(arrowstyle="->", color="0.55", lw=0.7,
-                                connectionstyle="arc3,rad=-0.18"))
+    ax.set_title("Distance between stories", pad=4, loc="left")
     return {"abandon_median": round(st.median(abandon), 4), "n_abandon": len(abandon),
             "within_median": round(st.median(within), 4), "n_within": len(within),
             "cross_median": round(st.median(cross), 4), "n_cross": len(cross)}
 
 
+def panel_mid(ax):
+    """Found, and not volunteered: the middle link of the argument.
+
+    Solid bar is games that reached a solution-grade answer (sustained peak at
+    or above half the scale); the hatched bar is how many of those the agent
+    ever volunteered of its own accord.
+    """
+    sol, com = {}, {}
+    for tier, game, _ in games():
+        acc = {int(k): v for k, v in (game.get("accuracy_by_round") or {}).items()}
+        if not acc:
+            continue
+        v = [acc[k] for k in sorted(acc)]
+        sustained = max((min(v[i], v[i + 1]) for i in range(len(v) - 1)), default=0.0)
+        sol.setdefault(tier, 0); com.setdefault(tier, 0)
+        if sustained >= 0.5:
+            sol[tier] += 1
+            com[tier] += 1 if game.get("natural_final_answer") else 0
+    w = 0.36
+    for i, tier in enumerate(MODELS):
+        c = COLORS[tier]
+        ax.bar(i - w / 2, sol.get(tier, 0), w, color=c, lw=0)
+        ax.bar(i + w / 2, com.get(tier, 0), w, facecolor="white", edgecolor=c,
+               lw=0.9, hatch="////")
+        for x, n in ((i - w / 2, sol.get(tier, 0)), (i + w / 2, com.get(tier, 0))):
+            ax.text(x, n + 0.18, str(n), ha="center", fontsize=6.2, color=c)
+    ax.set_xticks(range(3))
+    ax.set_xticklabels([LABELS[m] for m in MODELS])
+    ax.set_ylim(0, 8.2)
+    ax.set_yticks([0, 2, 4, 6, 8])
+    ax.set_ylabel("Games (of 66)")
+    ax.set_title("Solution-grade games", pad=4, loc="left")
+
+
 def main() -> None:
     rng = random.Random(0)
-    fig, (ax_a, ax_b) = plt.subplots(1, 2, figsize=(5.2, 1.75))
+    fig, (ax_a, ax_m, ax_b) = plt.subplots(1, 3, figsize=(6.9, 1.9),
+                                           gridspec_kw={"width_ratios": [1.0, 0.85, 1.05]})
     panel_a(ax_a, rng)
+    panel_mid(ax_m)
     stats = panel_b(ax_b)
-    fig.tight_layout(w_pad=2.0)
+    for ax, lab in ((ax_a, "a"), (ax_m, "b"), (ax_b, "c")):
+        ax.text(-0.20, 1.20, lab, transform=ax.transAxes, fontsize=8.5,
+                fontweight="bold", va="top")
+    fig.tight_layout(w_pad=2.2)
 
     stem = "fig_feedback"
     if require_matplotlib_panel_alignment is not None:
