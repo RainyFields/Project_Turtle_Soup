@@ -1,0 +1,146 @@
+{
+ "n_puzzles": 22,
+ "permutations": 5000,
+ "by_indicator": {
+  "best_acc": {
+   "Qwen3.5-4B": {
+    "rho": -0.09,
+    "p": 0.6858
+   },
+   "Qwen3.6-27B": {
+    "rho": -0.095,
+    "p": 0.67
+   },
+   "Qwen3.5-397B": {
+    "rho": -0.283,
+    "p": 0.195
+   }
+  },
+  "mean_step": {
+   "Qwen3.5-4B": {
+    "rho": 0.226,
+    "p": 0.3034
+   },
+   "Qwen3.6-27B": {
+    "rho": 0.045,
+    "p": 0.8498
+   },
+   "Qwen3.5-397B": {
+    "rho": -0.073,
+    "p": 0.7446
+   }
+  },
+  "late_step": {
+   "Qwen3.5-4B": {
+    "rho": 0.132,
+    "p": 0.54
+   },
+   "Qwen3.6-27B": {
+    "rho": 0.05,
+    "p": 0.83
+   },
+   "Qwen3.5-397B": {
+    "rho": -0.084,
+    "p": 0.7246
+   }
+  },
+  "human_dist_slope": {
+   "Qwen3.5-4B": {
+    "rho": 0.194,
+    "p": 0.3888
+   },
+   "Qwen3.6-27B": {
+    "rho": 0.095,
+    "p": 0.6762
+   },
+   "Qwen3.5-397B": {
+    "rho": 0.303,
+    "p": 0.1812
+   }
+  },
+  "mean_human_dist": {
+   "Qwen3.5-4B": {
+    "rho": 0.116,
+    "p": 0.5982
+   },
+   "Qwen3.6-27B": {
+    "rho": 0.16,
+    "p": 0.4892
+   },
+   "Qwen3.5-397B": {
+    "rho": 0.088,
+    "p": 0.7038
+   }
+  },
+  "surface_human_dist_slope": {
+   "Qwen3.5-4B": {
+    "rho": 0.264,
+    "p": 0.2424
+   },
+   "Qwen3.6-27B": {
+    "rho": -0.072,
+    "p": 0.754
+   },
+   "Qwen3.5-397B": {
+    "rho": 0.32,
+    "p": 0.1508
+   }
+  },
+  "rounds": {
+   "Qwen3.5-4B": {
+    "rho": 0.116,
+    "p": 0.6142
+   },
+   "Qwen3.6-27B": {
+    "rho": 0.304,
+    "p": 0.1784
+   },
+   "Qwen3.5-397B": {
+    "rho": 0.286,
+    "p": 0.2014
+   }
+  },
+  "committed": {
+   "Qwen3.5-4B": {
+    "rho": -0.324,
+    "p": 0.1748
+   },
+   "Qwen3.6-27B": {
+    "rho": -0.254,
+    "p": 0.2546
+   },
+   "Qwen3.5-397B": {
+    "rho": -0.43,
+    "p": 0.0476
+   }
+  }
+ },
+ "pooled": {
+  "commit_rate": {
+   "rho": -0.339,
+   "p": 0.13
+  },
+  "best_accuracy": {
+   "rho": -0.168,
+   "p": 0.4542
+  },
+  "commit_vs_accuracy_rho": 0.578
+ },
+ "terciles": [
+  {
+   "mean_under_determination": 0.234,
+   "commit_rate": 0.254,
+   "best_accuracy": 0.334
+  },
+  {
+   "mean_under_determination": 0.335,
+   "commit_rate": 0.048,
+   "best_accuracy": 0.22
+  },
+  {
+   "mean_under_determination": 0.462,
+   "commit_rate": 0.042,
+   "best_accuracy": 0.29
+  }
+ ]
+}

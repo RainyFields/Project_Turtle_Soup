@@ -27,3 +27,8 @@ temp_plan.md
 
 # Paper structure spec — working document, not yet merged into the handoff
 docs/paper/paper-outline.md
+
+# LaTeX build artifacts (TinyTeX added locally 2026-09-05)
+docs/paper/*.aux
+docs/paper/*.log
+docs/paper/*.out
