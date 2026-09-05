@@ -346,5 +346,167 @@
    "malformed_frac": 0.011
   },
   "verdict": "circling signature survives exclusion of malformed rounds"
+ },
+ "pattern_classification": {
+  "criteria": "circling: late-third stride < 0.04 AND never committed AND sustained peak < 0.3; abandoning: sustained peak >= 0.3 AND final < half of sustained peak",
+  "counts": {
+   "Qwen3.5-397B": {
+    "n": 66,
+    "circling": 6,
+    "abandoning": 12,
+    "overlap": 0,
+    "final_ge_05": 2
+   },
+   "Qwen3.5-4B": {
+    "n": 66,
+    "circling": 39,
+    "abandoning": 1,
+    "overlap": 0,
+    "final_ge_05": 0
+   },
+   "Qwen3.6-27B": {
+    "n": 66,
+    "circling": 12,
+    "abandoning": 4,
+    "overlap": 0,
+    "final_ge_05": 4
+   }
+  }
+ },
+ "round2_additions": {
+  "e1_termination": {
+   "note": "E1 loop enforces no game token budget (budget applies to E2 play only); checkpoint calls sit outside any budget",
+   "early_empty_terminations": {
+    "397B": 0,
+    "4B": 0,
+    "27B": 0
+   },
+   "committed": {
+    "397B": 9,
+    "4B": 2,
+    "27B": 11
+   }
+  },
+  "solution_grade_crosstab": {
+   "threshold": 0.5,
+   "397B": {
+    "peak_ge05": 6,
+    "committed": 1,
+    "final_to_peak_ratios": [
+     0.53,
+     0.18,
+     0.87,
+     0.46,
+     0.74,
+     0.12
+    ]
+   },
+   "27B": {
+    "peak_ge05": 4,
+    "committed": 3,
+    "final_to_peak_ratios": [
+     0.86,
+     0.82,
+     0.82,
+     0.82
+    ]
+   },
+   "4B": {
+    "peak_ge05": 0
+   }
+  },
+  "stride_clustered_ci": {
+   "method": "per-puzzle means, bootstrap over 22 puzzles (2000 reps), 95% CI; late = second half of a game strides; _f = wellformed-only rounds",
+   "4B": {
+    "mean": [
+     0.0493,
+     [
+      0.0402,
+      0.0598
+     ]
+    ],
+    "late": [
+     0.0295,
+     [
+      0.0214,
+      0.0392
+     ]
+    ],
+    "mean_f": [
+     0.0555,
+     [
+      0.0451,
+      0.0667
+     ]
+    ],
+    "late_f": [
+     0.0332,
+     [
+      0.0245,
+      0.0439
+     ]
+    ]
+   },
+   "27B": {
+    "mean": [
+     0.1135,
+     [
+      0.0914,
+      0.1362
+     ]
+    ],
+    "late": [
+     0.0818,
+     [
+      0.0647,
+      0.0982
+     ]
+    ],
+    "mean_f": [
+     0.1184,
+     [
+      0.0934,
+      0.1484
+     ]
+    ],
+    "late_f": [
+     0.0879,
+     [
+      0.068,
+      0.1084
+     ]
+    ]
+   },
+   "397B": {
+    "mean": [
+     0.0881,
+     [
+      0.0782,
+      0.0989
+     ]
+    ],
+    "late": [
+     0.061,
+     [
+      0.0534,
+      0.0694
+     ]
+    ],
+    "mean_f": [
+     0.0899,
+     [
+      0.0793,
+      0.1023
+     ]
+    ],
+    "late_f": [
+     0.0642,
+     [
+      0.0548,
+      0.0747
+     ]
+    ]
+   }
+  }
  }
 }
