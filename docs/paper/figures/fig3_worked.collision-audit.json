@@ -1,0 +1,48 @@
+{
+  "pdf": "fig3_worked.pdf",
+  "auditable": true,
+  "verdict": "REVIEW REQUIRED",
+  "page_count": 1,
+  "visible_text_box_count": 12,
+  "text_trace_count": 12,
+  "stroke_path_count": 42,
+  "filled_region_count": 42,
+  "image_region_count": 0,
+  "summary": {
+    "fail": 0,
+    "warn": 1,
+    "contained_fill_overlays": 0,
+    "contained_image_overlays": 0
+  },
+  "thresholds": {
+    "text_inset_pt": 0.6,
+    "min_overlap_ratio": 0.05,
+    "clipping_tolerance_pt": 0.5
+  },
+  "findings": [
+    {
+      "severity": "WARN",
+      "kind": "text-fill-edge",
+      "page": 1,
+      "message": "Text partially overlaps the edge of 1 filled region(s)",
+      "text": "solution reached (1.00), rounds 10-11",
+      "text_bbox": [
+        201.23582458496094,
+        12.523131370544434,
+        309.1028137207031,
+        19.023130416870117
+      ],
+      "other_text": null,
+      "other_bbox": [
+        38.37871170043945,
+        8.577926635742188,
+        312.7693786621094,
+        14.089645385742188
+      ],
+      "object_count": 1,
+      "object_indexes": [
+        2000
+      ]
+    }
+  ]
+}
