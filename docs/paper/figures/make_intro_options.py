@@ -119,6 +119,40 @@ def opt1(ax, by, games):
     ax.set_title("Plateau height and slope", pad=3, loc="left")
 
 
+def opt_stride(ax, by, games):
+    """Stride contracts four- to fivefold while accuracy stands still.
+
+    This replaces a peak-versus-final panel. That panel plotted the gap between
+    a maximum and one particular element of the same noisy sequence, which a
+    within-game permutation null reproduces (Appendix C); it showed something
+    the paper's own null test cannot separate from scoring jitter. Stride
+    contraction is a direct measurement with no selection step, and together
+    with panel (a) it is the title: narrowing, without converging.
+    """
+    import glob, json
+    from pathlib import Path
+    geo = json.loads((FIGDIR / "e3_geometry.json").read_text())["traces"]
+    per = defaultdict(lambda: defaultdict(list))
+    for t in geo:
+        for i, s_ in enumerate(t["step_sizes"]):
+            per[t["label"]][i + 1].append(s_)
+    for tier in MODELS:
+        rounds = sorted(r for r in per[tier] if r <= 29)
+        mean = [st.mean(per[tier][r]) for r in rounds]
+        c = COL[tier]
+        ax.plot(rounds, mean, lw=1.5, color=c)
+        # 27B and 397B end within 0.01 of each other; nudge the labels apart.
+        nudge = {"Qwen3.6-27B": +0.011, "Qwen3.5-397B": -0.011}.get(tier, 0.0)
+        ax.text(rounds[-1] + 0.7, mean[-1] + nudge, LAB[tier], color=c,
+                fontsize=6.2, va="center")
+    ax.set_xlim(1, 33)
+    ax.set_ylim(0, 0.26)
+    ax.set_xlabel("Round")
+    ax.set_ylabel("Semantic stride")
+    ax.set_title("Stride contracts four- to fivefold", pad=3, loc="left")
+    ax.grid(alpha=0.18)
+
+
 def opt2(ax, by, games):
     """What is found, versus what survives to the end."""
     for i, tier in enumerate(MODELS):
@@ -171,7 +205,8 @@ def build(name, fn, by, games):
 if __name__ == "__main__":
     import sys
     by, games = load()
-    build("fig1_plateau", opt2, by, games)
+    build("fig1_plateau", opt_stride, by, games)
     if "--all" in sys.argv:
         build("fig1_alt_height", opt1, by, games)
         build("fig1_alt_counts", opt3, by, games)
+        build("fig1_alt_peakfinal", opt2, by, games)

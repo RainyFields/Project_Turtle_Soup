@@ -6,7 +6,8 @@ full 0-1 axis; (b) per-game final score against sustained peak, with y=x and
 y=x/2 references. Together: gains stop after round ten, and the plateau is an
 equilibrium of finding and losing.
 
-Figure 2 (fig2_geometry): (a) mean stride and (b) drift slope against best
+Figure 2 (fig2_geometry): (a) mean stride and (b) per-round change in anchor
+distance, against best
 checkpoint score per trace: circling regime separation, and the within-model
 flatness behind H3's negative result.
 
@@ -199,9 +200,9 @@ def fig2():
     ax_b.axvline(0.0, color="0.55", lw=0.8, ls=(0, (4, 2)))
     lim_b = 0.055
     ax_b.set_xlim(-lim_b, lim_b)
-    ax_b.set_xlabel(r"Drift slope $dh/dt$ (solution-aware anchor)")
+    ax_b.set_xlabel("Change per round in distance\nto the anchor (solution-aware)")
     ax_b.set_ylabel("Best accuracy")
-    ax_b.set_title("Drift slopes cluster near zero", pad=3)
+    ax_b.set_title("Change clusters near zero", pad=3)
     ax_b.set_ylim(0, 1.05)
     for ax, lab in ((ax_a, "a"), (ax_b, "b")):
         ax.text(-0.24, 1.06, lab, transform=ax.transAxes,
