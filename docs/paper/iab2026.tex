@@ -15,6 +15,9 @@
 \usepackage{booktabs}
 \usepackage{caption}
 \usepackage[hidelinks]{hyperref}
+% Keep the PDF metadata anonymous too: reviewers open the file, and
+% xelatex would otherwise carry \author into /Author.
+\hypersetup{pdfauthor={}, pdftitle={}, pdfsubject={}, pdfkeywords={}, pdfcreator={}}
 \usepackage{titlesec}
 \usepackage{xcolor}
 \titlespacing*{\section}{0pt}{6pt}{2pt}
@@ -27,8 +30,9 @@
 \setlist{nosep,leftmargin=1.3em}
 
 \title{Narrowing Without Converging:\\ How Interactive LLM Agents Search Under Feedback}
-\author{Xiaoxuan Lei \and (co-authors TBD)\\
-\small Draft v0.13 --- IAB: Interpreting Agent Behavior, Workshop @ NeurIPS 2026}
+\author{Anonymous Author(s)\\
+\small Paper under double-blind review ---
+IAB: Interpreting Agent Behavior, Workshop @ NeurIPS 2026}
 \date{}
 
 \begin{document}
@@ -549,7 +553,8 @@ covariate is not coupled to the outcome apparatus.
 \textbf{Artifacts.} Harness, puzzle set with per-item source records, per-game
 logs (including every checkpoint story), and the analysis scripts behind each
 reported number are released at
-\texttt{github.com/RainyFields/Project\_Turtle\_Soup}. Puzzle surfaces and
+a public repository, withheld here for double-blind review and available to
+reviewers on request through the programme chairs. Puzzle surfaces and
 solutions originate from a public community repertoire and are redistributed
 with source attribution and a content flag.
 
