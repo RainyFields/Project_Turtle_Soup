@@ -353,7 +353,9 @@ human-derived (\S\ref{sec:traj}), and \S\ref{sec:patterns} shows the encoder's
 resolution is itself a limit on what any embedding-based instrument can score.
 One DeepSeek model serves as both Oracle and judge, and the tiers confound
 generation and architecture, so tier effects are model comparisons, not scaling
-laws. The source site is public and memorisation probes are pending. Puzzles
+laws. The source site is public, so the difficulty measure may partly read
+familiarity; no claim here rests on it, since it is n.s.\ against every outcome
+and behavioural indicator we tested. Puzzles
 involve death and dark themes; content-flagged.
 
 \textbf{Conclusion.} These agents narrow without converging. The step shrinks
@@ -424,12 +426,14 @@ than two: a surface loose enough to admit many mechanisms is, for that same
 reason, one whose true mechanism takes more reframing to reach, so \emph{how
 far} and \emph{how many ways} are not separable here.
 
-\textbf{A caveat we report either way.} The two puzzles scoring easiest are the
-two most widely circulated ones. Their surfaces may be easy to complete not
-because the inference is short but because the story is in the training data,
-in which case the measure reads familiarity as much as difficulty. A
-memorisation probe (asking for the solution with no surface given) separates
-the two and belongs in any use of this measure.
+\textbf{A caveat we report either way.} The two puzzles scoring easiest are
+among the most widely circulated, and the models' own first-round guesses are
+consistent with familiarity contributing: on the best-known of them the two
+larger tiers open at 0.61 and 0.53 before any evidence arrives, against 0.24 and
+0.36 on a puzzle of almost identical under-determination. The measure may
+therefore read familiarity as much as difficulty on the easy end. Separating the
+two calls for a memorisation probe, which we have not run; nothing in this paper
+rests on the measure.
 
 \section{Measuring agent performance}\label{app:metrics}
 
