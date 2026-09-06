@@ -128,7 +128,7 @@ def panel_a(ax, rng):
         ax.plot([mn], [y], "o", mfc="white", mec=c, mew=1.2, ms=5.5, zorder=3)
         ax.plot([my], [y], "o", color=c, ms=5.5, zorder=3)
         sig = "" if lo <= 0 <= hi else "*"
-        ax.text(max(my, mn) + 0.006, y, f"{delta:+.3f}{sig}", va="center", fontsize=6, color=c)
+        ax.text(max(my, mn) + 0.011, y, f"{delta:+.3f}{sig}", va="center", fontsize=6, color=c)
 
     # Direct labels on the top row instead of a legend: a legend would sit in the
     # same corner as the smallest tier's markers, and the reader would have to
@@ -143,10 +143,10 @@ def panel_a(ax, rng):
     my_top = st.mean([st.mean(v["yes"]) - st.mean(v["yes"] + v["no"]) + grand for v in usable.values()])
     # Short labels: the title and the axis already say what "no" and "yes" mean,
     # and the full phrases were wide enough to run into each other.
-    ax.annotate("no", xy=(mn_top, top - 0.14), xytext=(mn_top - 0.010, top - 0.46),
+    ax.annotate("no", xy=(mn_top, top - 0.14), xytext=(mn_top - 0.014, top - 0.56),
                 fontsize=6, color="0.35", ha="center",
                 arrowprops=dict(arrowstyle="-", color="0.65", lw=0.6))
-    ax.annotate("yes", xy=(my_top, top - 0.14), xytext=(my_top + 0.010, top - 0.46),
+    ax.annotate("yes", xy=(my_top, top - 0.14), xytext=(my_top + 0.002, top - 0.56),
                 fontsize=6, color="0.35", ha="center",
                 arrowprops=dict(arrowstyle="-", color="0.65", lw=0.6))
     ax.set_yticks(range(len(MODELS)))
@@ -260,15 +260,15 @@ def panel_mid(ax):
 
 def main() -> None:
     rng = random.Random(0)
-    fig, (ax_a, ax_m, ax_b) = plt.subplots(1, 3, figsize=(6.9, 1.9),
-                                           gridspec_kw={"width_ratios": [1.0, 0.85, 1.05]})
+    fig, (ax_a, ax_m, ax_b) = plt.subplots(1, 3, figsize=(5.35, 1.52),
+                                           gridspec_kw={"width_ratios": [1.0, 1.0, 1.0]})
     panel_a(ax_a, rng)
     panel_mid(ax_m)
     stats = panel_b(ax_b)
     for ax, lab in ((ax_a, "a"), (ax_m, "b"), (ax_b, "c")):
         ax.text(-0.20, 1.20, lab, transform=ax.transAxes, fontsize=8.5,
                 fontweight="bold", va="top")
-    fig.tight_layout(w_pad=2.2)
+    fig.tight_layout(w_pad=1.6)
 
     stem = "fig_feedback"
     if require_matplotlib_panel_alignment is not None:
