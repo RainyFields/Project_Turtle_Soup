@@ -342,39 +342,37 @@ for over 12,000 cue words. \emph{Behavior Research Methods} 51(3):987--1006.
 \appendix
 \newpage
 \section{Related work}\label{app:rw}
-Existing turtle-soup benchmarks, TurtleBench~\cite{turtlebench},
+Existing Turtle Soup benchmarks score outcomes. TurtleBench~\cite{turtlebench},
 SPLAT~\cite{splat} (whose interactive player--judge protocol we adopt), and
-TurtleSoup-Bench~\cite{tsbench}, score verification accuracy, solve
-efficiency, or faithfulness to the intended story. TurtleSoup-Bench probes
-what agents ask next but grades it against the intended story; none of the
-three measures the search's geometry, which is our delta.
-MUTATE~\cite{mutate} shows frontier agents find far fewer mechanism-distinct
-paths than humans; its diverge-then-narrow agent is a natural test
-intervention for our metrics. The instrument itself adapts forward
+TurtleSoup-Bench~\cite{tsbench} evaluate verification accuracy, solve
+efficiency, or faithfulness to the intended story. TurtleSoup-Bench also
+probes what agents ask next, but it grades the question against the intended
+story; none of the three measures the geometry of the search itself, which is
+the gap this paper addresses. MUTATE~\cite{mutate} shows that frontier agents
+find far fewer mechanism-distinct solution paths than humans; its
+diverge-then-narrow agent is a natural intervention to test with our
+instruments. The trajectory instrument adapts forward
 flow~\cite{forwardflow} and the Divergent Association Task~\cite{dat} from
-human psychometrics. The Small World of Words norms~\cite{swow} provide the
-human anchor that ours is not yet (\S\ref{sec:traj}). Judge-bias
-catalogues~\cite{calm,posbias} shape the scoring: the model judge is confined
-to the one subscore that objective matching cannot reach
-(Appendix~\ref{app:metrics}).
+human psychometrics, and the Small World of Words norms~\cite{swow} are the
+natural source for the human-derived anchor that ours is not yet
+(\S\ref{sec:traj}). Catalogues of judge bias~\cite{calm,posbias} motivated
+confining the model judge to the one subscore that objective matching cannot
+reach (Appendix~\ref{app:metrics}).
 
 \section{The puzzle set}\label{app:set}
 
-\textbf{Where the puzzles come from.} A puzzle nobody has solved carries no
-evidence that its clues suffice, that its solution is unique, or that the
-intended leap is reachable; an agent scoring zero on it teaches us nothing. Our
-set is hand-picked
-from the classic repertoire of a Chinese Turtle Soup community: 22 puzzles people have
-played and solved, each keeping its source record. Every item was read and kept or
-rejected by hand; rejected were puzzles turning on deduction from stated evidence
-rather than a lateral reframing, and puzzles whose surfaces were incomplete at the
-source. Surfaces run 9--108 characters (median 34), solutions 13--200 (median 102).
+\paragraph{Selection.} The 22 puzzles were hand-picked from the classic
+repertoire of a Chinese Turtle Soup community, restricted to puzzles with a
+public record of human play (\S\ref{sec:framework}): a puzzle nobody has
+solved carries no evidence that its clues suffice or that the intended leap
+is reachable. Every candidate was read and kept or rejected by hand. We
+rejected puzzles that turn on deduction from stated evidence rather than a
+lateral reframing, and puzzles whose surfaces were incomplete at the source.
+Surfaces run 9--108 characters (median 34) and solutions 13--200 characters
+(median 102).
 
-\textbf{How hard are they?} Each puzzle carries an \textbf{under-determination} score:
-give a model the surface alone, with no Oracle and no feedback, let it write
-twelve complete stories, and take the closest to the real solution. The index is
-one minus that best guess, and is large when the surface leaves a solver far
-from the answer.
+\paragraph{Distribution of under-determination.} Under-determination is
+defined in \S\ref{sec:framework}. Its distribution over the 22 puzzles is:
 
 \begin{center}\small
 \begin{tabular}{@{}lc@{}}
@@ -390,63 +388,58 @@ from the answer.
 \end{tabular}
 \end{center}
 
-The median is 0.347, quartiles 0.273 and 0.410, full range 0.173--0.577:
-single-peaked with a thin hard tail. Easiest are the story the genre is named for (0.17)
-and the desert matchstick (0.19). Hardest is a fourteen-character surface
-reading \emph{our heights differ / a flowerpot broke / our heights are the same}
-(0.58).
+The median is 0.347, the quartiles are 0.273 and 0.410, and the full range
+is 0.173--0.577: single-peaked with a thin hard tail. The easiest puzzles are
+the story the genre is named for (0.17) and the desert matchstick (0.19); the
+hardest is a fourteen-character surface reading \emph{our heights differ / a
+flowerpot broke / our heights are the same} (0.58).
 
-Two properties make this usable as a covariate. It describes the puzzle, not any
-agent's performance on it. It is also independent of rounds used; a difficulty
+\paragraph{Validity as a covariate.} The score describes the puzzle, not any
+agent's performance on it, and it is independent of rounds used; a difficulty
 defined as ``how many rounds this takes'' would make an accuracy-versus-rounds
-plot confirm itself. Nor is it a proxy for surface length ($r=-0.22$, n.s.), so
-length dependence was not detected at $n = 22$ (a weak test). It is one measure rather
-than two: a surface loose enough to admit many mechanisms is, for that same
-reason, one whose true mechanism takes more reframing to reach, so \emph{how
-far} and \emph{how many ways} are not separable here.
+plot confirm itself. It is not a proxy for surface length ($r=-0.22$, n.s.\ at
+$n=22$, a weak test). It is also one measure rather than two: a surface loose
+enough to admit many mechanisms is, for the same reason, one whose true
+mechanism takes more reframing to reach, so \emph{how far} and \emph{how many
+ways} are not separable here.
 
-\textbf{A caveat we report either way.} The two puzzles scoring easiest are
-among the most widely circulated, and the models' own first-round guesses are
-consistent with familiarity contributing: on the best-known of them the two
-larger tiers open at 0.61 and 0.53 before any evidence arrives, against 0.24 and
-0.36 on a puzzle of almost identical under-determination. The measure may
-therefore read familiarity as much as difficulty on the easy end. Separating the
-two calls for a memorisation probe, which we have not run; nothing in this paper
-rests on the measure.
+\paragraph{Familiarity caveat.} The two puzzles scoring easiest are among the
+most widely circulated, and the models' first-round guesses are consistent
+with familiarity contributing: on the best-known of them, the two larger
+tiers open at 0.61 and 0.53 before any evidence arrives, against 0.24 and
+0.36 on a puzzle of almost identical under-determination. On the easy end the
+measure may therefore read familiarity as much as difficulty. Separating the
+two would take a memorisation probe, which we have not run; no claim in the
+paper rests on the measure.
 
 \section{Measuring agent performance}\label{app:metrics}
 
+\paragraph{Outcome score.} The outcome score combines \textbf{clue recall
+(70 points)} and \textbf{causal-logic identity (30 points)}
+(\S\ref{sec:framework}). Clue recall matches the answer against per-puzzle
+annotated key clues and is objective and reproducible; matching tolerates
+paraphrase through character-bigram recall, which sets a floor on how short
+an annotated clue may be (below the floor only a verbatim match counts, so
+all clues are annotated above it). The logic judge rates only whether cause
+$\to$ mechanism $\to$ outcome matches and is instructed to ignore wording.
+Because single ratings are unstable on borderline answers, each rating is
+sampled twice at temperature 0.2 and averaged; the two samples agree exactly
+in 86\% of ratings and differ by under one point of 30 on average. The gap
+between the two subscores is itself informative: right story, wrong
+vocabulary.
 
+\paragraph{The logic half earns its thirty points.} Every model earns
+proportionally far more of the judged causal-logic half than of the
+clue-recall half (397B averages 12.6/30 logic against 7.2/70 clues, 27B 10.1
+against 6.8, 4B 2.9 against 0.2), and the halves correlate only weakly per
+game (Spearman $\rho = 0.30 / 0.35 / 0.06$ for 397B / 27B / 4B over 396 E2
+games each): models reach the right causal shape well before, and often
+without, landing the annotated clue content. The 70/30 weighting is a design
+choice; every conclusion in \S\ref{sec:results} is readable from the two
+halves separately, though the absolute plateau level (${\sim}0.2$) depends
+on the weights.
 
-\textbf{What counts as a correct answer.} Judged outcome is \textbf{clue recall (70)}
-plus \textbf{causal-logic identity (30)}. Clue recall matches the answer against
-per-puzzle annotated key clues: objective and reproducible. The logic judge
-rates only whether cause $\to$ mechanism $\to$ outcome matches and is told
-explicitly to ignore wording. Because single ratings are unstable on borderline
-answers, ratings are sampled and averaged (two samples per rating in the
-reported grid). The gap between the two subscores is itself readable: right
-story, wrong vocabulary.
-
-Clue matching tolerates paraphrase through character-bigram recall, which sets a
-floor on how short an annotated clue may be. Below that floor only a verbatim
-match counts, and the score reads vocabulary rather than content. Clues are
-annotated above the floor.
-
-\textbf{Does the logic half earn its thirty points?} On the full grid, yes:
-every model earns proportionally far more of the judged causal-logic half than
-of the clue-recall half (397B averages 12.6/30 logic against 7.2/70 clues, 27B
-10.1 against 6.8, 4B 2.9 against 0.2), and the halves correlate only weakly
-per game (Spearman $\rho = 0.30 / 0.35 / 0.06$ for 397B / 27B / 4B over 396
-E2 games each): models reach the right causal shape well before, and often
-without, landing the annotated clue content. The 70/30 weighting itself is a
-design choice; every conclusion in \S\ref{sec:results} is readable from the
-two halves separately, though the absolute plateau level (${\sim}0.2$) does
-depend on the weights. The logic judge rates the causal-logic half on its
-30-point scale and is sampled twice per rating at temperature 0.2; the two
-samples agree exactly in 86\% of ratings and differ by under one point of 30
-on average.
-
-\textbf{Feedback response: definition, confound, and both estimates.} For each
+\paragraph{Feedback response: definition, confound, and both estimates.} For each
 round $t$ the Oracle's answer is paired with $s_{t+1}$, the stride into the next
 question; ``irrelevant'' rounds are excluded. Confirmation arrives earlier than
 refutation (mean round 12.1 / 9.7 / 10.9 for a ``yes'' against 15.6 / 15.6 / 15.9 for a ``no'') and early strides are larger, so an uncontrolled comparison is confounded
@@ -458,14 +451,15 @@ $[+0.023, +0.046]$); controlled, the smallest does not ($+0.001$ $[-0.009,
 +0.011]$; $+0.028$ $[+0.010, +0.046]$; $+0.009$ $[+0.002, +0.017]$). The gap
 between the two is the point.
 
-\textbf{The semantic scale of abandoning.} Within abandoning games (sustained
-peak $\geq 0.3$, final below half of it; $n = 34$), the final checkpoint story
-sits at cosine 0.851 (median) from the peak story, while any two checkpoints of
-the same game sit at 0.841 (median over all 77{,}906 within-game pairs from 60
-games) and two stories from different puzzles at 0.498 (231 pairs). The score
-gap across that same pair is $0.447 \rightarrow 0.099$.
+\paragraph{The semantic scale of abandoning.} Abandoning games are those
+with a sustained peak $\geq 0.3$ whose final checkpoint falls below half of
+it ($n = 34$). The final story sits at median cosine similarity 0.851 from
+the peak story, while any two checkpoints of the same game sit at 0.841
+(median over all 77{,}906 within-game pairs from 60 games) and two stories
+from different puzzles at 0.498 (231 pairs). Across the same peak-to-final
+pairs, the median score falls from 0.447 to 0.099.
 
-\textbf{The round-1 prior.} The round-1 checkpoint precedes the first Oracle
+\paragraph{The round-1 prior.} The round-1 checkpoint precedes the first Oracle
 answer and is therefore a cold guess. It holds 49\% / 33\% / 26\% (median, by
 tier) of the game's eventual best score, and correlates with it at $\rho =
 +0.37 / +0.57 / +0.47$ (permutation $p = 0.09 / 0.003 / 0.03$, $n = 22$ puzzles
@@ -474,7 +468,7 @@ guesses by a model cross-family with every Questioner, predicts round-1 quality
 at $\rho = -0.34 / -0.54 / -0.47$ ($p = 0.12 / 0.010 / 0.029$) but not the final
 score.
 
-\textbf{Behavioural indicators against puzzle structure.} Regressing each
+\paragraph{Behavioural indicators against puzzle structure.} Regressing each
 per-trace indicator on under-determination, seeds averaged, 5{,}000
 permutations: stride, late stride, drift (both anchors), mean anchor distance
 and rounds played are all n.s.\ at every tier ($|\rho| \leq 0.32$, $p > 0.10$).
@@ -482,7 +476,7 @@ Commit rate is negative at all three ($-0.32 / -0.25 / -0.43$) but pooled $p =
 0.13$, and 1 of 24 tests reaching $p < 0.05$ is the chance expectation, so we
 report it as unresolved rather than as an effect.
 
-\textbf{Retention estimator and permutation null.} Retention is the mean
+\paragraph{Retention estimator and permutation null.} Retention is the mean
 per-game final-to-sustained-peak ratio over games with a nonzero sustained
 peak; the final is the last played checkpoint, and excluding early-committing
 games changes each tier's value by $\leq 0.03$ (bootstrap 95\% CIs
@@ -497,54 +491,46 @@ fall significantly below this null (0.79--0.84, $p \geq 0.09$), so the
 peak-to-final gap visible in Figure~\ref{fig:e1fig}b is reported as consistent
 with scoring jitter and no claim in the body rests on its size; the commitment
 record of \S\ref{sec:patterns} is behavioural and unaffected by jitter.
-Late-game stride means the second half of a game's strides.
 
-\textbf{Mixed-model coefficients.} Best checkpoint accuracy per game; Gaussian
-LMM, puzzle random intercept, tier fixed effect, ML fits, likelihood-ratio
-tests against the covariate-only model. Stride $\beta = -0.010$ per SD, 95\%
-CI $[-0.035, 0.014]$, $p = 0.42$; drift $\beta = -0.011$, $[-0.035, 0.014]$,
-$p = 0.39$; stride $\times$ tier $p = 0.20$; surface-anchor drift
-$\beta = -0.020$, $[-0.044, 0.003]$, $p = 0.097$.
+\paragraph{Mixed-model coefficients.} Best checkpoint accuracy per game;
+Gaussian LMM, puzzle random intercept, tier fixed effect, ML fits,
+likelihood-ratio tests against the covariate-only model. Stride
+$\beta = -0.010$ per SD, 95\% CI $[-0.035, 0.014]$, $p = 0.42$; drift
+$\beta = -0.011$, $[-0.035, 0.014]$, $p = 0.39$; stride $\times$ tier
+$p = 0.20$; surface-anchor drift $\beta = -0.020$, $[-0.044, 0.003]$,
+$p = 0.097$. Figure~\ref{fig:e3} shows the underlying per-trace geometry.
 
-\textbf{Environment settings and Oracle audit.} Every model call uses
-max\_tokens 2048 (thinking disabled, temperature 0.2) with a per-game budget
-of 50{,}000 tokens; exhausting the game budget forces a final answer and is
-recorded as the game outcome \texttt{token\_budget}. The Oracle audit probes a
-candidate with 25 hand-crafted (question, expected-answer) pairs over three
-puzzles, 21 with a definite yes/no answer and 4 expecting ``irrelevant''; the
-pass bar is 90\% on the yes/no items. The deployed DeepSeek-V3.1 scored 20/21
-(95\%) on yes/no and 3/4 exact on ``irrelevant''. Candidates measured in the
-pilot phase: a 4B Oracle with thinking disabled, 30\% (rejected; in that pilot
-configuration, raising Oracle accuracy from
-30\% to 100\% left the 4B Questioner's score unchanged); the same model with
-thinking enabled, 70\% (rejected); a same-family flash model, 90\% (excluded
-for sharing the Questioners' family); GLM-5.3-flash, 100\% (used in earlier
-tooling).
+\paragraph{Oracle audit and game-budget outcome.} Model-call settings are
+given in \S\ref{sec:framework}; exhausting the 50{,}000-token game budget
+forces a final answer and is recorded as the game outcome
+\texttt{token\_budget}. The Oracle audit probes a candidate with 25
+hand-crafted (question, expected-answer) pairs over three puzzles, 21 with a
+definite yes/no answer and 4 expecting ``irrelevant''; the pass bar is 90\%
+on the yes/no items. The deployed DeepSeek-V3.1 scored 20/21 (95\%) on
+yes/no and 3/4 exact on ``irrelevant''. Pilot candidates: a 4B Oracle with
+thinking disabled, 30\% (rejected; in that configuration, raising Oracle
+accuracy from 30\% to 100\% left the 4B Questioner's score unchanged); the
+same model with thinking enabled, 70\% (rejected); a same-family flash
+model, 90\% (excluded for sharing the Questioners' family); GLM-5.3-flash,
+100\% (used in earlier tooling).
 
-\textbf{Trajectory and difficulty pipeline.} Keywords are extracted with
-jieba after stripping Latin characters and digits; each keyword is embedded
-with bge-small-zh-v1.5 (normalized), and the round vector is the re-normalized
-mean of its keyword embeddings. All distances are cosine. The solution-aware
-anchor embeds the puzzle's surface, solution, and clue terms; the surface-only
-anchor embeds surface terms alone. The under-determination measure prompts
-GLM-5.3-flash (cross-family with all Questioners) for twelve cold guesses from
-the surface and scores closeness as embedding similarity between guess and
-solution under the same encoder, not with the composite score, so the
-covariate is not coupled to the outcome apparatus.
+\paragraph{Trajectory and difficulty pipeline.} The embedding pipeline is
+specified in \S\ref{sec:framework}; two details matter for reproduction.
+Keyword extraction strips Latin characters and digits before jieba
+segmentation, and the round vector is the re-normalized mean of the keyword
+embeddings. Late-game stride denotes the second half of a game's strides.
+The under-determination measure prompts GLM-5.3-flash (cross-family with all
+Questioners) for the twelve cold guesses and scores closeness as embedding
+similarity between guess and solution under the same encoder, not with the
+composite score, so the covariate is not coupled to the outcome apparatus.
 
-\textbf{Artifacts.} Harness, puzzle set with per-item source records, per-game
+\paragraph{Artifacts.} Harness, puzzle set with per-item source records, per-game
 logs (including every checkpoint story), and the analysis scripts behind each
 reported number are released at
 a public repository, withheld here for double-blind review and available to
 reviewers on request through the programme chairs. Puzzle surfaces and
 solutions originate from a public community repertoire and are redistributed
 with source attribution and a content flag.
-
-\textbf{Where the accuracy curve comes from.} E1 does not score once at the end.
-Every round, after the Oracle answers, the Questioner is required to commit its
-best complete story, and \emph{that} is scored. Each point on the accuracy
-curve is therefore a full answer written with the evidence available at that
-round.
 
 \begin{figure}[t]
 \centering
@@ -562,24 +548,24 @@ zero at every tier.}
 \includegraphics[width=\linewidth]{figures/fig3_worked.pdf}
 \captionof{figure}{One abandoning game (\texttt{refsoup\_021}, 397B, seed 2):
 the round 10--11 checkpoint stories are the solution (band), never
-volunteered, abandoned by round 19. Full rows in
-Appendix~\ref{app:metrics}.}
+volunteered, abandoned by round 19. Table~\ref{tab:game} shows seven of the
+thirty rounds.}
 \label{fig:worked}
 \end{minipage}
 \end{figure}
 
 
-\textbf{One game, worked.} Puzzle \texttt{refsoup\_021} (surface: a stormy
+\paragraph{One game, worked.} Figure~\ref{fig:worked} and
+Table~\ref{tab:game} show puzzle \texttt{refsoup\_021} (surface: a stormy
 night, a run-down temple, two photographs on the wall that seem to stare; by
-morning the narrator sees only two windows; solution:
-``there were never photos on the
-wall; people were pressing against the windows, looking in''), played by
-Qwen3.5-397B, seed~2. Table~\ref{tab:game} shows seven of thirty rounds;
-Questions and stories are our translations of the logged Chinese, stories
-abridged to the clause carrying the hypothesis. Rounds 22--30, eight
-lexically distinct re-asks of the same flooding hypothesis (e.g.\ round 25,
-whether the narrator woke floating upside down; round 28, whether rising
-water reached eye level), are in the released logs.
+morning the narrator sees only two windows; solution: ``there were never
+photos on the wall; people were pressing against the windows, looking in''),
+played by Qwen3.5-397B, seed~2. Questions and stories are our translations
+of the logged Chinese, with stories abridged to the clause carrying the
+hypothesis. Rounds 22--30, eight lexically distinct re-asks of the same
+flooding hypothesis (e.g.\ round 25, whether the narrator woke floating
+upside down; round 28, whether rising water reached eye level), are in the
+released logs.
 
 \begin{table}[h]
 \centering\footnotesize
@@ -603,18 +589,18 @@ stories are our translations; the original transcripts are in the released logs.
 \label{tab:game}
 \end{table}
 
-Three things the table shows that no mean curve can. \textbf{The checkpoint
+The table shows three things that no mean curve can. \textbf{The checkpoint
 mechanism surfaces knowledge the agent never acts on.} The round-10 committed
-story \emph{is} the solution, synthesized from earlier answers on a round whose
-own question was answered ``no''. Yet the model never volunteers a final answer in
-all thirty rounds (one of the 57/66 non-committing 397B games), and by round 19
-it has abandoned the correct reading for a falling-coverings mechanism it never
-escapes. \textbf{Stalling in fresh words happens at the largest scale too.}
-Rounds 22--30 are eight lexically distinct re-asks of the same flooding
-hypothesis, exactly the pattern lexical novelty misses. \textbf{The curve's
-round-to-round jitter is a scoring fact, not a knowledge fact.} The same
-understanding re-worded (rounds 3~$\to$~4) swings the clue half $70 \to 0$. The
-mean curves of \S\ref{sec:results} average this out, which is why single-game
-curves are not the unit of analysis.
+story \emph{is} the solution, synthesized from earlier answers on a round
+whose own question was answered ``no''. Yet the model never volunteers a
+final answer in all thirty rounds (one of the 57/66 non-committing 397B
+games), and by round 19 it has abandoned the correct reading for a
+falling-coverings mechanism it never escapes. \textbf{Circling in fresh words
+happens at the largest tier too.} Rounds 22--30 are eight lexically distinct
+re-asks of the same flooding hypothesis, exactly the pattern lexical novelty
+misses. \textbf{The curve's round-to-round jitter is a scoring fact, not a
+knowledge fact.} The same understanding re-worded (rounds 3~$\to$~4) swings
+the clue half from 70 to 0. The mean curves of \S\ref{sec:results} average
+this out, which is why single-game curves are not the unit of analysis.
 
 \end{document}
