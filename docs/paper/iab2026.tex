@@ -26,7 +26,7 @@
 \usepackage{enumitem}
 \setlist{nosep,leftmargin=1.3em}
 
-\title{Answered, Not Steered: How Interactive LLM Agents Use Yes/No Evidence}
+\title{Narrowing Without Converging:\\ How Interactive LLM Agents Search Under Feedback}
 \author{Xiaoxuan Lei \and (co-authors TBD)\\
 \small Draft v0.13 --- IAB: Interpreting Agent Behavior, Workshop @ NeurIPS 2026}
 \date{}
@@ -36,15 +36,16 @@
 \vspace{-1.8em}
 
 \begin{abstract}
-\small\noindent An interactive agent is supposed to use what it is told. We
+\small\noindent An interactive agent searching under feedback should
+contract toward the answer. These agents contract and arrive nowhere. We
 instrument Turtle Soup, a lateral-thinking game of yes/no questions, with two
-process-level probes, a forced and scored checkpoint story every round and an
-association trajectory embedded from each round's question, and run three Qwen
-tiers on 22 human-played puzzles. Interaction helps for ten of thirty rounds and
-then stops, at every tier, and neither the round budget, the Oracle, nor puzzle
-difficulty accounts for it. Three explanations a reader reaches for first are
-tested in turn. The search does narrow, four to five fold, and converges on
-nothing. The answer barely redirects it: controlling for round position, the
+process-level probes --- a forced and scored checkpoint story every round and an
+association trajectory embedded from each round's question --- and run three
+Qwen tiers on 22 human-played puzzles. Interaction helps for ten of thirty
+rounds and then stops, at every tier, and neither the round budget, the Oracle,
+nor puzzle difficulty accounts for it. The per-round step contracts four to five
+fold over the same rounds, so the search narrows while accuracy does not move.
+Three explanations are tested in turn. The answer barely redirects it: controlling for round position, the
 smallest tier's next move is statistically independent of whether it was just
 confirmed or refuted ($\Delta$ stride $+0.001$, 95\% CI $[-0.009, +0.011]$),
 while the larger two move \emph{further} after a confirmation
@@ -70,9 +71,9 @@ this story by asking yes/no questions, one per round.
 Outcome metrics can say whether an agent got there; on our set that story is
 flat, and the round budget is not the constraint (\S\ref{sec:results}). What
 they cannot say is how the agent searched: one zero-scorer never leaves its
-first hypothesis, another finds the answer and lets it go. Instruments that
-read the process, and an environment audited enough to trust them, are this
-paper's contribution. Turtle Soup suits the job: the behavior \emph{is} text, the Oracle's reply is
+first hypothesis, another finds the answer and lets it go. What the process shows is a search that
+contracts without converging, and the account of why is this paper's
+contribution. Turtle Soup suits the job: the behavior \emph{is} text, the Oracle's reply is
 a clean one-trit signal whose effect on the next move can be isolated, and
 puzzles are deliberately under-determined.
 
@@ -101,10 +102,12 @@ them in turn. H1 half-holds and misleads, H2 is refuted with the sign reversed,
 and H3 fails at the point that matters: the largest tier reaches a solution-grade
 answer in six games and volunteers one.
 
-\textbf{Contributions.} (1)~A measurement of \textbf{feedback response} in an
-interactive agent, stride conditioned on the answer received with round
-position controlled, absent at the smallest tier and inverted at the larger
-two. (2)~Two failure patterns \textbf{derived from it rather than catalogued},
+\textbf{Contributions.} (1)~A characterization of interactive search that
+\textbf{narrows without converging}: the per-round step contracts four to five
+fold at every tier while accuracy stays flat, and the feedback that should
+redirect it does not --- stride conditioned on the answer received, with round
+position controlled, is absent at the smallest tier and inverted at the larger
+two, and told ``no'' every tier moves toward what it has already ruled out. (2)~Two failure patterns \textbf{derived from it rather than catalogued},
 circling and abandoning, with per-game criteria and counts. (3)~An honest
 boundary: the geometry describes these failures but cannot score them, because
 the gap between holding the solution and having lost it is no larger than
@@ -334,7 +337,7 @@ geometry says \emph{how} an agent fails, not how well it will score.
 
 \section{Limitations and Conclusion}
 \textbf{Limitations.} Everything here comes from one game, one Oracle protocol,
-and three models of a single family; whether feedback response looks the same in
+and three models of a single family; whether search under feedback behaves this way in
 other interactive settings is untested, and the title's ``interactive LLM
 agents'' is a hypothesis about scope rather than a demonstration of one. The feedback measurement reads \emph{how far} the next
 question moves, not \emph{what} it asks; a content-level test is the natural
@@ -349,11 +352,12 @@ generation and architecture, so tier effects are model comparisons, not scaling
 laws. The source site is public and memorisation probes are pending. Puzzles
 involve death and dark themes; content-flagged.
 
-\textbf{Conclusion.} The flat curve is what happens when evidence does not steer
-the search. Told ``no'', every tier moves back toward what it has already ruled
-out; the smallest never finds the answer and circles, the largest finds it and
-does not stop. The two failures need opposite fixes, and one endpoint number
-scores them alike.
+\textbf{Conclusion.} These agents narrow without converging. The step shrinks
+four to five fold while the score stands still, and the feedback that should
+turn the search instead sends every tier back toward what it has already ruled
+out --- the smallest never finding the answer, the largest finding it and not
+stopping. The two failures need opposite fixes, and one endpoint number scores
+them alike.
 
 \begin{thebibliography}{9}\small
 \bibitem{turtlebench} Q.~Yu \emph{et al.} TurtleBench: Evaluating Top Language Models via Real-World Yes/No Puzzles. arXiv:2410.05262.
