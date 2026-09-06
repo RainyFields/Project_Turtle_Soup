@@ -8,8 +8,11 @@ from urllib.parse import urlencode, urljoin
 SITE_BASE = "https://soup.ahelumos.com"
 SITE_NAME = "ahelumos"
 
+# The site adds attributes to these anchors over time (target, rel,
+# data-home-soup-link…), so match on the href and the card class without
+# assuming attribute order or that they are adjacent.
 _LIST_CARD_ANCHOR = re.compile(
-    r'<a href="/soups/(\d+)" class="cursor-pointer group block">(.*?)</a>',
+    r'<a\s+[^>]*?href="/soups/(\d+)"[^>]*?class="cursor-pointer group block"[^>]*>(.*?)</a>',
     re.DOTALL,
 )
 _TAG_RE = re.compile(

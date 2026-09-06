@@ -1,0 +1,35 @@
+{
+ "Qwen3.5-397B-A17B": {
+  "n": 66,
+  "mean_peak": 0.386,
+  "mean_sustained_peak": 0.296,
+  "mean_final": 0.191,
+  "retention_raw": 0.518,
+  "retention_sustained": 0.734,
+  "games_final_below_half_sustained_peak": 18,
+  "games_sustained_peak_ge_0.5": 6,
+  "games_raw_peak_ge_0.5": 11
+ },
+ "Qwen3.5-4B": {
+  "n": 66,
+  "mean_peak": 0.146,
+  "mean_sustained_peak": 0.084,
+  "mean_final": 0.05,
+  "retention_raw": 0.473,
+  "retention_sustained": 0.761,
+  "games_final_below_half_sustained_peak": 19,
+  "games_sustained_peak_ge_0.5": 0,
+  "games_raw_peak_ge_0.5": 0
+ },
+ "Qwen3.6-27B": {
+  "n": 66,
+  "mean_peak": 0.314,
+  "mean_sustained_peak": 0.24,
+  "mean_final": 0.165,
+  "retention_raw": 0.534,
+  "retention_sustained": 0.687,
+  "games_final_below_half_sustained_peak": 20,
+  "games_sustained_peak_ge_0.5": 4,
+  "games_raw_peak_ge_0.5": 10
+ }
+}

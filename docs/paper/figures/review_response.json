@@ -1,0 +1,512 @@
+{
+ "retention": {
+  "Qwen3.5-397B": {
+   "n": 66,
+   "n_nonzero_peak": 66,
+   "retention_mean_of_ratios": 0.734,
+   "retention_ci95": [
+    0.647,
+    0.819
+   ],
+   "retention_ratio_of_means": 0.643,
+   "null_mean_retention": 0.796,
+   "null_ci95": [
+    0.672,
+    0.979
+   ],
+   "p_observed_at_or_below_null": 0.2345,
+   "retention_excl_committed": 0.703
+  },
+  "Qwen3.5-4B": {
+   "n": 66,
+   "n_nonzero_peak": 66,
+   "retention_mean_of_ratios": 0.761,
+   "retention_ci95": [
+    0.643,
+    0.897
+   ],
+   "retention_ratio_of_means": 0.598,
+   "null_mean_retention": 0.844,
+   "null_ci95": [
+    0.699,
+    1.046
+   ],
+   "p_observed_at_or_below_null": 0.1715,
+   "retention_excl_committed": 0.765
+  },
+  "Qwen3.6-27B": {
+   "n": 66,
+   "n_nonzero_peak": 66,
+   "retention_mean_of_ratios": 0.687,
+   "retention_ci95": [
+    0.608,
+    0.762
+   ],
+   "retention_ratio_of_means": 0.686,
+   "null_mean_retention": 0.787,
+   "null_ci95": [
+    0.658,
+    0.988
+   ],
+   "p_observed_at_or_below_null": 0.088,
+   "retention_excl_committed": 0.666
+  }
+ },
+ "wellformed": {
+  "Qwen3.5-397B": {
+   "rounds": 1838,
+   "wellformed": 1827,
+   "frac": 0.994
+  },
+  "Qwen3.5-4B": {
+   "rounds": 1967,
+   "wellformed": 1632,
+   "frac": 0.8297
+  },
+  "Qwen3.6-27B": {
+   "rounds": 1772,
+   "wellformed": 1753,
+   "frac": 0.9893
+  }
+ },
+ "e2_conditional": {
+  "Qwen3.5-397B": {
+   "5": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.186,
+    "mean_nonexhausted": 0.186
+   },
+   "10": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.185,
+    "mean_nonexhausted": 0.185
+   },
+   "15": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.206,
+    "mean_nonexhausted": 0.206
+   },
+   "20": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.209,
+    "mean_nonexhausted": 0.209
+   },
+   "25": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.197,
+    "mean_nonexhausted": 0.197
+   },
+   "30": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.201,
+    "mean_nonexhausted": 0.201
+   }
+  },
+  "Qwen3.5-4B": {
+   "5": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.05,
+    "mean_nonexhausted": 0.05
+   },
+   "10": {
+    "n": 66,
+    "exhausted": 4,
+    "mean_all": 0.05,
+    "mean_nonexhausted": 0.053
+   },
+   "15": {
+    "n": 66,
+    "exhausted": 13,
+    "mean_all": 0.041,
+    "mean_nonexhausted": 0.051
+   },
+   "20": {
+    "n": 66,
+    "exhausted": 44,
+    "mean_all": 0.02,
+    "mean_nonexhausted": 0.06
+   },
+   "25": {
+    "n": 66,
+    "exhausted": 51,
+    "mean_all": 0.02,
+    "mean_nonexhausted": 0.089
+   },
+   "30": {
+    "n": 66,
+    "exhausted": 63,
+    "mean_all": 0.004,
+    "mean_nonexhausted": 0.09
+   }
+  },
+  "Qwen3.6-27B": {
+   "5": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.167,
+    "mean_nonexhausted": 0.167
+   },
+   "10": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.184,
+    "mean_nonexhausted": 0.184
+   },
+   "15": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.14,
+    "mean_nonexhausted": 0.14
+   },
+   "20": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.172,
+    "mean_nonexhausted": 0.172
+   },
+   "25": {
+    "n": 66,
+    "exhausted": 0,
+    "mean_all": 0.176,
+    "mean_nonexhausted": 0.176
+   },
+   "30": {
+    "n": 66,
+    "exhausted": 2,
+    "mean_all": 0.176,
+    "mean_nonexhausted": 0.181
+   }
+  }
+ },
+ "e1_vs_e2": {
+  "Qwen3.5-397B": {
+   "5": {
+    "e1_checkpoint_mean": 0.189,
+    "e2_cap_final_mean": 0.186,
+    "e2_cap_final_nonexhausted": 0.186
+   },
+   "10": {
+    "e1_checkpoint_mean": 0.2,
+    "e2_cap_final_mean": 0.185,
+    "e2_cap_final_nonexhausted": 0.185
+   },
+   "15": {
+    "e1_checkpoint_mean": 0.201,
+    "e2_cap_final_mean": 0.206,
+    "e2_cap_final_nonexhausted": 0.206
+   },
+   "20": {
+    "e1_checkpoint_mean": 0.178,
+    "e2_cap_final_mean": 0.209,
+    "e2_cap_final_nonexhausted": 0.209
+   },
+   "25": {
+    "e1_checkpoint_mean": 0.19,
+    "e2_cap_final_mean": 0.197,
+    "e2_cap_final_nonexhausted": 0.197
+   },
+   "30": {
+    "e1_checkpoint_mean": 0.191,
+    "e2_cap_final_mean": 0.201,
+    "e2_cap_final_nonexhausted": 0.201
+   }
+  },
+  "Qwen3.5-4B": {
+   "5": {
+    "e1_checkpoint_mean": 0.053,
+    "e2_cap_final_mean": 0.05,
+    "e2_cap_final_nonexhausted": 0.05
+   },
+   "10": {
+    "e1_checkpoint_mean": 0.063,
+    "e2_cap_final_mean": 0.05,
+    "e2_cap_final_nonexhausted": 0.053
+   },
+   "15": {
+    "e1_checkpoint_mean": 0.053,
+    "e2_cap_final_mean": 0.041,
+    "e2_cap_final_nonexhausted": 0.051
+   },
+   "20": {
+    "e1_checkpoint_mean": 0.064,
+    "e2_cap_final_mean": 0.02,
+    "e2_cap_final_nonexhausted": 0.06
+   },
+   "25": {
+    "e1_checkpoint_mean": 0.053,
+    "e2_cap_final_mean": 0.02,
+    "e2_cap_final_nonexhausted": 0.089
+   },
+   "30": {
+    "e1_checkpoint_mean": 0.05,
+    "e2_cap_final_mean": 0.004,
+    "e2_cap_final_nonexhausted": 0.09
+   }
+  },
+  "Qwen3.6-27B": {
+   "5": {
+    "e1_checkpoint_mean": 0.18,
+    "e2_cap_final_mean": 0.167,
+    "e2_cap_final_nonexhausted": 0.167
+   },
+   "10": {
+    "e1_checkpoint_mean": 0.162,
+    "e2_cap_final_mean": 0.184,
+    "e2_cap_final_nonexhausted": 0.184
+   },
+   "15": {
+    "e1_checkpoint_mean": 0.167,
+    "e2_cap_final_mean": 0.14,
+    "e2_cap_final_nonexhausted": 0.14
+   },
+   "20": {
+    "e1_checkpoint_mean": 0.159,
+    "e2_cap_final_mean": 0.172,
+    "e2_cap_final_nonexhausted": 0.172
+   },
+   "25": {
+    "e1_checkpoint_mean": 0.177,
+    "e2_cap_final_mean": 0.176,
+    "e2_cap_final_nonexhausted": 0.176
+   },
+   "30": {
+    "e1_checkpoint_mean": 0.165,
+    "e2_cap_final_mean": 0.176,
+    "e2_cap_final_nonexhausted": 0.181
+   }
+  }
+ },
+ "mixed_model": {
+  "stride_main": {
+   "coef": -0.0102,
+   "ci95": [
+    -0.0349,
+    0.0145
+   ],
+   "lrt_p": 0.4197
+  },
+  "drift_main": {
+   "coef": -0.0107,
+   "ci95": [
+    -0.035,
+    0.0137
+   ],
+   "lrt_p": 0.3913
+  },
+  "surface_drift_main": {
+   "coef": -0.0202,
+   "ci95": [
+    -0.044,
+    0.0035
+   ],
+   "lrt_p": 0.0965
+  },
+  "spec": "response = best checkpoint accuracy per game; Gaussian LMM, puzzle random intercept, tier fixed effect, ML fits, LRTs"
+ },
+ "subscores": {
+  "Qwen3.5-397B": {
+   "n": 396,
+   "spearman": 0.3,
+   "p": 0.0
+  },
+  "Qwen3.5-4B": {
+   "n": 396,
+   "spearman": 0.062,
+   "p": 0.21808
+  },
+  "Qwen3.6-27B": {
+   "n": 396,
+   "spearman": 0.354,
+   "p": 0.0
+  },
+  "judge_intersample_mean_absdiff_of30": 0.03,
+  "judge_intersample_exact_agreement": 0.863
+ },
+ "stride_artifact_check": {
+  "method": "exact trace_geometry pipeline (jieba keywords -> bge-small-zh-v1.5 -> normalized mean round vector -> cosine stride); rounds filtered to well-formed questions (ends with question mark or interrogative pattern in last 25 chars)",
+  "Qwen3.5-4B": {
+   "mean_stride_unfiltered": 0.0493,
+   "mean_stride_wellformed_only": 0.0555,
+   "late_third_unfiltered": 0.0276,
+   "late_third_wellformed_only": 0.0287,
+   "malformed_frac": 0.17
+  },
+  "Qwen3.6-27B": {
+   "mean_stride_unfiltered": 0.1135,
+   "mean_stride_wellformed_only": 0.1184,
+   "late_third_unfiltered": 0.071,
+   "late_third_wellformed_only": 0.0812,
+   "malformed_frac": 0.011
+  },
+  "verdict": "circling signature survives exclusion of malformed rounds"
+ },
+ "pattern_classification": {
+  "criteria": "circling: late-third stride < 0.04 AND never committed AND sustained peak < 0.3; abandoning: sustained peak >= 0.3 AND final < half of sustained peak",
+  "counts": {
+   "Qwen3.5-397B": {
+    "n": 66,
+    "circling": 6,
+    "abandoning": 12,
+    "overlap": 0,
+    "final_ge_05": 2
+   },
+   "Qwen3.5-4B": {
+    "n": 66,
+    "circling": 39,
+    "abandoning": 1,
+    "overlap": 0,
+    "final_ge_05": 0
+   },
+   "Qwen3.6-27B": {
+    "n": 66,
+    "circling": 12,
+    "abandoning": 4,
+    "overlap": 0,
+    "final_ge_05": 4
+   }
+  }
+ },
+ "round2_additions": {
+  "e1_termination": {
+   "note": "E1 loop enforces no game token budget (budget applies to E2 play only); checkpoint calls sit outside any budget",
+   "early_empty_terminations": {
+    "397B": 0,
+    "4B": 0,
+    "27B": 0
+   },
+   "committed": {
+    "397B": 9,
+    "4B": 2,
+    "27B": 11
+   }
+  },
+  "solution_grade_crosstab": {
+   "threshold": 0.5,
+   "397B": {
+    "peak_ge05": 6,
+    "committed": 1,
+    "final_to_peak_ratios": [
+     0.53,
+     0.18,
+     0.87,
+     0.46,
+     0.74,
+     0.12
+    ]
+   },
+   "27B": {
+    "peak_ge05": 4,
+    "committed": 3,
+    "final_to_peak_ratios": [
+     0.86,
+     0.82,
+     0.82,
+     0.82
+    ]
+   },
+   "4B": {
+    "peak_ge05": 0
+   }
+  },
+  "stride_clustered_ci": {
+   "method": "per-puzzle means, bootstrap over 22 puzzles (2000 reps), 95% CI; late = second half of a game strides; _f = wellformed-only rounds",
+   "4B": {
+    "mean": [
+     0.0493,
+     [
+      0.0402,
+      0.0598
+     ]
+    ],
+    "late": [
+     0.0295,
+     [
+      0.0214,
+      0.0392
+     ]
+    ],
+    "mean_f": [
+     0.0555,
+     [
+      0.0451,
+      0.0667
+     ]
+    ],
+    "late_f": [
+     0.0332,
+     [
+      0.0245,
+      0.0439
+     ]
+    ]
+   },
+   "27B": {
+    "mean": [
+     0.1135,
+     [
+      0.0914,
+      0.1362
+     ]
+    ],
+    "late": [
+     0.0818,
+     [
+      0.0647,
+      0.0982
+     ]
+    ],
+    "mean_f": [
+     0.1184,
+     [
+      0.0934,
+      0.1484
+     ]
+    ],
+    "late_f": [
+     0.0879,
+     [
+      0.068,
+      0.1084
+     ]
+    ]
+   },
+   "397B": {
+    "mean": [
+     0.0881,
+     [
+      0.0782,
+      0.0989
+     ]
+    ],
+    "late": [
+     0.061,
+     [
+      0.0534,
+      0.0694
+     ]
+    ],
+    "mean_f": [
+     0.0899,
+     [
+      0.0793,
+      0.1023
+     ]
+    ],
+    "late_f": [
+     0.0642,
+     [
+      0.0548,
+      0.0747
+     ]
+    ]
+   }
+  }
+ }
+}

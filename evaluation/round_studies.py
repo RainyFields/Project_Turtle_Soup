@@ -4,20 +4,21 @@ import json
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
-from agents.base_agent import ModelConfig
+from agents.base_agent import EmptyResponseError, ModelConfig
 from agents.questioner_agent import QuestionerInputs
 from engine.config import AppConfig, GameConfig
 from engine.game import (
     TurtleSoupGame,
+    has_question_content,
     format_qa_history,
     is_final_answer_turn,
     load_puzzle,
     parse_final_answer,
 )
 from engine.trajectory import RoundRecord
-from evaluation.judge import heuristic_judge
+from evaluation.judge import LLMJudge, composite_judge, heuristic_judge
 from evaluation.study_report_html import write_json_and_html
 
 
@@ -29,18 +30,85 @@ class ModelSpec:
 
 
 @dataclass
+class JudgeSpec:
+    """How final/checkpoint answers get scored.
+
+    mode "heuristic" keeps the substring-matching judge; "composite" uses
+    composite_judge (clue recall 70 + logic 30). The logic 30 needs a rater
+    model; without provider/model the composite run scores clues only and so
+    tops out at 0.70. The grid gives both experiments a rater for that reason -
+    scoring Exp 1 on clues alone put its curve on a different scale from Exp 2's
+    while the two get read side by side.
+    """
+
+    mode: str = "heuristic"
+    provider: Optional[str] = None
+    model: Optional[str] = None
+    logic_samples: int = 3
+
+    def build_rater(self) -> Optional[LLMJudge]:
+        if self.mode != "composite" or not self.provider:
+            return None
+        return LLMJudge(provider_name=self.provider, model=self.model or "gpt-4o")
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "mode": self.mode,
+            "provider": self.provider,
+            "model": self.model,
+            "logic_samples": self.logic_samples,
+        }
+
+
+@dataclass
 class TimingRecord:
     label: str
     elapsed_s: float
     extra: Dict[str, Any] = field(default_factory=dict)
 
 
-def _judge_score(puzzle: Dict[str, Any], final_answer: Optional[str]) -> float:
-    return heuristic_judge(
-        solution=puzzle["solution"],
-        final_answer=final_answer,
-        key_clues=puzzle.get("key_clues", []),
-    ).score
+def _judge_score(
+    puzzle: Dict[str, Any],
+    final_answer: Optional[str],
+    *,
+    judge: Optional[JudgeSpec] = None,
+    rater: Optional[LLMJudge] = None,
+) -> float:
+    return _judge_detail(puzzle, final_answer, judge=judge, rater=rater)[0]
+
+
+def _judge_detail(
+    puzzle: Dict[str, Any],
+    final_answer: Optional[str],
+    *,
+    judge: Optional[JudgeSpec] = None,
+    rater: Optional[LLMJudge] = None,
+) -> Tuple[float, Optional[Dict[str, Any]]]:
+    """Score, plus the breakdown behind it.
+
+    composite_judge already computes the two halves separately, which clue was
+    hit, and every logic sample; keeping only the blended number throws all of
+    that away at no saving. It cannot be recovered afterwards without paying for
+    the judge calls again, and the open question of whether the logic half earns
+    its thirty points is answered by comparing the halves.
+    """
+    if judge is not None and judge.mode == "composite":
+        detail = composite_judge(
+            solution=puzzle["solution"],
+            final_answer=final_answer,
+            key_clues=puzzle.get("key_clues", []),
+            logic_rater=rater,
+            logic_samples=judge.logic_samples if rater is not None else 0,
+        ).to_dict()
+        return detail["score"], detail
+    return (
+        heuristic_judge(
+            solution=puzzle["solution"],
+            final_answer=final_answer,
+            key_clues=puzzle.get("key_clues", []),
+        ).score,
+        None,
+    )
 
 
 def build_app_config(
@@ -72,11 +140,13 @@ def run_round_curve(
     max_checkpoint_round: int = 30,
     oracle_provider: Optional[str] = None,
     questioner_provider: Optional[str] = None,
+    judge: Optional[JudgeSpec] = None,
 ) -> Dict[str, Any]:
     """
     Exp 1: play up to max_checkpoint_round; after each round, checkpoint-judge
     the Questioner's best answer so far (extra LLM call per round).
     """
+    rater = judge.build_rater() if judge else None
     cfg = app_config.game
     cfg.max_rounds = max_checkpoint_round
     cfg.min_rounds_before_answer = 0
@@ -93,12 +163,28 @@ def run_round_curve(
 
     traj_rounds: List[RoundRecord] = []
     accuracy_by_round: Dict[int, float] = {}
+    checkpoints_by_round: Dict[int, str] = {}
+    score_detail_by_round: Dict[int, Dict[str, Any]] = {}
     natural_end_round: Optional[int] = None
     natural_final_answer: Optional[str] = None
 
-    for round_idx in range(1, max_checkpoint_round + 1):
+    empty_turns = 0
+    round_idx = 0
+    while round_idx < max_checkpoint_round:
         history = format_qa_history(traj_rounds)
-        question = game.questioner.next_turn(history)
+        try:
+            question = game.questioner.next_turn(history)
+        except EmptyResponseError:
+            question = ""
+
+        # Exp 1 measures accuracy per *asked* round; a turn with no question
+        # in it — including one truncated down to its own markup — is not one.
+        if not has_question_content(question):
+            empty_turns += 1
+            if empty_turns >= cfg.max_empty_turns:
+                break
+            continue
+        round_idx += 1
 
         if is_final_answer_turn(question):
             parsed = parse_final_answer(question)
@@ -107,21 +193,40 @@ def run_round_curve(
                 traj_rounds.append(RoundRecord(round=round_idx, question=question, answer=answer))
                 natural_end_round = round_idx
                 natural_final_answer = parsed
+                final_score = _judge_score(puzzle, parsed, judge=judge, rater=rater)
                 for r in range(round_idx, max_checkpoint_round + 1):
-                    accuracy_by_round[r] = _judge_score(puzzle, parsed)
+                    accuracy_by_round[r] = final_score
                 break
 
         answer = game.oracle.answer(question)
         traj_rounds.append(RoundRecord(round=round_idx, question=question, answer=answer))
 
-        checkpoint = game.questioner.request_final_answer(format_qa_history(traj_rounds))
+        try:
+            checkpoint = game.questioner.request_final_answer(format_qa_history(traj_rounds))
+        except EmptyResponseError:
+            checkpoint = ""  # no checkpoint answer this round → scores 0
         checkpoint_answer = parse_final_answer(checkpoint)
-        accuracy_by_round[round_idx] = _judge_score(puzzle, checkpoint_answer)
+        checkpoints_by_round[round_idx] = checkpoint_answer or ""
+        score, detail = _judge_detail(
+            puzzle, checkpoint_answer, judge=judge, rater=rater
+        )
+        accuracy_by_round[round_idx] = score
+        if detail is not None:
+            score_detail_by_round[round_idx] = detail
 
     api_calls = len(traj_rounds) * 3  # question + oracle + checkpoint per round played
     return {
         "puzzle_id": puzzle["id"],
+        # Full text per round — the association-trajectory study (E3) reads these.
+        "qa_rounds": [
+            {"round": r.round, "question": r.question, "answer": r.answer}
+            for r in traj_rounds
+        ],
+        "checkpoints_by_round": checkpoints_by_round,
         "accuracy_by_round": accuracy_by_round,
+        # Per-round halves of the composite score. Free to keep, impossible to
+        # rebuild later without re-paying for the logic judge.
+        "score_detail_by_round": score_detail_by_round,
         "natural_end_round": natural_end_round,
         "natural_final_answer": natural_final_answer,
         "total_played_rounds": len(traj_rounds),
@@ -136,8 +241,10 @@ def run_round_cap(
     round_cap: int,
     oracle_provider: Optional[str] = None,
     questioner_provider: Optional[str] = None,
+    judge: Optional[JudgeSpec] = None,
 ) -> Dict[str, Any]:
     """Exp 2: hard cap at round_cap; force FINAL_ANSWER on last turn if needed."""
+    rater = judge.build_rater() if judge else None
     cfg = app_config.game
     cfg.max_rounds = round_cap
     cfg.min_rounds_before_answer = 0
@@ -154,12 +261,19 @@ def run_round_cap(
 
     result = game.run(verbose=False)
     traj = result.trajectory
-    score = _judge_score(puzzle, traj.final_answer)
+    score, score_detail = _judge_detail(
+        puzzle, traj.final_answer, judge=judge, rater=rater
+    )
     api_calls = traj.total_rounds * 2 + (1 if traj.final_answer else 0)
     return {
         "puzzle_id": puzzle["id"],
+        "qa_rounds": [
+            {"round": r.round, "question": r.question, "answer": r.answer}
+            for r in traj.trajectory
+        ],
         "round_cap": round_cap,
         "score": score,
+        "score_detail": score_detail,
         "final_answer": traj.final_answer,
         "total_rounds": traj.total_rounds,
         "terminated_by": traj.terminated_by,
@@ -176,6 +290,7 @@ def run_pilot(
     max_rounds: int = 30,
     round_caps: Optional[List[int]] = None,
     output_dir: Path,
+    judge: Optional[JudgeSpec] = None,
 ) -> Dict[str, Any]:
     output_dir.mkdir(parents=True, exist_ok=True)
     caps = round_caps or [5, 10, 15, 20, 25, 30]
@@ -200,6 +315,7 @@ def run_pilot(
             max_checkpoint_round=max_rounds,
             questioner_provider=questioner.provider,
             oracle_provider=oracle_provider,
+            judge=judge,
         )
         elapsed = time.perf_counter() - t0
         row["elapsed_s"] = round(elapsed, 3)
@@ -223,6 +339,7 @@ def run_pilot(
                 round_cap=cap,
                 questioner_provider=questioner.provider,
                 oracle_provider=oracle_provider,
+                judge=judge,
             )
             elapsed = time.perf_counter() - t0
             row["elapsed_s"] = round(elapsed, 3)
@@ -248,6 +365,7 @@ def run_pilot(
         "puzzle_ids": puzzle_ids,
         "questioner": questioner.__dict__,
         "oracle": {"provider": oracle_provider, "model": oracle_model},
+        "judge": (judge or JudgeSpec()).to_dict(),
         "max_rounds": max_rounds,
         "round_caps": caps,
         "api_calls": {

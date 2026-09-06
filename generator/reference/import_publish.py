@@ -11,9 +11,26 @@ from generator.schema import puzzle_dict_to_json_ready, validate_puzzle
 REFERENCE_PREFIX = "refsoup_"
 
 
+# Reference-site imports are externally verifiable, so they belong in the
+# real/ provenance folder (see data/puzzles/README.md).
+REAL_SUBDIR = "real"
+
+
+def _real_dir(puzzles_dir: Path) -> Path:
+    d = puzzles_dir / REAL_SUBDIR
+    return d if d.exists() or not puzzles_dir.exists() else d
+
+
+def _existing_reference_files(puzzles_dir: Path):
+    """refsoup_*.json in both the flat dir and real/, so ids never collide."""
+    return list(puzzles_dir.glob(f"{REFERENCE_PREFIX}*.json")) + list(
+        (puzzles_dir / REAL_SUBDIR).glob(f"{REFERENCE_PREFIX}*.json")
+    )
+
+
 def next_reference_puzzle_id(puzzles_dir: Path, prefix: str = REFERENCE_PREFIX) -> str:
     nums: List[int] = []
-    for p in puzzles_dir.glob(f"{prefix}*.json"):
+    for p in _existing_reference_files(puzzles_dir):
         m = re.match(rf"{re.escape(prefix)}(\d+)$", p.stem)
         if m:
             nums.append(int(m.group(1)))
@@ -42,7 +59,7 @@ def _save_manifest(path: Path, manifest: Dict[str, Any]) -> None:
 
 def _imported_external_ids(manifest: Dict[str, Any], puzzles_dir: Path) -> set[str]:
     ids = {str(x.get("external_id")) for x in manifest.get("imported", []) if x.get("external_id")}
-    for p in puzzles_dir.glob(f"{REFERENCE_PREFIX}*.json"):
+    for p in _existing_reference_files(puzzles_dir):
         try:
             data = json.loads(p.read_text(encoding="utf-8"))
             ext = (data.get("metadata") or {}).get("external_id")
@@ -75,7 +92,9 @@ def publish_reference_sample(
     if not ok:
         raise ValueError("reference publish validation failed: " + "; ".join(errors))
 
-    path = puzzles_dir / f"{pid}.json"
+    target_dir = puzzles_dir / REAL_SUBDIR
+    target_dir.mkdir(parents=True, exist_ok=True)
+    path = target_dir / f"{pid}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding="utf-8")
 
@@ -100,7 +119,7 @@ def publish_reference_sample(
 def clear_reference_puzzles(puzzles_dir: Path, *, manifest_path: Optional[Path] = None) -> int:
     """Remove all refsoup_*.json from puzzles_dir; optionally reset manifest."""
     removed = 0
-    for p in list(puzzles_dir.glob(f"{REFERENCE_PREFIX}*.json")):
+    for p in list(_existing_reference_files(puzzles_dir)):
         p.unlink()
         removed += 1
     if manifest_path is not None:
@@ -148,4 +167,5 @@ def select_samples_for_import(
             -float(x.get("rating") or 0),
         )
     )
-    return rows[:limit]
+    # limit <= 0 means "no cap", matching crawl_reference.py's --limit
+    return rows if limit is None or limit <= 0 else rows[:limit]

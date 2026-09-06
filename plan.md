@@ -2,7 +2,7 @@
 
 **Project**: `turtle-soup-bench`  
 **Updated**: 2026-07-08  
-**Status**: Pilot **可跑**（`run_pilot.py`）；全量 11×3×3 **未跑**
+**Status**: 题集与工具链就绪（22 道，标注 100%）；**全量网格未跑** —— 见「下一阶段」
 
 ---
 
@@ -25,7 +25,10 @@ Oracle 固定；Questioner 为对比变量。
 | Judge | `gpt-4o` LLM | **当前 pilot 用 `heuristic_judge`** |
 | Questioner | deepseek-r1 / qwq-32b / llama3.3:70b | 或本地 Ollama |
 
-**默认 pilot 题**：`refsoup_006`（经典、难度适中）。
+**默认 pilot 题**：`refsoup_008`（沙漠里的尸体）。
+
+> ⚠️ **本节以下的运行示例是历史记录，不要照抄。**它们用 `--mock` 或单题，
+> 且写于题集重建之前。正式重跑请照「下一阶段 → 怎么跑」的四条命令。
 
 **输出**：`results/pilot/<dir>/pilot_timing.json` + `pilot_timing.html`
 
@@ -45,32 +48,222 @@ Oracle 固定；Questioner 为对比变量。
 
 ```bash
 # Mock 管线验证
-python scripts/run_pilot.py --puzzles refsoup_006 --mock
+python scripts/run_pilot.py --puzzles refsoup_008 --mock
 
-# Ollama（已跑通 refsoup_006 + qwen2.5:7b，~270s）
-python scripts/run_pilot.py --puzzles refsoup_006 \
+# Ollama（已跑通 refsoup_008 + qwen2.5:7b，~270s）
+python scripts/run_pilot.py --puzzles refsoup_008 \
   --max-rounds 12 --round-caps 5 10 12 \
   --questioner-provider ollama --questioner-model qwen2.5:7b \
   --oracle-provider ollama --oracle-model qwen2.5:7b \
-  --output results/pilot/refsoup_006
+  --output results/pilot/refsoup_008
 
 # 真实 API 计时外推
 python scripts/run_real_timing.py \
-  --puzzle refsoup_006 \
+  --puzzle refsoup_008 \
   --questioner-provider qwen --questioner-model qwen-plus \
   --max-rounds 8 --round-caps 5 10
 ```
 
 ---
 
-## 待做
+## 待做（当前阶段）
 
-- [ ] 独立 CLI：`run_round_curve.py`、`run_round_cap_sweep.py`
-- [ ] `evaluation/plot_round_studies.py`
-- [ ] 全量：11 puzzles × 3 models × 3 seeds
-- [ ] 可选：pilot 切换 LLM judge；Exp 1 每 5 轮 checkpoint
+- [x] 独立 CLI：`run_round_curve.py`、`run_round_cap_sweep.py`（支持 `--seeds`、`--judge composite`、`--mock`）
+- [x] `evaluation/plot_round_studies.py`（吃 `pilot_timing.json` / 两个新 CLI 的 JSON，出 PNG）
+- [x] 把 `composite_judge` 接进 `run_game.py` / `round_studies.py`
+  - `run_game.py --composite-judge [--logic-samples N]`；judge provider/model 复用现有 flag
+  - `round_studies.py` 走 `JudgeSpec(mode="composite", provider=..., model=...)`；
+    不给 provider 则只算关键词 70 分（满分 0.70）。
+    ⚠️ **网格里 E1 和 E2 现已统一都开逻辑分** —— 否则两条曲线标度不同却被并排讨论
+- [x] 全量网格 —— **2026-09-04 完成**，见「执行状态（2026-09-04）」
+- [ ] 可选：Exp 1 每 5 轮 checkpoint（降低 checkpoint 调用量）
 
 ---
+
+# 论文 — IAB (Interpreting Agent Behavior) @ NeurIPS 2026
+
+**目标**：4 页 workshop 论文，内容 = 本 plan 的实验体系 + 创意 proposal 的故事线。
+**工作方式**：每完成一版草稿即提交给作者反馈，**收到反馈前不推进下一版**；
+认为达到"好论文"标准即停。草稿在 `docs/paper/iab2026-draft.md`。
+
+## 进度日志
+
+| 版本 | 日期 | 内容 | 状态 |
+|------|------|------|------|
+| v0.1 | 2026-08-25 | 完整 4 页结构：故事线 = "失败模式在交互轨迹几何中可读"（H1 stalling / H2 drifting / H3 predictivity）；E1–E4 实验设计；pilot 观察作初步证据；12 篇参考文献全部逐一核验（每条带链接）；文末 5 个待作者决策的问题 | ✅ 已收到部分反馈 |
+| v0.2 | 2026-08-26 | **全量 693 局跑完**（E1 99 + E2 594，零错误）。核心结果：① E1 三模型 checkpoint 准确率 30 轮全程平坦（27B≈0.20 ≥ 397B≈0.18 > 4B≈0.14）；② E2 大模型对预算不敏感（0.32–0.36），4B 随预算**单调退化**（cap15 0.23 → cap30 0.10，29/198 局 token 超限）；③ E3 几何解释平坦性且**随规模反转**：drift 斜率预测失败（pooled r=−0.28，27B −0.43），步长 4B ρ=−0.46 vs 397B +0.21；④ 提交行为分化（4B 0/33 从不提交，27B 9/33 @8.7 轮）。Figure 1 用真实 30 轮轨迹重做（4B late-step 0.003 停摆 vs 397B 0.16→0.02 探索收敛）。**PDF 已产出**（`docs/paper/iab2026.pdf`，tectonic XeLaTeX，5 页=4 正文+参考文献，中文正常）。Artifact 已更新至 v0.2 | ✅ 反馈已消化 |
+| v0.18 | 2026-09-06 | **作者逐节改写定稿**（abstract → intro → §2 → §3 → §4，作者供稿、逐节渲染验证）：摘要重写（去数字化、保留两失败框架）；引言改为五段式（谜题→评估空白→设置与探针→三假设→贡献，图 1 保留）；§2 扩为 9 个 run-in 段（新增 under-determination 定义段与 Model grid and validity controls 段，validity 内容自 §3 前言上移）；§3 去前言、六段式（plateau 两段 + H1/H2/H3 + geometry 两段），全部数字与 ground truth 核对一致；§4 重写（Limitations 合为一段 + Conclusion）。§4 超页 ~8 行由 Claude 裁剪回第 4 页（删 general-law 句、tiers-vs-scaling 重复句、topic sentence、future-work 句 + 词级收紧，"smaller"→"smallest" 修正），全部裁剪已向作者报备待否决。QA 全绿：正文收于 p4 line 159，Declaration/References 起 p5，0 overfull、无 ??、匿名与 metadata 干净 | ⏳ 待 OpenReview 提交（AoE 截稿 9/6 11:59 UTC）|
+| v0.17 | 2026-09-06 | **按 IAB CFP 实查结果转 NeurIPS 官方格式并重新收回 4 页**。CFP 关键事实：NeurIPS-style formatting，short paper ≤4 页（不含 references，附录不限），Declaration of LLM Usage 不计页数，双盲评审，投稿走 OpenReview `NeurIPS.cc/2026/Workshop/IAB`；**截稿延期至 2026-09-05 23:59 AoE（= SF 时间 9/6 04:59）**。技术改动：`neurips_2026.sty` 官方模板 `[nonatbib,dblblindworkshop]`（匿名块+行号自动）+ `[T1]fontenc+times`（tectonic TU 编码下 ptm 静默回退 Latin Modern 的坑）；Related Work 移附录 A（SPLAT/forward-flow/DAT 关键引用织回正文）；Framework+Designs 合并为 §2 段落式、H1–H3 转 run-in paragraph；删 §2 feedback 定义段（与 §H2+附录三重冗余）；新增 Declaration of LLM usage（p5 首，正文外）；fig_feedback 按 5.5in 版心源头重制（5.35×1.52 等宽三面板，text-text 碰撞清零，字号回到 ≥6pt 实际渲染）；fig1 0.86\linewidth；工作局表格列宽适配。正文精确收于 p4 末行（lineno 165），References p5、附录 A/B/C p6 起。QA：0 overfull、无 ??、匿名无泄漏、PDF metadata 干净 | 🚨 待用户 OpenReview 提交 |
+| v0.16 | 2026-09-05 | **合入 Choga 重构版并完成其交办的裁剪**：正文精确收回第 4 页（References 从 p5 char 0 起）。删重复/残留：H3 开头双重判词与残留过渡句；§4 feedback 定义三重冗余瘦身，并去掉与 §5.2 "无前提检验"相抵触的 "should move further after no" 断言（图 2 题注同步）；H1 重复的 ±0.035 界；附录两段 score-halves 重复合并；"abstract finding 4" 失效引用；图 2 面板引用 b→c；§3.1 "the the"×2 与孤立括号；表题注 "Italics" 残留。附录留存率段落补报不显著结论（0.69–0.76 vs 零模型 0.79–0.84，p≥0.09，图 1b 峰-终差明示不作主张）——守住 GT#1，同时按 Choga 730f22c 建议落定未决问题：hook 落在 commitment record 上。QA 全绿：0 overfull、无 ??、匿名无泄漏、metadata 干净 | ⏸ 等 Choga 反馈 |
+| v0.15 | 2026-09-05 | **Choga 七连提交（730f22c…affef44）**：以既有 grid 新算 feedback response 并重定主线——(puzzle, round-bin) 控制下 4B 步长对答案统计独立（+0.001），27B/397B 反号响应（+0.028/+0.009）；新增无前提方向检验：被否后三档均移向已排除区（−0.089/−0.051/−0.032），被肯后无不对称。两次改题至 "Narrowing Without Converging: How Interactive LLM Agents Search Under Feedback"；H1–H3 判词先行；全文英文化；双盲匿名化（byline、artifact URL、PDF metadata）；去掉记忆探针承诺、改为已量化熟悉度 caveat（最知名题冷启 0.61/0.53 vs 同欠定度题 0.24/0.36）；仓库只保留 tex 实际引用的资产。正文超第 4 页约 20 行，裁剪交回 co-author | ✅ 已合入 |
+| v0.13 | 2026-09-05 | **二轮模拟审稿全员倾向接收**（A minor revision / B editing alone / C lean accept，reviews/ 目录），并按其共识完成接收导向重构：单一主线贯穿摘要/贡献/结论（"一条平坦分数下藏着两种相反失败；几何看见 circling，checkpoint-commitment 记录看见 abandoning，没有审计过的环境两者都看不见"）；checkpoint 协议升格为 §3.2 具名仪器；贡献重排（仪器对→审计信条×2→模式操作化→工件）；假设改为 Q1–Q3 问句+裁决；新证据：逐局判据计数（4B 39/1，397B 6/12，零重叠）、solution-grade 交叉表（397B 提交 1/6、四局跌破半峰；27B 提交 3/4 保留 ~0.83）、聚类 CI 步长对比 + 病句剔除、Δ(r10→30) CI、E1 无预算声明、finding-4 推断修正、Oracle 误差敞口。图重做（fig1a inset+rule、fig1b 提交标记+0.5 参考线、fig2a 分布图、fig3 工作局图入正文并列）。正文精确收在第 4 页 | ⏸ 等作者反馈 |
+| v0.12 | 2026-09-04 | **模拟审稿（3 盲审 + synthesis，reviews/ 目录）已回应**：审稿人两大 blocking 关切被数据证实——留存率统计不显著低于抖动置换零模型（0.69–0.76 vs 零模型 0.79–0.84，p≥0.09）→ **"发现-丢弃平衡"从正面结论撤回、改为诚实不确定**；4B 预算退化被归因为 token 耗尽的**环境伪影**（非耗尽局 0.05–0.09 不降，且解释 E1/E2 第 30 轮矛盾）。circling 经 malformed-question 检查存活（17% 病句剔除后步长 0.049→0.056）。"scale"→tier；Oracle 审计协议/管线规格/预算/裁判一致性/翻译/工件声明入附录；abstract 第 4 条改为已报告的 30%→100% pilot。新分析脚本 `review_response_analyses.py`。正文仍恰在第 4 页收尾 | ⏸ 等作者反馈 |
+| v0.11 | 2026-09-04 | **按作者两点总结重定中心**：① 失败非预算/能力问题而是无效探索——新增 peak-retention 分析（`analyze_peak_retention.py`：sustained-peak 保留率 0.69–0.76 与规模无关，规模只抬峰值 3.5×；平坦曲线 = 发现-丢弃平衡）；② 两模式改名 **circling / abandoning**，几何+语言空间联合识别（词面只见一半）。v0.10 nature-polish（NeurIPS 2024 exemplar 语态、去破折号、术语表、k=2 修正、H2 裁决）。图用 nature-figure skill 重制（`make_figures.py`，全部 QA 通过）。§6 并入 §5.3/§7。正文仍恰在第 4 页收尾 | ⏸ 等作者反馈 |
+| v0.9 | 2026-09-04 | **§5 与摘要按新网格回填**（flatness-first 钩子经作者确认）：5.1 增益仅前 ~10 轮且仅大模型（397B 0.124→0.200 后平坦，4B 全程 ~0.05）；5.2 预算不对称（4B 0.050→0.004 单调退化，175/396 局 token 终止）+ 两半评分解离（逻辑分保留的实证）；5.3 几何解释平坦但不预测（组内 \|ρ\|≤0.16，drift LRT p=0.39，欠定度协变量 n.s. p=0.22）+ 双锚点一致（ρ=0.80，38/198 翻符号）。tex 由 md 重新生成（不打补丁），图 2 张入稿，PDF 6 页（4 页目标待 §2 裁剪，见开放问题 4）。§6 已按作者要求 4→2。附录 B 整局示例表已填（refsoup_021 / 397B / seed2：第 10 轮 checkpoint 合成出正解 1.00、随后弃解退化至 0.12、30 轮未提交 —— 单局同时演示 checkpoint 机制价值、弃解、大模型换词打转与评分抖动），**无余留 GAP** | ⏸ 等作者反馈 |
+| v0.3 | 2026-08-26 | 按作者反馈：① **摘要/引言改为平坦性结果先行**；② **混合效应分析已跑**（`scripts/mixed_effects_h3.py` → `h3_mixed_effects.json`）：puzzle 随机截距吸收 drift 信号（drift LRT p=0.28，stride×tier p=0.73，puzzle 方差 0.050）→ **H3 不成立**，论文改为主张"轨迹几何是解释性仪器而非结果预测器"（诚实呈报）；md/tex/PDF/artifact 四处同步 | ⏸ 等作者反馈 |
+
+## 作者反馈（2026-09-03）
+
+- ✅ **论文只保留最重要的结论与结果，不罗列测试/失败实验。**
+  已按此裁剪草稿 §6（四条 → 两条，被裁两条的实质已由 §3.2/§3.3/附录覆盖）。
+  重跑后回填 §5 时同样适用：报主结果与核心失败模式对比，
+  pilot 数字、评分 bug、被否决的度量等留在 plan/AGENTS，不进论文。
+- ✅ **Oracle/裁判可走 Tinker**（无 OpenRouter 余额时）：DeepSeek-V3.1 审计 95% 通过。
+
+## 作者反馈（2026-08-26）
+
+- ✅ 决策 2：**跑满 E1–E3**（Tinker 预算已批）
+- ✅ 决策 5：**Figure 1 用 pilot 数据先做**
+- ✅ 新要求：**最终交付 PDF**（本机已有 tectonic，走 LaTeX；官方 pdf skill 已装）
+- ⏳ 决策 1（故事侧重）、3（中文联想 norms）、4（标题）仍待反馈
+
+## 执行状态（2026-09-04）—— 新题集全量网格已完成
+
+- **9/9 shard 零失败**：22 题 × {Qwen3.5-4B, Qwen3.6-27B, Qwen3.5-397B-A17B} × 3 seeds，
+  E1（30 轮 checkpoint）+ E2（6 cap），全走 Tinker（Oracle/裁判 = DeepSeek-V3.1，跨家族）。
+  并行 9 shard，总墙钟 ~8h；输出 `results/grid_2026_09/`（gitignored，45MB，逐轮
+  qa_rounds/step/anchor 距离齐备，score_detail 含 key_clue/logic 两半）。
+- **E1**：增益只在前 ~10 轮且只属大模型（397B 0.124→0.200，27B 0.117→0.162，之后平坦）；
+  4B 全程平坦 ~0.05–0.06。
+- **E2**：397B/27B 对预算不敏感（~0.14–0.21）；4B 单调退化 0.050→0.004
+  （175/396 局 token_budget 终止）。
+- **子分**：所有模型逻辑分占比远高于线索分（397B 12.6/30 vs 7.2/70；4B 2.9/30 vs 0.2/70）
+  —— 两半明显测不同东西，单题 ρ=1.000 的 pilot 结论不成立，逻辑分应保留。
+- **E3/H3（`h3_mixed_effects.json`，n=198）**：负结果复现 —— drift LRT p=0.39，
+  stride×tier p=0.20；**欠定度协变量不显著**（coef −0.031，p=0.22，只吸收 ~8% puzzle 方差）
+  → puzzle 随机效应不只是难度，保持「解释性仪器而非预测器」框架（回答开放问题 1）。
+- 图已重生成：`fig_e1_curves.png` / `fig_e2_caps.png` / `fig_e3_scatter.png`（英文标注，全量程纵轴）。
+- **下一步**：按 2026-09-03 作者要求（只报最重要结论）由 `iab2026-draft.md` 回填 §5，
+  再由 md 重生成 tex/PDF。
+
+## 执行状态（2026-08-26）
+
+- **Oracle 审计通过**：Tinker Qwen3.5-397B（thinking off），yes/no 探针 15/15=100%
+  （`scripts/audit_oracle.py`，三条"与此无关"探针答"不是"，属软通过）
+- **评分修复（跑全量前的关键 bug）**：句子式 key_clues 是连续中文串，token 匹配退化为
+  精确子串 → 正确的意译答案得 0（实测 397B 解对 turtle_002 得 0.00）。已加
+  **字符 bigram 召回 ≥0.5 兜底**（`_clue_matches_answer`），修复后正确答案 70/70、
+  错误答案 0/70
+- **E1/E2 全量已启动**（⚠️ 历史记录，该批数据已作废）：9 个并行 shard，11 puzzles；
+  Questioner = Qwen3.5-4B / Qwen3.6-27B / Qwen3.5-397B-A17B；Oracle/judge = 397B；
+  E1 clue-only checkpoint 评分，E2 composite + 397B 逻辑评分（2 samples）；
+  输出 `results/full_20260826/`；`qa_rounds`（逐轮 Q/A 全文）已随报告落盘供 E3 用
+- **E3 工具链**：`evaluation/trajectory.py`（jieba 关键词 → bge-small-zh 嵌入 →
+  step size + 代理人类流形距离）+ `scripts/plot_figure1.py`；
+  ⚠️ 流形目前是代理版（汤面/汤底/key_clues 词），SWOW 版待决策 3
+
+---
+
+# 下一阶段 — 重跑与待决事项
+
+> 本节取代原「题库设计：深度 × 广度」计划。深度与广度**已合并为单一维度**并完成标注，
+> 详见下文与 `AGENTS.md`「题目难度」。
+
+## ⚠️ 首要：下一轮网格是完全重跑，不是增量
+
+自上一轮 693 局以来有**三处同时变更**，任何一处都足以让新旧数字不可比：
+
+| 变更 | 影响 |
+|------|------|
+| 题集 11 → 22 道已验证题 | **零重叠**。旧题里 6 道 LLM 生成（含 mock 占位符、三道近重复），2 道手工经典题已删 |
+| Oracle / 裁判须换家族 | 旧网格中 Qwen3.5-397B 同时是 Questioner、Oracle 和裁判，「规模效应」与「与 Oracle 的相似度」分不开 |
+| 锚点新增 `surface_only` | 旧锚点含汤底信息，换锚点后 drift 斜率在部分轨迹上符号翻转 |
+
+**论文 §5 的每个数字都需重新建立，不能与新结果并排比较。**
+
+## 需要人决定的只有两件事
+
+其余都有可用的默认值，脚本会自己往下走。
+
+1. **测哪些 Questioner。** 默认是 `Qwen3.5-4B / Qwen3.6-27B / Qwen3.5-397B-A17B`
+   经 tinker 采样，三个 seed。换模型或缩小范围：
+   `MODELS="a b" SEEDS="0" bash scripts/run_all_shards.sh <outdir>`
+2. **预算。** 22 题 × 模型数 × seed 数，E1 每题 30 轮、每轮 3 次调用，
+   E2 六个 cap 各一局。Oracle 与裁判默认走 OpenRouter（`z-ai/glm-5.3-flash`，$0），
+   需要 OpenRouter key；**没有 key 时可全走 Tinker**：
+   `ORACLE_PROVIDER=tinker ORACLE_MODEL=deepseek-ai/DeepSeek-V3.1`
+   （2026-09-03 审计通过：yes/no 20/21 = 95%，跨家族），费用记入 $2k Tinker 额度。
+   `run_full_grid.sh` 的守卫已从「不同 provider」改为「不同**模型家族**」，
+   同一 tinker 账号下 Qwen Questioner + DeepSeek Oracle 是合法组合；
+   `tinker://` checkpoint 无法从名字判家族，需显式 `QUESTIONER_FAMILY=...`。
+
+**默认锚点用哪个不需要决定** —— `analyze_grid.py` 已改为**两个锚点都算**，
+逐轮距离各存一份（`anchor_dists` 与 `surface_anchor_dists`）。
+默认值仍是 `with_solution`，只影响单独调用 `trace_geometry` 时的行为。
+
+**逻辑分是否保留也不需要现在决定** —— E1 与 E2 现已用**同一把尺**
+（都开逻辑分，`LOGIC_SAMPLES` 可调）。此前 E1 只算关键词、满分 0.70，
+而 E2 满分 1.00，两条曲线并排讨论时不可比。同尺之后，
+在 E1 上对比「仅关键词」与「关键词+逻辑」的排序即可回答这个问题。
+
+## 怎么跑
+
+```bash
+# 1. 预检：确认 token 预算对全部 22 道够用。
+#    ⚠️ 探的是 **Questioner**（预算不足时它返回空内容，整局零轮结束），
+#    所以要传实际要跑的 Questioner，不是 Oracle。默认值是 OpenRouter，没有 key 时必须改：
+python scripts/check_puzzle_runnability.py \
+  --provider tinker --model Qwen/Qwen3.5-4B
+
+# 2. 审计 Oracle：≥90%，且必须与 Questioner 不同家族
+python scripts/audit_oracle.py --provider openrouter --model z-ai/glm-5.3-flash
+
+# 3. 跑完整网格（所有分片，可中断续跑）
+bash scripts/run_all_shards.sh results/grid_2026_09
+
+# 4. 分析
+python scripts/analyze_grid.py --run results/grid_2026_09
+```
+
+`run_all_shards.sh` **跳过已完成的分片**，失败后重跑只补失败的那些；
+单个分片失败不会中断其余；结束时列出需要重试的分片。
+E1 失败则跳过该分片的 E2（否则会在坏数据上继续烧钱）。
+
+`run_full_grid.sh` 已改为：题目列表运行时从 `family="real"` 取（不会漏题也不会
+混入生成题）、Oracle 与裁判默认异构且同家族时**拒绝启动**、解释器用当前环境
+（不再硬编码 `.venv/bin/python`）。`analyze_grid.py` 现在会保存**逐轮**
+step 与 anchor 距离，而不只是均值 —— 否则核心图画不出来，跑完还得再跑一遍。
+
+## 重跑时必须一次做到位（否则要再跑一遍）
+
+**判据不是「论文需要什么」，而是「跑完之后还能不能从磁盘上的东西重算出来」。**
+这份清单最初是照论文的图倒推的，于是只列了轨迹几何，漏掉了评分：
+`_judge_score` 把 `composite_judge` 的两半窄化成一个浮点数丢掉了细节，
+而关键词那半事后能免费重算、逻辑那半不能。凡是「算出来但没落盘」的量，
+先问一句它可不可重算，不可重算的一律存下来。
+
+- [x] **两个锚点都算** —— `analyze_grid.py` 已实现，两份逐轮距离分别落盘
+- [x] **保存逐轮步长与逐轮距离** —— 已实现（`step_sizes` / `anchor_dists`）
+- [x] **`qa_rounds` 入库** —— 已实现，E1/E2 报告的每行都带逐轮问答全文
+- [ ] **跑前做可跑性预检**：`python scripts/check_puzzle_runnability.py`。
+      推理模型把 token 预算先花在思考上，预算不足时 Questioner 返回空内容、
+      整局可能零轮结束；而空轮若不被识别会被当作正常轮记入曲线
+- [ ] **Oracle 先审计**：`python scripts/audit_oracle.py --provider <p> --model <m>`，
+      通过线 ≥90%，且**必须与 Questioner 不同家族**
+
+## 待决事项
+
+- [x] ~~默认锚点用哪个~~ —— 不必再决定，两个锚点都会算出来。
+- [x] ~~逻辑分那 30 分是否保留~~ —— 不必现在决定，E1/E2 已同尺，
+      跑完在 E1 上对比「仅关键词」与「关键词+逻辑」的排序即可回答。
+- [ ] **记忆混淆检验。⚠️ 尚无脚本**，需新写（约 22 次调用）。 欠定度最低的两道恰是流传最广的两道，可能在测熟悉度而非难度。
+      记忆探针（不给汤面直接问答案）即可区分，22 次调用。
+- [ ] **难度标注的人工复核**（8–10 道报 agreement）—— LLM 标注，投稿时会被问效度来源。
+- [ ] 若接 SWOW-zh 做人类锚点：先验证覆盖率，`热气球` `抽签` 未必是 SWOW cue。
+
+## 已完成（勿重做）
+
+| 项 | 结论 |
+|----|------|
+| 题集重建 | 22 道，全部有人类游玩记录，来源隔离由代码强制并有回归测试 |
+| 难度度量 | **欠定度**，22/22 标注完成，范围 0.173–0.577。**与汤面长度无关**（r=−0.22, n.s.），可作题目层协变量 |
+| 深度 × 广度 | **已合并为欠定度**。分开测时两者都撞天花板，且本身不独立 |
+| Oracle 选型 | 四模型实测在案；准确率不是正确度量，应报互信息 |
+| 锚点问题 | 代码支持三种锚点；论文措辞已改为实际做法 |
+
+**已否决的做法**（勿重走）：汤面–汤底单点 embedding 距离（ρ=−0.005，把最浅的题判成最深）；
+依次加 key_clues 看落差（距离不单调）；深度 1–5 绝对打分（全打 4 分）；
+候选去重计数（恒为满值）；悬置细节计数（值域被汤面长度锁死）。
 
 ## 成本粗算
 
@@ -81,6 +274,26 @@ python scripts/run_real_timing.py \
 | 单题 pilot（12 轮 + 3 caps，Ollama） | ~93 calls，~270s |
 
 @ 12s/call 规划：全量合计约 **31h** API 时间。
+
+### Tinker（$2k 预算）可行性 — 2026-08-25
+
+Tinker 支持对开源大模型直接采样推理（SamplingClient），按 token 计费
+（prefill / sample / train 三档，cached prefill 打 2 折）。代表性价格（$/M tokens，prefill/sample）：
+Qwen3.5-397B-A17B $3.00/$7.50，Kimi-K2.6 $2.21/$5.49，DeepSeek-V3.1 $1.70/$4.22，
+GPT-OSS-120B $0.33/$0.84。
+
+（历史估算，题集已变）全量 11×3×3 的 Questioner 侧 token 粗算：Exp2 594 games（~18 轮/game，历史随轮增长）
+≈ 12.5M prefill + 思考型输出 ~11M sample；Exp1 99 games（30 轮 × 3 调用）≈ 8M + 6M。
+合计 ~20M prefill + ~17M sample →
+**Qwen3.5-397B 全量约 $190，Kimi-K2.6 约 $140**；就算思考 token 放大 5 倍也 <$700。
+**结论：$2k 足够在最大档位模型上跑数遍全量。**
+
+注意：
+1. ~~需新增 tinker_provider~~ **已接入**：`--questioner-provider tinker`，
+   支持 base model 名和 `tinker://` 训练 checkpoint（用法见 AGENTS.md Tinker 节）。
+2. 纯推理 OpenRouter 已接好且同类开源模型往往更便宜；Tinker 预算的**独特价值在 train 档**
+   （LoRA 微调/RL 训练 Questioner，composite score 可直接作 reward）。建议推理基准走
+   OpenRouter/qwen，Tinker 额度留给训练实验。
 
 ---
 

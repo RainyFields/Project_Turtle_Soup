@@ -1,0 +1,1433 @@
+Your Tinker SDK version is outdated. Please upgrade to the latest version.
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Session heartbeat failed for 135.03303850000157 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 165.03933750000215 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 195.0454524170018 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 225.0517478340007 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 255.0572000420034 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+Session heartbeat failed for 285.0630685000033 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 315.0692017090005 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 345.0746053340008 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 375.08076966700173 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 405.0870565000005 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+Session heartbeat failed for 435.0932358750033 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 465.0993773750015 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 495.1047824590023 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 525.1103420420004 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 555.1158786250016 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 585.1208690000021 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+Session heartbeat failed for 615.1265016670004 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 645.1319486250031 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 675.1356596250007 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 705.1382695840002 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 735.1435637920004 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 765.1501667500015 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+Session heartbeat failed for 795.1546295000007 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 825.1607126250019 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 855.1666625420003 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 885.1726202090031 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 915.178751792002 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+Session heartbeat failed for 945.1845500420022 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 975.1906980420026 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1005.1961118340005 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1035.2008025840005 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1065.2058447500021 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1095.2101735420001 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+Session heartbeat failed for 1125.2150610000026 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1155.2213515840012 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1185.2275042090005 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1215.2330042500034 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1245.2392337500023 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1275.2454676670022 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+Session heartbeat failed for 1305.2517221250018 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1335.2579615420036 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1365.2641725840003 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1395.2679519170015 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1425.274119667003 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+Session heartbeat failed for 1455.2786544170012 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1485.2839198750007 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1515.2884097500028 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1545.2927820840014 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1575.2989092090029 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1605.3050605000026 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+Session heartbeat failed for 1635.3082581250019 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1665.3143682090013 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1695.320560125001 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1725.3266949590034 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1755.331883625 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1785.3362046670009 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+Session heartbeat failed for 1815.3399383750002 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1845.3450682500006 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1875.3499657090033 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1905.3542391670017 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1935.3585724170007 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+Session heartbeat failed for 1965.3628458750027 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 1995.367790375003 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2025.373902792002 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2055.379485792 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2085.385631459001 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2115.391823834001 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+Session heartbeat failed for 2145.3970114170006 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2175.4030367090018 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2205.409220417001 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2235.415365500001 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2265.4215125420014 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+Session heartbeat failed for 2295.4276708750003 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2325.432318084 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2355.4365225 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2385.442468625002 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2415.1027732090006 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APIConnectionError: Connection error..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2445.107920417002 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+Session heartbeat failed for 2475.1130523750035 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2505.119087459003 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2535.124627584002 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2565.130861875001 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2595.1369758750006 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2625.143329417002 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+Session heartbeat failed for 2655.149511667001 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2685.1538812500003 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2715.158233209 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2745.162423375001 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+Session heartbeat failed for 2775.165260042002 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+On-demand JWT refresh failed: Request timed out.
+Session heartbeat failed for 3337.0582331250007 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+On-demand JWT refresh failed: Request timed out.
+Failed to send telemetry batch
+Traceback (most recent call last):
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 507, in wait_for
+    return await fut
+           ^^^^^^^^^
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 78, in handle_async_request
+    response = await asyncio.wait_for(
+               ^^^^^^^^^^^^^^^^^^^^^^^
+        self._transport.execute(pyqwest_request), remaining_time(deadline)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/tasks.py", line 506, in wait_for
+    async with timeouts.timeout(timeout):
+               ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/bytedance/miniconda3/lib/python3.13/asyncio/timeouts.py", line 116, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 996, in request
+    response = await self._client.send(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1629, in send
+    response = await self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1657, in _send_handling_auth
+    response = await self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1694, in _send_handling_redirects
+    response = await self._send_single_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/httpx/_client.py", line 1730, in _send_single_request
+    response = await transport.handle_async_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/pyqwest/httpx/_transport.py", line 92, in handle_async_request
+    raise map_timeout_error(e, request) from e
+httpx.ReadTimeout: timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 156, in _send_batch_with_retry
+    return await self._send_batch(batch)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/lib/telemetry.py", line 165, in _send_batch
+    return await client.telemetry.send(request=request, timeout=HTTP_TIMEOUT_SECONDS)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/resources/telemetry.py", line 41, in send
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1259, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/bytedance/Project_Turtle_Soup/.venv/lib/python3.13/site-packages/tinker/_base_client.py", line 1014, in request
+    raise APITimeoutError(request=request) from err
+tinker.APITimeoutError: Request timed out.
+On-demand JWT refresh failed: Request timed out.
+On-demand JWT refresh failed: Request timed out.
+On-demand JWT refresh failed: Request timed out.
+Session heartbeat failed for 5273.698312667002 seconds for session ed1183c4-e647-5118-961e-d6b5d6809023. Last exception: APITimeoutError: Request timed out..
+Your connection may be unreliable or Tinker is down. If this persists, the session will be terminated.
+On-demand JWT refresh failed: Request timed out.
+On-demand JWT refresh failed: Connection error.
+Request failed with non-retryable error: ValueError: Error retrieving result: Error code: 401 - {'detail': 'Invalid JWT'} with status 401 for self.request_id='ed1183c4-e647-5118-961e-d6b5d6809023:sample:0:93' and expected type self.model_cls=<class 'tinker.SampleResponse'>
+[curve] refsoup_001 seed=0: rounds=30 end=None (513.79s)
+[tinker] ValueError on attempt 1; retrying in 6.0s
+[curve] refsoup_003 seed=0: rounds=30 end=None (6683.621s)
+[curve] refsoup_004 seed=0: rounds=30 end=None (471.037s)
+[curve] refsoup_005 seed=0: rounds=30 end=None (692.227s)
+[curve] refsoup_006 seed=0: rounds=30 end=None (548.271s)
+[curve] refsoup_008 seed=0: rounds=30 end=None (380.707s)
+[curve] refsoup_009 seed=0: rounds=30 end=None (638.543s)
+[curve] refsoup_010 seed=0: rounds=30 end=None (476.172s)
+[curve] refsoup_012 seed=0: rounds=30 end=None (587.502s)
+[curve] refsoup_013 seed=0: rounds=30 end=None (421.095s)
+[curve] refsoup_017 seed=0: rounds=30 end=None (629.455s)
+[curve] refsoup_019 seed=0: rounds=30 end=None (344.461s)
+[curve] refsoup_021 seed=0: rounds=30 end=None (565.224s)
+[curve] refsoup_022 seed=0: rounds=30 end=None (427.685s)
+[curve] refsoup_023 seed=0: rounds=30 end=None (546.909s)
+[curve] refsoup_024 seed=0: rounds=30 end=None (1058.894s)
+[curve] refsoup_026 seed=0: rounds=30 end=None (770.141s)
+[curve] refsoup_027 seed=0: rounds=30 end=None (360.127s)
+[curve] refsoup_028 seed=0: rounds=30 end=None (662.043s)
+[curve] refsoup_029 seed=0: rounds=30 end=None (494.831s)
+[curve] refsoup_030 seed=0: rounds=30 end=None (366.543s)
+[curve] refsoup_031 seed=0: rounds=30 end=None (395.443s)
+Report: results/grid_2026_09/Qwen_Qwen3.5-4B_s0/curve/round_curve.json
+HTML:   results/grid_2026_09/Qwen_Qwen3.5-4B_s0/curve/round_curve.html

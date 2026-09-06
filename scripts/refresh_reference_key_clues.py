@@ -15,6 +15,21 @@ from generator.schema import puzzle_dict_to_json_ready, validate_puzzle
 
 
 def main() -> int:
+    print(
+        "This script uses the lexicon-based extractor, which was written for the\n"
+        "first ten puzzles and emits mid-sentence fragments and clues too short to\n"
+        "survive paraphrase on anything else. Running it would overwrite the\n"
+        "current annotations with worse ones.\n\n"
+        "Use instead:  python scripts/refresh_key_clues_llm.py\n"
+        "Pass --i-know-this-is-the-old-extractor to run it anyway.",
+        file=sys.stderr,
+    )
+    if "--i-know-this-is-the-old-extractor" not in sys.argv:
+        return 2
+    return _run()
+
+
+def _run() -> int:
     puzzles_dir = ROOT / "data" / "puzzles"
     updated = 0
     for path in sorted(puzzles_dir.glob("refsoup_*.json")):

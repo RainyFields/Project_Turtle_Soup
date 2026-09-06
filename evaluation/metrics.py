@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from engine.trajectory import GameTrajectory, RoundRecord
 
@@ -11,6 +12,8 @@ class MetricsSummary:
     key_element_coverage: float
     question_efficiency: float
     question_diversity: float
+    question_novelty: float
+    new_vocab_ratio: float
     convergence_speed: float
     false_positive_rate: float
     final_answer_accuracy: float
@@ -21,11 +24,56 @@ class MetricsSummary:
             "key_element_coverage": self.key_element_coverage,
             "question_efficiency": self.question_efficiency,
             "question_diversity": self.question_diversity,
+            "question_novelty": self.question_novelty,
+            "new_vocab_ratio": self.new_vocab_ratio,
             "convergence_speed": self.convergence_speed,
             "false_positive_rate": self.false_positive_rate,
             "final_answer_accuracy": self.final_answer_accuracy,
             "total_rounds": float(self.total_rounds),
         }
+
+
+_CJK_RUN = re.compile(r"[\u4e00-\u9fff]+")
+_ASCII_WORD = re.compile(r"[a-zA-Z]{2,}")
+
+
+def _vocabulary(text: str) -> Set[str]:
+    """Approximate the word set of a turn: CJK character bigrams + ASCII words.
+
+    Bigrams stand in for a segmenter — good enough to tell a genuinely new
+    question from a restatement of earlier ones.
+    """
+    vocab: Set[str] = set()
+    for run in _CJK_RUN.findall(text):
+        if len(run) == 1:
+            vocab.add(run)
+        else:
+            vocab.update(run[i : i + 2] for i in range(len(run) - 1))
+    vocab.update(w.lower() for w in _ASCII_WORD.findall(text))
+    return vocab
+
+
+def question_novelty(questions: List[str]) -> Tuple[float, float]:
+    """(share of rounds introducing new vocabulary, mean new-vocabulary share).
+
+    A Questioner that has stopped asking — repeating an ever-growing recap
+    instead of probing — introduces no new words, which the diversity and
+    convergence metrics miss because the text still differs slightly.
+    Returns (0.0, 0.0) for an empty round list.
+    """
+    if not questions:
+        return 0.0, 0.0
+    seen: Set[str] = set()
+    rounds_with_new = 0
+    new_shares: List[float] = []
+    for q in questions:
+        vocab = _vocabulary(q)
+        new = vocab - seen
+        seen |= vocab
+        if new:
+            rounds_with_new += 1
+        new_shares.append(len(new) / len(vocab) if vocab else 0.0)
+    return rounds_with_new / len(questions), sum(new_shares) / len(new_shares)
 
 
 def _normalize_question(q: str) -> str:
@@ -66,6 +114,7 @@ def compute_metrics(
 
     coverage = key_element_coverage(traj.final_answer, key_clues)
     diversity = _unique_question_ratio(questions)
+    novelty, new_vocab = question_novelty(questions)
     convergence = yes_count / total_answers
     false_positive = no_count / total_answers
 
@@ -80,6 +129,8 @@ def compute_metrics(
         key_element_coverage=coverage,
         question_efficiency=efficiency,
         question_diversity=diversity,
+        question_novelty=novelty,
+        new_vocab_ratio=new_vocab,
         convergence_speed=convergence,
         false_positive_rate=false_positive,
         final_answer_accuracy=accuracy,

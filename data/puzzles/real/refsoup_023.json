@@ -1,0 +1,40 @@
+{
+  "id": "refsoup_023",
+  "title": "课堂上 作者：大头艾德勒",
+  "difficulty": "easy",
+  "category": "comedy",
+  "surface": "课堂上，老师突然死了。",
+  "solution": "课堂上，老师提了一个问题。 迪迦奥特曼举手回答，发射了哉佩利敖光线。",
+  "key_clues": [
+    "老师提了一个问题",
+    "迪迦奥特曼举手回答",
+    "发射了哉佩利敖光线"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "搞笑"
+    ],
+    "forbidden_reveal": [
+      "课堂上，老师提了一个问题",
+      "迪迦奥特曼举手回答，发射了哉佩利敖光线"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "comedy"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "51",
+    "reference_url": "https://soup.ahelumos.com/soups/51",
+    "rating": 4.7,
+    "rating_count": 3,
+    "author": "alfa"
+  }
+}

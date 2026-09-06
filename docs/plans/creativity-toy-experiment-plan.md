@@ -92,7 +92,7 @@ Configuration goes in `config.yaml` under a new `creativity:` key (generator poo
 
 - Select **6 fresh community puzzles** (post-2025 sources preferred), 3 intuitively *open-ended* (many plausible stories) + 3 intuitively *constrained*. Import via the existing R-branch tooling (`scripts/import_reference_puzzles.py` pattern) into `data/puzzles/creativity_001…006.json` with `source_type: community`. Record the human intuition (`expected_openness: high|low`) in metadata — this is the informal prediction that H1's profiles should confirm or refute.
 - For 2 of the 6, draft a **novel variant** with `generator/create` (same surface twist, new hidden story), review through the Step E UI, publish as `creativity_00X_v2.json` with `source_type: novel`, `novel_variant_of` set.
-- Do **not** reuse `refsoup_*` classics as primary toy puzzles (assumed contaminated); keep `refsoup_006` only as a debug fixture.
+- Do **not** reuse `refsoup_*` classics as primary toy puzzles (assumed contaminated); keep `refsoup_008` only as a debug fixture.
 - Run `scripts/run_memcheck.py`: for every (puzzle, model in generator pool ∪ agent pool), cold-prompt with the 汤面 and ask for the 汤底; score near-verbatim recall with the existing judge at high threshold (≥0.8 → flagged). Store flags in `data/creativity/memcheck.json`.
 
 **Exit criterion**: 8 puzzle files validate against schema; memcheck flags recorded (flags don't block the toy run; they annotate it).

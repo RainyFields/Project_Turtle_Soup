@@ -12,7 +12,7 @@
 |------|------|
 | **物理隔离** | `data/reference/`（参考原文）与 `data/puzzles/`（发布题库）平级，互不混用 |
 | **单点发布** | 只有 Step E 人工确认后，才调用 `publish` 写入 `data/puzzles/turtle_NNN.json` |
-| **Schema 单源** | 候选与发布题均经 `generator/schema.py` 校验，字段对齐 `refsoup_006.json` 等 benchmark 题 |
+| **Schema 单源** | 候选与发布题均经 `generator/schema.py` 校验，字段对齐 `refsoup_008.json` 等 benchmark 题 |
 | **来源标记** | 发布题强制 `metadata.source = "generated"`，并记录 `generator_batch` |
 | **分析不喂原文** | Layer B 输出统计/模板；生成 prompt 用脱敏特征，降低洗稿风险 |
 | **git 边界** | `data/reference/`、`data/generator/` 本地 gitignore；**不进仓库、不对外分发** |
@@ -100,10 +100,14 @@ python scripts/review_ui.py     # http://127.0.0.1:8765/
 python scripts/crawl_reference.py --sort rating_desc --max-pages 3
 
 # 预览：短 + 经典
+# ⚠️ --replace 会删光现有题库（含两轮人工审核与关键词重抽）。
+# 增补题目请用 --external-ids <站点id...>
 python scripts/import_reference_puzzles.py --replace --require-classic \
   --max-surface-chars 120 --max-solution-chars 200 --limit 10 --dry-run
 
 # 导入 → data/puzzles/refsoup_001.json …
+# ⚠️ --replace 会删光现有题库（含两轮人工审核与关键词重抽）。
+# 增补题目请用 --external-ids <站点id...>
 python scripts/import_reference_puzzles.py --replace --require-classic \
   --max-surface-chars 120 --max-solution-chars 200 --limit 10
 ```
@@ -112,12 +116,12 @@ python scripts/import_reference_puzzles.py --replace --require-classic \
 
 导入记录见 `data/generator/reference_import/manifest.json`。
 
-评测选题（默认示例题 `refsoup_006`）：
+评测选题（默认示例题 `refsoup_008`）：
 
 ```bash
-python scripts/run_game.py --puzzle refsoup_006 ...
+python scripts/run_game.py --puzzle refsoup_008 ...
 python scripts/run_benchmark.py --puzzles refsoup ...
-python scripts/run_pilot.py --puzzles refsoup_006 --mock
+python scripts/run_pilot.py --puzzles refsoup_008 --mock
 ```
 
 ---
@@ -272,7 +276,7 @@ python scripts/publish_puzzle.py \
 data/
 ├── puzzles/                          # ✅ 发布面（git 跟踪）
 │   ├── turtle_*.json …
-│   └── refsoup_006.json …          # R 支线参考导入
+│   └── refsoup_008.json …          # R 支线参考导入
 ├── reference/                        # 🔒 参考原文（gitignore）
 │   ├── parsed/samples.jsonl
 │   └── raw/                          # 可选 HTML 快照
@@ -337,7 +341,7 @@ scripts/
 发布后的 `data/puzzles/turtle_NNN.json` 与 `refsoup_NNN.json` **格式相同**，可直接用于：
 
 ```bash
-python scripts/run_game.py --puzzle refsoup_006 --mock
+python scripts/run_game.py --puzzle refsoup_008 --mock
 python scripts/run_benchmark.py --puzzles refsoup --mock
 ```
 
@@ -360,3 +364,32 @@ python scripts/run_benchmark.py --puzzles refsoup --mock
 ## 实现状态
 
 A→E 与 R 支线均已可用。后续非阻塞：benchmark M4b、更多 provider、发布前 mock smoke test。
+
+---
+
+## 下一阶段：题库的深度与广度
+
+当前管线只产出与参考站同类的**经典短汤（单解、线性推理）**。Benchmark 需要两个新维度
+（完整计划见仓库根 [`plan.md`](../plan.md)「下一阶段」）：
+
+### 深度 — 刁钻问题题库
+
+目标：朴素提问路径走不通，必须做非平凡的假设跳跃。
+
+- **Layer C**：`create/controllers.py` 目前只按 B 层统计抽样 category/difficulty，
+  没有「刁钻度」控制维度，需要新增可控机制。
+- **Layer D**：可加自动筛选 —— 用一个强 Questioner 试解候选，N 轮内被解出的判为深度不足。
+  实测参照：`refsoup_008` 被 `z-ai/glm-5.3-flash` 5 轮线性推到底。
+
+### 广度 — 一个汤面多个成立的解答
+
+**这不是加个字段就行**，`solution` 是单个字符串，整条链路按单解写死：
+
+| 位置 | 需要改什么 |
+|------|-----------|
+| `schema.py` | `REQUIRED_TOP_LEVEL` 含 `solution: str`，需扩成多解结构并向后兼容 |
+| `../agents/oracle_agent.py` | 模板只注入一个 `solution`；多解下是非判定规则需重新定义 |
+| `../evaluation/judge.py` | `composite_judge` 需按**最佳匹配解**打分 |
+| `key_clues` | 需按解分组，否则关键词分会跨解混算 |
+
+**待决**：多解时 Oracle 对「A 解成立、B 解不成立」的问题该答什么？这决定 schema 怎么设计。

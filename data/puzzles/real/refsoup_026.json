@@ -1,0 +1,44 @@
+{
+  "id": "refsoup_026",
+  "title": "高度",
+  "difficulty": "hard",
+  "category": "mystery",
+  "surface": "我们的高度不同 花盆碎了 我们高度相同",
+  "solution": "我是侏儒症，我喜欢一个女孩，她因为我是侏儒症很讨厌我。我每天都会偷偷跟踪她去家里，因为个子矮小从来没有被发现过。 有一次，我不小心打碎了花瓶，女孩发现我后惊恐地报警，因此我坐了几年牢。我怀恨在心，出狱后我把她的腿锯掉了。",
+  "key_clues": [
+    "我是侏儒症",
+    "喜欢一个女孩",
+    "偷偷跟踪她去家里",
+    "女孩发现我后报警",
+    "因此坐了几年牢",
+    "出狱后锯掉她的腿"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过"
+    ],
+    "forbidden_reveal": [
+      "我是侏儒症，我喜欢一个女孩，她因为我是侏儒症很讨",
+      "我每天都会偷偷跟踪她去家里，因为个子矮小从来没有",
+      "有一次，我不小心打碎了花瓶，女孩发现我后惊恐地报",
+      "我怀恨在心，出狱后我把她的腿锯掉了"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "mystery"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "63",
+    "reference_url": "https://soup.ahelumos.com/soups/63",
+    "rating": 10.0,
+    "rating_count": 2,
+    "author": "gougoudan"
+  }
+}

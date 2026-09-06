@@ -15,7 +15,7 @@ python scripts/setup_env.py
 python scripts/check_env.py
 cp config.local.yaml.example config.local.yaml   # optional
 
-python scripts/run_game.py --puzzle refsoup_006 --mock
+python scripts/run_game.py --puzzle refsoup_008 --mock
 ```
 
 ## Providers
@@ -43,21 +43,21 @@ python scripts/run_game.py --puzzle refsoup_006 --mock
 ## Running
 
 ```bash
-python scripts/run_game.py --puzzle refsoup_006
+python scripts/run_game.py --puzzle refsoup_008
 
-python scripts/run_game.py --puzzle refsoup_006 \
+python scripts/run_game.py --puzzle refsoup_008 \
   --questioner-provider zai --questioner-model glm-4.7 \
   --oracle-provider zai --oracle-model glm-4.7
 
-python scripts/run_pilot.py --puzzles refsoup_006 --mock
+python scripts/run_pilot.py --puzzles refsoup_008 --mock
 
-python scripts/run_pilot.py --puzzles refsoup_006 \
+python scripts/run_pilot.py --puzzles refsoup_008 \
   --questioner-provider ollama --questioner-model qwen2.5:7b \
   --oracle-provider ollama --oracle-model qwen2.5:7b \
   --max-rounds 12 --round-caps 5 10 12
 
 python scripts/run_real_timing.py \
-  --puzzle refsoup_006 --questioner-provider qwen --questioner-model qwen-plus \
+  --puzzle refsoup_008 --questioner-provider qwen --questioner-model qwen-plus \
   --max-rounds 8 --round-caps 5 10
 ```
 
@@ -67,6 +67,8 @@ Reports: `results/pilot/` or `results/real_timing/` (JSON + HTML).
 
 ```bash
 python scripts/crawl_reference.py --sort rating_desc --max-pages 3
+# ⚠️ --replace 会删光现有题库（含两轮人工审核与关键词重抽）。
+# 增补题目请用 --external-ids <站点id...>
 python scripts/import_reference_puzzles.py --replace --require-classic \
   --max-surface-chars 120 --max-solution-chars 200 --limit 10
 ```

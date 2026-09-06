@@ -1,0 +1,40 @@
+{
+  "id": "refsoup_022",
+  "title": "后退",
+  "difficulty": "easy",
+  "category": "comedy",
+  "surface": "他后退了两步， 他死了。",
+  "solution": "一个帅小伙是高空作业工人，下班约会前看着玻璃反光突然自恋起来，后退两步想看看ootd，结果掉下去摔死了。",
+  "key_clues": [
+    "高空作业工人",
+    "看玻璃反光自恋",
+    "想看看ootd",
+    "掉下去摔死"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "搞笑"
+    ],
+    "forbidden_reveal": [
+      "一个帅小伙是高空作业工人，下班约会前看着玻璃反光"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "comedy"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "118",
+    "reference_url": "https://soup.ahelumos.com/soups/118",
+    "rating": 4.8,
+    "rating_count": 10,
+    "author": "Yunhe004"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "refsoup_027",
+  "title": "上帝已死",
+  "difficulty": "hard",
+  "category": "original",
+  "surface": "都在无谓地等死。毕竟上帝已死。",
+  "solution": "人类是机器人的造物主。机器人的使命是服务人类。自从人类死光了之后机器人就无所事事，因此机器人也没必要维持机器人用能源，一直待机，直到最后没电了关机。",
+  "key_clues": [
+    "人类是机器人的造物主",
+    "机器人的使命是服务人类",
+    "人类死光了",
+    "机器人无所事事"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "原创"
+    ],
+    "forbidden_reveal": [
+      "人类是机器人的造物主",
+      "机器人的使命是服务人类",
+      "自从人类死光了之后机器人就无所事事，因此机器人也"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "original"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "149",
+    "reference_url": "https://soup.ahelumos.com/soups/149",
+    "rating": 10.0,
+    "rating_count": 1,
+    "author": "lanuage"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "refsoup_024",
+  "title": "同伴",
+  "difficulty": "easy",
+  "category": "comedy",
+  "surface": "我的同伴被吃掉了，我却在微笑跳舞",
+  "solution": "我是植物大战僵尸里的向日葵",
+  "key_clues": [
+    "植物大战僵尸",
+    "我是向日葵"
+  ],
+  "oracle_rules": {
+    "answerable_topics": [
+      "人物",
+      "地点",
+      "时间",
+      "原因",
+      "经过",
+      "搞笑",
+      "清汤"
+    ],
+    "forbidden_reveal": [
+      "我是植物大战僵尸里的向日葵"
+    ]
+  },
+  "metadata": {
+    "source": "reference",
+    "language": "zh",
+    "tags": [
+      "comedy",
+      "everyday"
+    ],
+    "reference_site": "ahelumos",
+    "external_id": "88",
+    "reference_url": "https://soup.ahelumos.com/soups/88",
+    "rating": 4.0,
+    "rating_count": 3,
+    "author": "wtf"
+  }
+}

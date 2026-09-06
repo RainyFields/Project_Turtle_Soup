@@ -21,3 +21,23 @@ data/generator/
 
 # pytest
 .pytest_cache/
+
+# Working notes not yet merged into plan.md
+temp_plan.md
+
+# Paper structure spec — working document, not yet merged into the handoff
+docs/paper/paper-outline.md
+
+# LaTeX build artifacts (TinyTeX added locally 2026-09-05)
+docs/paper/*.aux
+docs/paper/*.log
+docs/paper/*.out
+
+# Paper drafts and working notes: the compiled tex is the artifact.
+# Kept out of the repo 2026-09-05 so that what ships and what is tracked agree.
+docs/paper/iab2026-draft*.md
+docs/paper/*.alignment.json
+docs/paper/*.alignment.svg
+docs/paper/figures/*.alignment.json
+docs/paper/figures/*.alignment.svg
+docs/paper/figures/*.collision-audit.json
